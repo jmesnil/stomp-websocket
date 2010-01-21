@@ -10,7 +10,7 @@ var stomp = function (url){
   var client, ws, login, passcode;
   
   debug = function(str) {
-    $("#debug").append("<p>"+str+"</p>");
+    $("#debug").append(str + "\n");
   }
 
   onclose = function()
@@ -20,14 +20,14 @@ var stomp = function (url){
 
   onopen = function() {
     debug('Web Socket Opened...');
-    debug("[CONNECT]: " + login + " " + passcode);
+    transmit("CONNECT", {'login': login, 'passcode': passcode});
     // send to the server a CONNECT frame
     // FIXME this should go in onmessage when receiving a CONNECTED:
     if (client.onconnect) {
       client.onconnect();
     }
   };
-
+  
   onmessage = function(evt) {
     debug('[RECEIVE] ' + evt);
     // next, check what type of message RECEIPT, ERROR, CONNECTED, RECEIVE
@@ -40,7 +40,42 @@ var stomp = function (url){
       client.onreceive(evt);
     }
   };
+  
+  transmit = function(command, headers, body)
+  {
+    frame = command + '\n';
+    for (header in headers) {
+      if(headers.hasOwnProperty(header)) {
+        frame = frame + header + ': ' + headers[header] + '\n';
+      }
+    }
+    frame = frame + '\n';
+    if (body) {
+      frame = frame + body;
+    }
+    frame = frame + '\0';
+    debug(">>> " + frame);
+    //ws.send(frame);
+  }
 
+  Message = function(headers, body)
+  {
+    this.headers = headers;
+    this.body = body;
+    this.toString = function() {
+      frame = "MESSAGE\n";
+      for (header in headers) {
+        if(headers.hasOwnProperty(header)) {
+          frame = frame + header + ': ' + headers[header] + '\n';
+        }
+      }
+      frame = frame + '\n';
+      if (body) {
+        frame = frame + body;
+      }
+      return frame;
+    };
+  }
   client = {};
 
   client.connect = function(login_, passcode_) {
@@ -54,30 +89,32 @@ var stomp = function (url){
   };
 
   client.disconnect = function() {
-    debug("[DISCONNECT]");
+    transmit("DISCONNECT");
     // send to the server a DISCONNECT frame
-    debug("Disconnecting...");
     ws.close();
     if (client.ondisconnect) {
       client.ondisconnect();
     }
   };
 
-  client.send = function(headers, body) {
-    debug("[SEND] " + headers + " " + body);
-    // send to the server
-    // dataStr = "...."
-    // Stomp.ws.send(dataStr);
+  client.send = function(destination, headers, body) {
+    headers.destination = destination;
+    transmit("SEND", headers, body);
   };
 
   client.subscribe = function(destination, ack) {
-    debug("[SUBSCRIBE] " + destination + " " + ack);
-    // send to the server a SUBSCRIBE frame
+    headers = {'destination': destination};
+    if (ack) {
+      headers.ack = ack;
+    } else {
+      headers.ack = 'auto';
+    }
+    transmit("SUBSCRIBE", headers);
   };
 
   client.unsubscribe = function(destination) {
-    debug("[UNSUBSCRIBE] " + destination);
-    // send to the server a UNSUBSCRIBE frame
+    headers = {'destination': destination};
+    transmit("UNSUBSCRIBE", headers);
   };
 
   // FIXME temporary exposes the handlers to simulate events

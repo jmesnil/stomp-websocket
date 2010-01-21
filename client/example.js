@@ -7,13 +7,13 @@ $(document).ready(function(){
     
     var client = stomp(url);
     client.onreceive = function(message) {
-      debug(">>> got message " + message);
+      debug("<<< " + message);
     }
     client.onconnect = function() {
-      debug(">>> [CONNECTED] to Stomp ");
+      debug("<<< connected to Stomp");
     };
     client.ondisconnect = function() {
-      debug(">>> [DISCONNECTED] to Stomp ");
+      debug("<<< disconnected from Stomp");
     };
 
     client.connect(login, passcode);
@@ -21,9 +21,14 @@ $(document).ready(function(){
     // FIXME simutate openging the web socket
     client.onopen();
 
+    client.send("/queue/test", {foo: 1}, "hello, world!");
+    
     client.subscribe("/queue/test");
+    
     // FIXME simutate receiving a message
-    client.onmessage("wtf");
+    message = new Message({destination: "/queue/test", foo: 1},
+                          "hello, world!");
+    client.onmessage(message);
 
     client.unsubscribe("/queue/test");
     
