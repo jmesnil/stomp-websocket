@@ -4,17 +4,20 @@
 // * onreceive    => to receive STOMP messages
 // * onreceipt    => to receive STOMP receipts
 // * onerror      => to receive STOMP errors
+//
+// client can also define a debug(str) handler to display debug infos
 
 var stomp = function (url){
 
   var client, ws, login, passcode;
   
   debug = function(str) {
-    $("#debug").append(str + "\n");
-  }
+    if (client.debug) {
+      client.debug(str);
+    }
+  };
 
-  onclose = function()
-  {
+  onclose = function() {
     debug("Whoops! Looks like you lost internet connection or the server went down");
   };
 
@@ -41,8 +44,7 @@ var stomp = function (url){
     }
   };
   
-  transmit = function(command, headers, body)
-  {
+  transmit = function(command, headers, body) {
     frame = command + '\n';
     for (header in headers) {
       if(headers.hasOwnProperty(header)) {
@@ -58,8 +60,7 @@ var stomp = function (url){
     //ws.send(frame);
   }
 
-  Message = function(headers, body)
-  {
+  Message = function(headers, body) {
     this.headers = headers;
     this.body = body;
     this.toString = function() {
@@ -76,6 +77,7 @@ var stomp = function (url){
       return frame;
     };
   }
+
   client = {};
 
   client.connect = function(login_, passcode_) {

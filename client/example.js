@@ -6,9 +6,12 @@ $(document).ready(function(){
     passcode = $("#connect_passcode").val();
     
     var client = stomp(url);
+    client.debug = function(str) {
+      $("#debug").append(str + "\n");
+    };
     client.onreceive = function(message) {
       debug("<<< " + message);
-    }
+    };
     client.onconnect = function() {
       debug("<<< connected to Stomp");
     };
