@@ -8,6 +8,10 @@ body {
   padding: 10px;
 }
 
+#subscribe {
+  display: none;
+}
+
 #debug {
   background-color: #F0F0F0;
   font-size: 12px;

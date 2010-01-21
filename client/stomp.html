@@ -23,7 +23,11 @@
                <input id='connect_passcode' type=password placeholder="User Password" value="wombats">
             </li>
             <li>
-               <input type=submit id='connect_submit'>
+               <label for=destination>Destination</label>
+               <input id='destination' placeholder="Destination" value="/queue/test">
+            </li>
+            <li>
+               <input type=submit id='connect_submit' value="Connect">
             </li>
         </ol>
       </form>
@@ -32,7 +36,7 @@
     <div id="messages">
     </div>
     <form id='send_form'>
-      <input id='send_form_input' type='text' disabled />
+      <input id='send_form_input' placeholder="Type your message here" disabled />
     </form>
   </body>
 </html>
