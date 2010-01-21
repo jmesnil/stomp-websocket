@@ -70,6 +70,16 @@ var stomp = function (url){
     // Stomp.ws.send(dataStr);
   };
 
+  client.subscribe = function(destination, ack) {
+    debug("[SUBSCRIBE] " + destination + " " + ack);
+    // send to the server a SUBSCRIBE frame
+  };
+
+  client.unsubscribe = function(destination) {
+    debug("[UNSUBSCRIBE] " + destination);
+    // send to the server a UNSUBSCRIBE frame
+  };
+
   // FIXME temporary exposes the handlers to simulate events
   client.onmessage = onmessage;
   client.onopen = onopen;

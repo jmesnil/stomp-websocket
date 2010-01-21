@@ -20,8 +20,12 @@ $(document).ready(function(){
     
     // FIXME simutate openging the web socket
     client.onopen();
+
+    client.subscribe("/queue/test");
     // FIXME simutate receiving a message
     client.onmessage("wtf");
+
+    client.unsubscribe("/queue/test");
     
     client.disconnect();
 
