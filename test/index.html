@@ -1,32 +1,19 @@
 <html>
 <head>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  <title>Stomp Over Web Socket</title>
   <link rel="stylesheet" href="qunit.css" media="screen" />
   <script src="qunit.js"></script>
-  <script src="../src/stomp.js"></script>
 
-  <script>
-  $(document).ready(function(){
-module("Stomp Frame");
+  <script src="../dist/stomp.js"></script>
 
-test("create a CONNECT frame", function() {
-  //FIXME how can I have frame without creating stomp first?
-  stomp("foo");
-
-  frame = new Frame("CONNECT", {login: 'jmesnil', passcode: 'wombats'});
-  equals( "CONNECT", frame.command);
-  same({login: 'jmesnil', passcode: 'wombats'}, frame.headers);
-  ok(frame.body === undefined);
-});
-
-});
-  </script>
+  <script src="unit/websocket.js"></script>
+  <script src="unit/frame.js"></script>
   
 </head>
 <body>
-  <h1 id="qunit-header">Stomp Over Web Sockets</h1>
- <h2 id="qunit-banner"></h2>
- <h2 id="qunit-userAgent"></h2>
- <ol id="qunit-tests"></ol>
+  <h1 id="qunit-header">Stomp Over Web Socket</h1>
+  <h2 id="qunit-banner"></h2>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
 </body>
 </html>
