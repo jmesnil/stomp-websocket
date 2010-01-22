@@ -1,5 +1,5 @@
 module("Web Sockets");
 
-test("Check Web Sockets are supported", function() {
-  ok(WebSocket);
+test("check Web Sockets support", function() {
+  ok(WebSocket, "this browser support Web Sockets");
 });
