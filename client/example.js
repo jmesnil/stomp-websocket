@@ -15,7 +15,7 @@ $(document).ready(function(){
     client.onreceive = function(message) {
       debug("received " + message);
     };
-    client.onconnect = function() {
+    client.onconnect = function(frame) {
       debug("connected to Stomp");
       $('#connect').fadeOut({ duration: 'fast' });
       $('#connect').remove();

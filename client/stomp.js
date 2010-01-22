@@ -39,7 +39,7 @@
       // when RECEIPT is received, call onreceipt
       frame = unmarshall(evt);
       if (frame.command === "CONNECTED" && client.onconnect) {
-        client.onconnect();
+        client.onconnect(frame);
       } else if (frame.command === "MESSAGE" && client.onreceive) {
         client.onreceive(frame);
       } else if (frame.command === "RECEIPT" && client.onreceipt) {
