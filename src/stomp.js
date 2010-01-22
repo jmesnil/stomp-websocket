@@ -39,46 +39,10 @@
       }
     };
 
-    unmarshall = function(evt) {
-      // this is where the Stomp frame will be unmarshalled
-      // and a Frame created.
-      // For now, we hack by having evt BE a Frame :(
-      return evt;
-    }
-
     transmit = function(command, headers, body) {
-      frame = command + '\n';
-      for (header in headers) {
-        if(headers.hasOwnProperty(header)) {
-          frame = frame + header + ': ' + headers[header] + '\n';
-        }
-      }
-      frame = frame + '\n';
-      if (body) {
-        frame = frame + body;
-      }
-      frame = frame + '\0';
-      debug(">>> " + frame);
-      //ws.send(frame);
-    }
-
-    Frame = function(command, headers, body) {
-      this.command = command;
-      this.headers = headers;
-      this.body = body;
-      this.toString = function() {
-        frame = command + '\n';
-        for (header in headers) {
-          if(headers.hasOwnProperty(header)) {
-            frame = frame + header + ': ' + headers[header] + '\n';
-          }
-        }
-        frame = frame + '\n';
-        if (body) {
-          frame = frame + body;
-        }
-        return frame;
-      };
+      out = marshall(command, headers, body);
+      debug(">>> " + out);
+      //ws.send(out);
     }
 
     client = {};

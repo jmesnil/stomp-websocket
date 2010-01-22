@@ -6,6 +6,7 @@
     <mkdir dir="${dist}" />
     <concat destfile="${lib.file}">
       <fileset file="src/intro.js" />
+      <fileset file="src/frame.js" />
       <fileset file="src/stomp.js" />
       <fileset file="src/outro.js" />
     </concat>
