@@ -25,26 +25,36 @@
 
     onopen = function() {
       debug('Web Socket Opened...');
-      transmit("CONNECT", {'login': login, 'passcode': passcode});
-      // send to the server a CONNECT frame
-      // FIXME this should go in onmessage when receiving a CONNECTED:
-      if (client.onconnect) {
-        client.onconnect();
-      }
+      transmit("CONNECT", {login: login, passcode: passcode});
+      // onconnect handler will be called from onmessage when a CONNECTED frame is received
     };
 
     onmessage = function(evt) {
-      debug('[RECEIVE] ' + evt);
+      debug('<<< ' + evt);
       // next, check what type of message RECEIPT, ERROR, CONNECTED, RECEIVE
       // and create appropriate js objects and calls handler for received messags
       // when CONNECTED is received, call onconnect
       // when RECEIVE is received, call onreceive
       // when ERROR is received, call onerror
       // when RECEIPT is received, call onreceipt
-      if (client.onreceive) {
-        client.onreceive(evt);
+      frame = unmarshall(evt);
+      if (frame.command === "CONNECTED" && client.onconnect) {
+        client.onconnect();
+      } else if (frame.command === "MESSAGE" && client.onreceive) {
+        client.onreceive(frame);
+      } else if (frame.command === "RECEIPT" && client.onreceipt) {
+        client.onreceipt(frame);
+      } else if (frame.command === "ERROR" && client.onerror) {
+        client.onerror(frame);
       }
     };
+
+    unmarshall = function(evt) {
+      // this is where the Stomp frame will be unmarshalled
+      // and a Frame created.
+      // For now, we hack by having evt BE a Frame :(
+      return evt;
+    }
 
     transmit = function(command, headers, body) {
       frame = command + '\n';
@@ -108,7 +118,7 @@
     };
 
     client.subscribe = function(destination, ack) {
-      headers = {'destination': destination};
+      headers = {destination: destination};
       if (ack) {
         headers.ack = ack;
       } else {
@@ -118,7 +128,7 @@
     };
 
     client.unsubscribe = function(destination) {
-      headers = {'destination': destination};
+      headers = {destination: destination};
       transmit("UNSUBSCRIBE", headers);
     };
 

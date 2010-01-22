@@ -13,32 +13,35 @@ $(document).ready(function(){
       $("#debug").append(str + "\n");
     };
     client.onreceive = function(message) {
-      debug("<<< " + message);
+      debug("received " + message);
     };
     client.onconnect = function() {
-      debug("<<< connected to Stomp");
+      debug("connected to Stomp");
       $('#connect').fadeOut({ duration: 'fast' });
       $('#connect').remove();
       $('#send_form_input').removeAttr('disabled');
     };
     client.ondisconnect = function() {
-      debug("<<< disconnected from Stomp");
+      debug("disconnected from Stomp");
     };
 
     client.connect(login, passcode);
     
-    // FIXME simutate openging the web socket
+    // FIXME simutate opening the web socket
     client.onopen();
+    // FIMXE simulate CONNECTED response
+    client.onmessage(new Frame("CONNECTED"));
 
     client.subscribe(destination);
 
-    client.send("/queue/test", {foo: 1}, "hello, world!");
+    client.send(destination, {foo: 1}, "hello, world!");
     
     // FIXME simutate receiving a message
-    message = new Frame("MESSAGE", {destination: "/queue/test", foo: 1},
+    message = new Frame("MESSAGE", {destination: destination, foo: 1},
                           "hello, world!");
     client.onmessage(message);
     
+    client.unsubscribe(destination)
     client.disconnect();
 
     return false;
