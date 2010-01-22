@@ -138,7 +138,7 @@
 
     return client;
   };
-
+  
   window.stomp = stomp;
 
 })(window);
