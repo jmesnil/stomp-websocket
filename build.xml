@@ -1,0 +1,19 @@
+<project name="stomp-websocket" default="build" basedir=".">
+  <property name="dist" value="dist" />
+  <property name="lib.file" value="${dist}/stomp.js" />
+  
+  <target name="build" description="-> build library">
+    <mkdir dir="${dist}" />
+    <concat destfile="${lib.file}">
+      <fileset file="src/intro.js" />
+      <fileset file="src/stomp.js" />
+      <fileset file="src/outro.js" />
+    </concat>
+    <echo message="created ${lib.file}" />
+  </target>
+
+  <target name="clean" description="-> clean project">
+    <delete dir="${dist}" />
+  </target>
+
+</project>

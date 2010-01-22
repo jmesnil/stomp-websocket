@@ -1,0 +1,3 @@
+window.stomp = stomp;
+
+})(window);
