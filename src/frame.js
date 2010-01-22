@@ -5,7 +5,7 @@ Stomp.frame = function(command, headers, body) {
     headers: headers,
     body: body,
     toString: function() {
-      out = command + '\n';
+      var out = command + '\n';
       if (headers) {
         for (header in headers) {
           if(headers.hasOwnProperty(header)) {
