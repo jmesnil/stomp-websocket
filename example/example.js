@@ -3,12 +3,12 @@ $(document).ready(function(){
   var client;
 
   $('#connect_form').submit(function() {
-    url = $("#connect_url").val();
-    login = $("#connect_login").val();
-    passcode = $("#connect_passcode").val();
-    destination = $("#destination").val();
+    var url = $("#connect_url").val();
+    var login = $("#connect_login").val();
+    var passcode = $("#connect_passcode").val();
+    var destination = $("#destination").val();
 
-    client = stomp(url);
+    var client = Stomp.client(url);
 
     // this allows to display debug logs directly on the web page
     client.debug = function(str) {
@@ -35,8 +35,8 @@ $(document).ready(function(){
 
     // FIXME simutate opening the web socket
     client.onopen();
-    // FIMXE simulate CONNECTED response from the server
-    client.onmessage(stompFrame("CONNECTED")); // => trigges a call to client.onconnect()
+    // FIXME simulate CONNECTED response from the server
+    client.onmessage(Stomp.frame("CONNECTED")); // => trigges a call to client.onconnect()
 
     // Oonce the client is connected, it can send messages to the server
     client.send(destination, {foo: 1}, "hello, world!");
@@ -45,7 +45,7 @@ $(document).ready(function(){
     client.subscribe(destination);
 
     // FIXME simulates receiving a message
-    message = stompFrame("MESSAGE", {destination: destination, foo: 1},
+    var message = Stomp.frame("MESSAGE", {destination: destination, foo: 1},
                           "hello, world!");
     client.onmessage(message); // => triggers a call to client.onreceive()
 

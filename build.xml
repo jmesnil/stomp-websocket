@@ -7,7 +7,7 @@
     <concat destfile="${lib.file}">
       <fileset file="src/intro.js" />
       <fileset file="src/frame.js" />
-      <fileset file="src/stomp.js" />
+      <fileset file="src/client.js" />
       <fileset file="src/outro.js" />
     </concat>
     <echo message="created ${lib.file}" />

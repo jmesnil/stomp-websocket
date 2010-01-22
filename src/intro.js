@@ -8,3 +8,5 @@
 // client can also define a debug(str) handler to display debug infos
 
 (function(window) {
+  
+  var Stomp = {};

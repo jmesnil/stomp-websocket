@@ -1,3 +1,3 @@
-window.stomp = stomp;
+window.Stomp = Stomp;
 
 })(window);
