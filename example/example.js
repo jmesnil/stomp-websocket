@@ -36,7 +36,7 @@ $(document).ready(function(){
     // FIXME simutate opening the web socket
     client.onopen();
     // FIMXE simulate CONNECTED response from the server
-    client.onmessage(new Frame("CONNECTED")); // => trigges a call to client.onconnect()
+    client.onmessage(stompFrame("CONNECTED")); // => trigges a call to client.onconnect()
 
     // Oonce the client is connected, it can send messages to the server
     client.send(destination, {foo: 1}, "hello, world!");
@@ -45,7 +45,7 @@ $(document).ready(function(){
     client.subscribe(destination);
 
     // FIXME simulates receiving a message
-    message = new Frame("MESSAGE", {destination: destination, foo: 1},
+    message = stompFrame("MESSAGE", {destination: destination, foo: 1},
                           "hello, world!");
     client.onmessage(message); // => triggers a call to client.onreceive()
 
