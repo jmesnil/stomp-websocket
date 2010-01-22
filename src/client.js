@@ -1,4 +1,3 @@
-
   Stomp.client = function (url){
 
     var that, ws, login, passcode;
@@ -67,6 +66,7 @@
     };
 
     that.send = function(destination, headers, body) {
+      headers = headers || {};
       headers.destination = destination;
       transmit("SEND", headers, body);
     };
