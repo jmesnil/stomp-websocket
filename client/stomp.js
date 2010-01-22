@@ -62,11 +62,12 @@
       //ws.send(frame);
     }
 
-    Message = function(headers, body) {
+    Frame = function(command, headers, body) {
+      this.command = command;
       this.headers = headers;
       this.body = body;
       this.toString = function() {
-        frame = "MESSAGE\n";
+        frame = command + '\n';
         for (header in headers) {
           if(headers.hasOwnProperty(header)) {
             frame = frame + header + ': ' + headers[header] + '\n';

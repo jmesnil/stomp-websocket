@@ -35,7 +35,7 @@ $(document).ready(function(){
     client.send("/queue/test", {foo: 1}, "hello, world!");
     
     // FIXME simutate receiving a message
-    message = new Message({destination: "/queue/test", foo: 1},
+    message = new Frame("MESSAGE", {destination: "/queue/test", foo: 1},
                           "hello, world!");
     client.onmessage(message);
     
