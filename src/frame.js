@@ -3,17 +3,19 @@ Frame = function(command, headers, body) {
   this.headers = headers;
   this.body = body;
   this.toString = function() {
-    frame = command + '\n';
-    for (header in headers) {
-      if(headers.hasOwnProperty(header)) {
-        frame = frame + header + ': ' + headers[header] + '\n';
+    out = command + '\n';
+    if (headers) {
+      for (header in headers) {
+        if(headers.hasOwnProperty(header)) {
+          out = out + header + ': ' + headers[header] + '\n';
+        }
       }
     }
-    frame = frame + '\n';
+    out = out + '\n';
     if (body) {
-      frame = frame + body;
+      out = out + body;
     }
-    return frame;
+    return out;
   };
 }
 
@@ -25,18 +27,6 @@ unmarshall = function(evt) {
 }
 
 marshall = function(command, headers, body) {
-  out = command + '\n';
-  if (headers) {
-    for (header in headers) {
-      if(headers.hasOwnProperty(header)) {
-        out = out + header + ': ' + headers[header] + '\n';
-      }
-    }
-  }
-  out = out + '\n';
-  if (body) {
-    out = out + body;
-  }
-  out = out + '\0';
-  return out;
+  frame f = new Frame(command, headers, body);
+  return f.toString();
 }
