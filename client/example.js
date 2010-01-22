@@ -57,4 +57,10 @@ $(document).ready(function(){
 
     return false;
   });
+  
+  $('#send_form').submit(function() {
+    alert("Not implemented yet :)");
+    return false;
+  });
+  
 });
