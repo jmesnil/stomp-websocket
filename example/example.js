@@ -20,6 +20,10 @@ $(document).ready(function(){
       $('#connect').fadeOut({ duration: 'fast' });
       $('#connect').remove();
       $('#send_form_input').removeAttr('disabled');
+      
+      client.send(destination, {foo: 1}, "hello, world!");
+      
+      client.subscribe(destination);
     };
     // the client is notified when it is disconnected from the server.
     client.ondisconnect = function() {
@@ -34,26 +38,25 @@ $(document).ready(function(){
     client.connect(login, passcode);
 
     // FIXME simutate opening the web socket
-    client.onopen();
+    //client.onopen();
     // FIXME simulate CONNECTED response from the server
-    client.onmessage(Stomp.frame("CONNECTED")); // => trigges a call to client.onconnect()
+    //client.onmessage(Stomp.frame("CONNECTED")); // => trigges a call to client.onconnect()
 
     // Oonce the client is connected, it can send messages to the server
-    client.send(destination, {foo: 1}, "hello, world!");
 
     // Then, the client subscribes to a destination
-    client.subscribe(destination);
+    //client.subscribe(destination);
 
     // FIXME simulates receiving a message
-    var message = Stomp.frame("MESSAGE", {destination: destination, foo: 1},
-                          "hello, world!");
-    client.onmessage(message); // => triggers a call to client.onreceive()
+    //var message = Stomp.frame("MESSAGE", {destination: destination, foo: 1},
+    //                      "hello, world!");
+    //client.onmessage(message); // => triggers a call to client.onreceive()
 
     // The client can unsubscribe from the destination to stop receive messages
-    client.unsubscribe(destination)
+    //client.unsubscribe(destination)
 
     // Finally, it disconnects from the server
-    client.disconnect(); // => triggers a call to client.ondisconnect()
+    //client.disconnect(); // => triggers a call to client.ondisconnect()
 
     return false;
   });

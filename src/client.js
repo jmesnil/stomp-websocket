@@ -19,21 +19,25 @@
     };
 
     onmessage = function(evt) {
-      debug('<<< ' + evt);
+      debug('<<< ' + evt.data);
       // next, check what type of message RECEIPT, ERROR, CONNECTED, RECEIVE
       // and create appropriate js objects and calls handler for received messags
       // when CONNECTED is received, call onconnect
       // when RECEIVE is received, call onreceive
       // when ERROR is received, call onerror
       // when RECEIPT is received, call onreceipt
-      var frame = Stomp.unmarshall(evt);
-      if (frame.command === "CONNECTED" && that.onconnect) {
+      var frame = Stomp.unmarshall(evt.data);
+      if (frame.indexOf("CONNECTED") > -1 && that.onconnect) {
+      //if (frame.command === "CONNECTED" && that.onconnect) {
         that.onconnect(frame);
-      } else if (frame.command === "MESSAGE" && that.onreceive) {
+      } else if (frame.indexOf("MESSAGE") && that.onreceive) {
+      //} else if (frame.command === "MESSAGE" && that.onreceive) {
         that.onreceive(frame);
-      } else if (frame.command === "RECEIPT" && that.onreceipt) {
+      } else if (frame.indexOf("RECEIPT") && that.onreceipt) {
+      //} else if (frame.command === "RECEIPT" && that.onreceipt) {
         that.onreceipt(frame);
-      } else if (frame.command === "ERROR" && that.onerror) {
+      } else if (frame.indexOf("ERROR") && that.onerror) {
+      // } else if (frame.command === "ERROR" && that.onerror) {
         that.onerror(frame);
       }
     };
@@ -41,7 +45,7 @@
     transmit = function(command, headers, body) {
       var out = Stomp.marshall(command, headers, body);
       debug(">>> " + out);
-      //ws.send(out);
+      ws.send(out);
     }
 
     that = {};
