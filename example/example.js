@@ -1,14 +1,14 @@
 $(document).ready(function(){
 
-  var client;
+  var client, destination;
 
   $('#connect_form').submit(function() {
     var url = $("#connect_url").val();
     var login = $("#connect_login").val();
     var passcode = $("#connect_passcode").val();
-    var destination = $("#destination").val();
+    destination = $("#destination").val();
 
-    var client = Stomp.client(url);
+    client = Stomp.client(url);
 
     // this allows to display debug logs directly on the web page
     client.debug = function(str) {
@@ -21,8 +21,6 @@ $(document).ready(function(){
       $('#connect').remove();
       $('#send_form_input').removeAttr('disabled');
       
-      client.send(destination, {foo: 1}, "hello, world!");
-      
       client.subscribe(destination);
     };
     // the client is notified when it is disconnected from the server.
@@ -31,7 +29,7 @@ $(document).ready(function(){
     };
     // the client is notified every time it receives a message from the server
     client.onreceive = function(message) {
-      debug("received " + message);
+      $("#messages").append("<p>" + message.body + "</p>\n");
     };
 
     // First thing is to connect with the credentials
@@ -62,7 +60,8 @@ $(document).ready(function(){
   });
   
   $('#send_form').submit(function() {
-    alert("Not implemented yet :)");
+    var text = $('#send_form_input').val();
+    client.send(destination, {foo: 1}, text);
     return false;
   });
   
