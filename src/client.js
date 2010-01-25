@@ -27,17 +27,13 @@
       // when ERROR is received, call onerror
       // when RECEIPT is received, call onreceipt
       var frame = Stomp.unmarshall(evt.data);
-      if (frame.indexOf("CONNECTED") > -1 && that.onconnect) {
-      //if (frame.command === "CONNECTED" && that.onconnect) {
+      if (frame.command === "CONNECTED" && that.onconnect) {
         that.onconnect(frame);
-      } else if (frame.indexOf("MESSAGE") && that.onreceive) {
-      //} else if (frame.command === "MESSAGE" && that.onreceive) {
+      } else if (frame.command === "MESSAGE" && that.onreceive) {
         that.onreceive(frame);
-      } else if (frame.indexOf("RECEIPT") && that.onreceipt) {
-      //} else if (frame.command === "RECEIPT" && that.onreceipt) {
+      } else if (frame.command === "RECEIPT" && that.onreceipt) {
         that.onreceipt(frame);
-      } else if (frame.indexOf("ERROR") && that.onerror) {
-      // } else if (frame.command === "ERROR" && that.onerror) {
+      } else if (frame.command === "ERROR" && that.onerror) {
         that.onerror(frame);
       }
     };
