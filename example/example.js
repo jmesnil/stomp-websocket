@@ -21,7 +21,7 @@ $(document).ready(function(){
       $('#connect').remove();
       $('#send_form_input').removeAttr('disabled');
       
-      client.subscribe(destination, 'ack', {}, function(message) {
+      client.subscribe(destination, {}, function(message) {
         $("#messages").append("<p>" + message.body + "</p>\n");
       });
     };
@@ -30,29 +30,7 @@ $(document).ready(function(){
       debug("disconnected from Stomp");
     };
 
-    // First thing is to connect with the credentials
     client.connect(login, passcode);
-
-    // FIXME simutate opening the web socket
-    //client.onopen();
-    // FIXME simulate CONNECTED response from the server
-    //client.onmessage(Stomp.frame("CONNECTED")); // => trigges a call to client.onconnect()
-
-    // Oonce the client is connected, it can send messages to the server
-
-    // Then, the client subscribes to a destination
-    //client.subscribe(destination);
-
-    // FIXME simulates receiving a message
-    //var message = Stomp.frame("MESSAGE", {destination: destination, foo: 1},
-    //                      "hello, world!");
-    //client.onmessage(message); // => triggers a call to client.onreceive()
-
-    // The client can unsubscribe from the destination to stop receive messages
-    //client.unsubscribe(destination)
-
-    // Finally, it disconnects from the server
-    //client.disconnect(); // => triggers a call to client.ondisconnect()
 
     return false;
   });

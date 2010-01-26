@@ -105,9 +105,9 @@
       if (frame.command === "CONNECTED" && that.onconnect) {
         that.onconnect(frame);
       } else if (frame.command === "MESSAGE") {
-        var listener = listeners[frame.headers.destination];
-        if (listener) {
-          listener(frame);
+        var onreceive = subscriptions[frame.headers.destination];
+        if (onreceive) {
+          onreceive(frame);
         }
       } else if (frame.command === "RECEIPT" && that.onreceipt) {
         that.onreceipt(frame);
@@ -144,25 +144,22 @@
     };
 
     that.send = function(destination, headers, body) {
-      headers = headers || {};
+      var headers = headers || {};
       headers.destination = destination;
       transmit("SEND", headers, body);
     };
 
-    that.subscribe = function(destination, ack, headers, callback) {
+    that.subscribe = function(destination, headers, callback) {
       var headers = headers || {};
       headers.destination = destination;
-      if (ack) {
-        headers.ack = ack;
-      } else {
-        headers.ack = 'auto';
-      }
-      listeners[destination] = callback;
+      subscriptions[destination] = callback;
       transmit("SUBSCRIBE", headers);
     };
 
-    that.unsubscribe = function(destination) {
-      var headers = {destination: destination};
+    that.unsubscribe = function(destination, headers) {
+      var headers = headers || {};
+      headers.destination = destination;
+      delete subscriptions[destination];
       transmit("UNSUBSCRIBE", headers);
     };
 
