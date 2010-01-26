@@ -2,27 +2,11 @@
 
 The project is hosted on [GitHub](http://github.com/jmesnil/stomp-websocket).
 
-## Build
-
-To build the library, use Apache Ant from the root directory:
-
-    $ cd stomp-websocket
-    $ ant
-    Buildfile: build.xml
-
-    build:
-        [mkdir] Created dir: /Users/jmesnil/Git/stomp-websocket/dist
-         [echo] created dist/stomp.js
-
-    BUILD SUCCESSFUL
-    Total time: 0 seconds
-    
-The library file will be located in `dist/stomp.js`.  
+The library file will be located in `src/stomp.js`.  
 It does not require any dependency (except Web Socket support from the browser!)
 
 ## Test
 
-* Build the library
 * Open in your web browser the [test page](test/index.html)
 * Check all tests pass
 

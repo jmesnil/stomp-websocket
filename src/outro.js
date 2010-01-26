@@ -1,3 +1,0 @@
-window.Stomp = Stomp;
-
-})(window);
