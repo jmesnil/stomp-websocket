@@ -74,6 +74,8 @@
   Stomp.client = function (url){
 
     var that, ws, login, passcode;
+    // subscriptions callback indexed by destination
+    var subscriptions = {};
 
     debug = function(str) {
       if (that.debug) {
@@ -102,8 +104,11 @@
       var frame = Stomp.unmarshall(evt.data);
       if (frame.command === "CONNECTED" && that.onconnect) {
         that.onconnect(frame);
-      } else if (frame.command === "MESSAGE" && that.onreceive) {
-        that.onreceive(frame);
+      } else if (frame.command === "MESSAGE") {
+        var listener = listeners[frame.headers.destination];
+        if (listener) {
+          listener(frame);
+        }
       } else if (frame.command === "RECEIPT" && that.onreceipt) {
         that.onreceipt(frame);
       } else if (frame.command === "ERROR" && that.onerror) {
@@ -144,7 +149,7 @@
       transmit("SEND", headers, body);
     };
 
-    that.subscribe = function(destination, ack, headers) {
+    that.subscribe = function(destination, ack, headers, callback) {
       var headers = headers || {};
       headers.destination = destination;
       if (ack) {
@@ -152,6 +157,7 @@
       } else {
         headers.ack = 'auto';
       }
+      listeners[destination] = callback;
       transmit("SUBSCRIBE", headers);
     };
 
@@ -159,10 +165,6 @@
       var headers = {destination: destination};
       transmit("UNSUBSCRIBE", headers);
     };
-
-    // FIXME temporary exposes the handlers to simulate events
-    that.onmessage = onmessage;
-    that.onopen = onopen;
 
     return that;
   };

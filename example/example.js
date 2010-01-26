@@ -21,15 +21,13 @@ $(document).ready(function(){
       $('#connect').remove();
       $('#send_form_input').removeAttr('disabled');
       
-      client.subscribe(destination);
+      client.subscribe(destination, 'ack', {}, function(message) {
+        $("#messages").append("<p>" + message.body + "</p>\n");
+      });
     };
     // the client is notified when it is disconnected from the server.
     client.ondisconnect = function() {
       debug("disconnected from Stomp");
-    };
-    // the client is notified every time it receives a message from the server
-    client.onreceive = function(message) {
-      $("#messages").append("<p>" + message.body + "</p>\n");
     };
 
     // First thing is to connect with the credentials

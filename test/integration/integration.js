@@ -17,7 +17,9 @@ $(document).ready(function(){
   // the client is notified when it is connected to the server.
   client.onconnect = function(frame) {
       debug("connected to Stomp");
-      client.subscribe(destination, "auto", {receipt: 123});
+      client.subscribe(destination, "auto", {receipt: 123}, function(frame) {
+        client.disconnect();
+      });
   };
   client.onerror = function(frame) {
       debug("connected to Stomp");
@@ -28,9 +30,6 @@ $(document).ready(function(){
   client.onreceipt = function() {
     debug("receipt from Stomp");
     client.send(destination, {foo: 1}, "test")
-  };
-  client.onreceive = function(message) {
-    client.disconnect();
   };
 
   client.connect(login, passcode);
