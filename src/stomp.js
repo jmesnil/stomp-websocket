@@ -144,8 +144,9 @@
       transmit("SEND", headers, body);
     };
 
-    that.subscribe = function(destination, ack) {
-      var headers = {destination: destination};
+    that.subscribe = function(destination, ack, headers) {
+      var headers = headers || {};
+      headers.destination = destination;
       if (ack) {
         headers.ack = ack;
       } else {
