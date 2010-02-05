@@ -1,8 +1,8 @@
 $(document).ready(function(){
 
-  var url = "ws://localhost:61613/stomp";
-  var login = "brianm";
-  var passcode = "wombats"
+  var url = "ws://localhost:61614/stomp";
+  var login = "guest";
+  var passcode = "guest"
   var destination = "/queue/test";
   
   $("#server_url").text(url);
