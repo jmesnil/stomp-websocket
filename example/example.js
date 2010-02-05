@@ -37,8 +37,10 @@ $(document).ready(function(){
   
   $('#send_form').submit(function() {
     var text = $('#send_form_input').val();
-    client.send(destination, {foo: 1}, text);
-    $('#send_form_input').val("");
+    if (text) {
+      client.send(destination, {foo: 1}, text);
+      $('#send_form_input').val("");
+    }
     return false;
   });
   
