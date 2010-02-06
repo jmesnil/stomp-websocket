@@ -3,9 +3,10 @@ module("Stomp Message");
 test("Send and receive a message", function() {
   
   var client = Stomp.client(TEST.url);
+  client.debug = TEST.debug;
   client.connect(TEST.login, TEST.password,
     function() {
-      client.subscribe(TEST.destination, {}, function(message)
+      client.subscribe(TEST.destination, function(message)
       {
         start();
         equals(message.body, "message body");

@@ -21,7 +21,7 @@ $(document).ready(function(){
       $('#disconnect').fadeIn();
       $('#send_form_input').removeAttr('disabled');
       
-      client.subscribe(destination, {}, function(message) {
+      client.subscribe(destination, function(message) {
         $("#messages").append("<p>" + message.body + "</p>\n");
       });
     };

@@ -150,7 +150,7 @@
       transmit("SEND", headers, body);
     };
 
-    that.subscribe = function(destination, headers, callback) {
+    that.subscribe = function(destination, callback, headers) {
       var headers = headers || {};
       headers.destination = destination;
       subscriptions[destination] = callback;
