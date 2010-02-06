@@ -163,7 +163,30 @@
       delete subscriptions[destination];
       transmit("UNSUBSCRIBE", headers);
     };
+    
+    that.begin = function(transaction, headers) {
+      var headers = headers || {};
+      headers.transaction = transaction;
+      transmit("BEGIN", headers);
+    };
 
+    that.commit = function(transaction, headers) {
+      var headers = headers || {};
+      headers.transaction = transaction;
+      transmit("COMMIT", headers);
+    };
+    
+    that.abort = function(transaction, headers) {
+      var headers = headers || {};
+      headers.transaction = transaction;
+      transmit("ABORT", headers);
+    };
+    
+    that.ack = function(message_id, headers) {
+      var headers = headers || {};
+      headers["message-id"] = message_id;
+      transmit("ACK", headers);
+    };
     return that;
   };
   
