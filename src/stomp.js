@@ -83,16 +83,6 @@
       }
     };
 
-    onclose = function() {
-      debug("Whoops! Looks like you lost internet connection or the server went down");
-    };
-
-    onopen = function() {
-      debug('Web Socket Opened...');
-      transmit("CONNECT", {login: login, passcode: passcode});
-      // onconnect handler will be called from onmessage when a CONNECTED frame is received
-    };
-
     onmessage = function(evt) {
       debug('<<< ' + evt.data);
       // next, check what type of message RECEIPT, ERROR, CONNECTED, RECEIVE
@@ -102,8 +92,8 @@
       // when ERROR is received, call onerror
       // when RECEIPT is received, call onreceipt
       var frame = Stomp.unmarshall(evt.data);
-      if (frame.command === "CONNECTED" && that.onconnect) {
-        that.onconnect(frame);
+      if (frame.command === "CONNECTED" && that.connectCallback) {
+        that.connectCallback(frame);
       } else if (frame.command === "MESSAGE") {
         var onreceive = subscriptions[frame.headers.destination];
         if (onreceive) {
@@ -124,22 +114,33 @@
 
     that = {};
 
-    that.connect = function(login_, passcode_) {
+    that.connect = function(login_, passcode_, connectCallback, errorCallback) {
       debug("Opening Web Socket...");
       ws = new WebSocket(url);
       ws.onmessage = onmessage;
-      ws.onclose   = onclose;
-      ws.onopen    = onopen;
+      ws.onclose   = function() {
+        var msg = "Whoops! Lost connection to " + url;
+        debug(msg);
+          if (errorCallback) {
+            errorCallback(msg);
+          }
+      };
+      ws.onopen    = function() {
+        debug('Web Socket Opened...');
+        transmit("CONNECT", {login: login, passcode: passcode});
+        // onconnect handler will be called from onmessage when a CONNECTED frame is received
+      };
       login = login_;
       passcode = passcode_;
+      that.connectCallback = connectCallback;
     };
 
-    that.disconnect = function() {
+    that.disconnect = function(disconnectCallback) {
       transmit("DISCONNECT");
       // send to the server a DISCONNECT frame
       ws.close();
-      if (that.ondisconnect) {
-        that.ondisconnect();
+      if (disconnectCallback) {
+        disconnectCallback();
       }
     };
 

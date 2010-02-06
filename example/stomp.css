@@ -8,6 +8,9 @@ body {
   padding: 10px;
 }
 
+#disconnect {
+  display: none;
+}
 #subscribe {
   display: none;
 }
@@ -48,9 +51,8 @@ body {
   left: 0;
   overflow: auto;
   padding: 5px;
-  position: absolute;
   right: 0;
-  top: 0;
+  top: 2em;
   z-index: -1;
 }
 

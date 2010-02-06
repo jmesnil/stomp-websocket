@@ -15,26 +15,29 @@ $(document).ready(function(){
       $("#debug").append(str + "\n");
     };
     // the client is notified when it is connected to the server.
-    client.onconnect = function(frame) {
+    var onconnect = function(frame) {
       debug("connected to Stomp");
       $('#connect').fadeOut({ duration: 'fast' });
-      $('#connect').remove();
+      $('#disconnect').fadeIn();
       $('#send_form_input').removeAttr('disabled');
       
       client.subscribe(destination, {}, function(message) {
         $("#messages").append("<p>" + message.body + "</p>\n");
       });
     };
-    // the client is notified when it is disconnected from the server.
-    client.ondisconnect = function() {
-      debug("disconnected from Stomp");
-    };
-
-    client.connect(login, passcode);
+    client.connect(login, passcode, onconnect);
 
     return false;
   });
   
+  $('#disconnect_form').submit(function() {
+    client.disconnect(function() {
+      $('#disconnect').fadeOut({ duration: 'fast' });
+      $('#connect').fadeIn();
+    });
+    return false;
+  });
+   
   $('#send_form').submit(function() {
     var text = $('#send_form_input').val();
     if (text) {
