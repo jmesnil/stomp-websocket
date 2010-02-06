@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Stomp on WebSocket</title>
+  <!--[if IE]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel=stylesheet href=screen.css>
+</head>
+<body>
+<header>
+<h1>Stomp On WebSocket</h1>
+
+</header>
+
+<section>
+<h1>Requirements</h1>
+
+</section>
+
+<section>
+<h1>API</h1>
+
+<h2>Stomp.client()</h2>
+
+<p>TODO describe Stomp.client method</p>
+<aside>
+    <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
+     This is an aside</aside>
+<pre>
+  <code>
+    client = Stomp.client(url);
+
+    // this allows to display debug logs directly on the web page
+    <mark>client.debug</mark> = function(str) {
+      $("#debug").append(str + "\n");
+    };
+  </code>
+</pre>
+
+<h2>Connection to the server</h2>
+
+<pre>
+  <code>
+    client = Stomp.client(url);
+    client.connect(login, passcode, <mark>function(frame)</mark> {
+      // this function will be called when the client is connected to the Stomp server
+    };
+  </code>
+</pre>
+
+
+<p> this is regular test</p>
+<p> this is regular test</p>
+</section>
+
+<footer>
+&copy; 2010 <a href="http://jmesnil.net/">Jeff Mesnil</a>
+</footer>
+</body>
+</html>

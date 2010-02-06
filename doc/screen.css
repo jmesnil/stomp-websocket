@@ -1,0 +1,37 @@
+aside {
+  display: block;
+  float: right;
+  width: 25%;
+  padding: 0.75em;
+  margin: 0 1.75em .75em 1.75em;
+  border: 1px solid #000;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+
+  font-style: oblique;
+  font-size: xx-large;
+}
+
+footer {
+  clear: both;
+  text-align: center;
+  font-size: small;
+  display: block;
+}
+
+pre, kbd, samp, code, var {
+  font: medium Consolas, "Andale Mono", Monaco, "Liberation Mono", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", monospace;
+  word-spacing: 0;
+  letter-spacing: 0;
+}
+
+mark {
+  display: inline-block;
+  background: #ff8;
+  border: 1px dotted #888;
+}
+
+h1, h2, h3, h4, caption, thead th {
+  font-family: "Essays 1743", "Linux Libertine", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+}
