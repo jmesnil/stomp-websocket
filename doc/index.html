@@ -63,6 +63,26 @@ it explained the idea behind Web Sockets:</p>
 <section>
 <h2 id=requirements>Server Requirements</h2>
 
+<h3>HornetQ prototype</h3>
+
+<p><a href=http://jboss.org/hornetq>HornetQ</a> is the Open Source messaging system developed
+  by Red Hat and JBoss. There is an experimental support for Stomp on Web Sockets which 
+  has not landed on the main source repository yet.</p>
+<p>To start HornetQ with support for Stomp on Web Sockets, run the following steps:</p>  
+<pre>
+  <samp>$ </samp><kbd>git clone git://github.com/jmesnil/hornetq.git</kbd>
+  <samp>...</samp>
+  <samp>$ </samp><kbd>cd hornetq </kbd>
+  <samp>$ </samp><kbd>git co -b stomp-websocket origin/stomp-websocket</kbd>
+  <samp>Branch stomp-websocket set up to track remote branch stomp-websocket from origin.
+  Switched to a new branch 'stomp-websocket'</samp>
+  <samp>$ </samp><kbd>./build.sh runServer</kbd>
+  <samp>...
+  HornetQ Server version 2.0.0.GA (Hornet Queen, 113) started</samp>
+</pre>
+
+<p>HornetQ is now started and listens to Stomp on TCP on the default port <code>61613</code>.<br>
+It also accepts <em>Stomp on Web Sockets</em> from the <code>ws://localhost:61614/stomp</code> URL.</p>
 </section>
 
 <section>
@@ -189,15 +209,31 @@ with the URL corresponding to the server's WebSocket endpoint:
 <p>To receive messages in the browser, the Stomp client must first subscribe to a destination.</p>
 <p>You can use the <code>subscribe()</code> method to subscribe to a destination. The method takes 2 mandatory
   arguments: <code>destination</code>, a String corresponding to the destination and 
-  <code>callback</code>.
+  <code>callback</code>, a function with one <code>message</code> argument.
 
 <pre>
   <code>
-    <mark>client.subscribe</mark>("/queue/test", function(message) {
-      // called when the client receives a Stomp message from the server
-    });
+    <mark>client.subscribe</mark>("/queue/test", callback);
   </code>
 </pre>
+
+<p>The client will send a Stomp 
+  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#subscribe>SUBSCRIBE</a> frame to the server and register the callback. Every time the server
+  send a message to the client, the client will in turn call the callback with a Stomp Frame object
+  corresponding to the message:</p>
+
+  <pre>
+    <code>
+      <mark>callback</mark> = function(message) {
+        // called when the client receives a Stomp message from the server
+        if (message.body) {
+          alert("got message with body " + message.body)
+        } else {
+          alert("got empty message");
+        }
+      });
+    </code>
+  </pre>
   
 <p>The <code>subscribe()</code> method takes an optional <code>headers</code> parameters to specify
   additional headers when subscribing to a destination:</p>
@@ -208,12 +244,37 @@ with the URL corresponding to the server's WebSocket endpoint:
       client.subscribe("/queue/test", message_callback, <mark>headers</mark>);
     </code>
   </pre>
-  
 
 
 <p>The client specifies that it will handle the message acknowledgement and is interested to receive
   only messages matching the selector <code>location = 'Europe'</code></p>
 
+  <div class=advice>
+      <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
+      <p>If you want to subscribe the client to multiple destinations, you can use the same callback to receive all
+        the messages:
+      <pre style="clear:left">
+        <code>
+onmessage = function(message) {
+  // called every time the client receives a message
+}
+client.subscribe(destination_1, <mark>onmessage</mark>);
+client.subscribe(destination_2, <mark>onmessage</mark>);
+        </code>
+      </pre>
+  </div>
+  
+<p>To stop receiving messages, the client can use its <code>unsubscribe</code> method.
+  The method takes a <code>destination</code> argument corresponding to the destination to unsubscribe from.</p>
+<pre>
+  <code>
+    <mark>client.unsubscribe</mark>("/queue/test");
+  </code
+</pre>
+<p>
+  The method also takes an optional <code>headers</code> argument if the client needs to pass additional headers.
+  </p>
+  
 <h3 id=ack>Acknowledgment</h3>
 
 <p> this is regular test</p>
@@ -230,6 +291,7 @@ with the URL corresponding to the server's WebSocket endpoint:
 
 <section>
 <h2 id=example>Example</h2>
+
 
 <p> this is regular test</p>
 
@@ -254,6 +316,15 @@ with the URL corresponding to the server's WebSocket endpoint:
 
 <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js'></script>
 <script src='j/doc.js'></script>
+<script type="text/javascript"> 
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script> 
+<script type="text/javascript"> 
+var pageTracker = _gat._getTracker("UA-257783-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 
 </body>
 </html>

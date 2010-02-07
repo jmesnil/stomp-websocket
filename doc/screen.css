@@ -20,6 +20,14 @@ pre, kbd, samp, code, var {
   letter-spacing: 0;
 }
 
+code, var, samp {
+  line-height:inherit !important;
+}
+
+samp {
+  display:inline ;
+  color: #667;
+}
 mark {
   display: inline-block;
   background: #ff8;
