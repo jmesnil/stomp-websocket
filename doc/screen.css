@@ -1,18 +1,3 @@
-aside {
-  display: block;
-  float: right;
-  width: 25%;
-  padding: 0.75em;
-  margin: 0 1.75em .75em 1.75em;
-  border: 1px solid #000;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
-  border-radius: 1em;
-
-  font-style: oblique;
-  font-size: xx-large;
-}
-
 footer {
   clear: both;
   text-align: center;
@@ -20,6 +5,15 @@ footer {
   display: block;
 }
 
+
+body {
+    font: large/1.556 "Linux Libertine", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+     word-spacing: 0.1em;
+     max-width: 800px;
+     margin: 0 auto;
+     padding-bottom: 2em;
+   }
+   
 pre, kbd, samp, code, var {
   font: medium Consolas, "Andale Mono", Monaco, "Liberation Mono", "Bitstream Vera Sans Mono", "DejaVu Sans Mono", monospace;
   word-spacing: 0;
@@ -34,4 +28,71 @@ mark {
 
 h1, h2, h3, h4, caption, thead th {
   font-family: "Essays 1743", "Linux Libertine", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+}
+
+h1, h2, h3, h4 {
+  clear: both;
+}
+
+
+img {
+  float: left;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.bc, .st {
+  width:100%;
+  border-collapse:collapse;
+}
+
+.st {
+  border: 1px solid;
+}
+
+.st th {
+  text-align: left;
+  font-weight: normal;
+}
+
+.st tr > th:first-child {
+  padding-left: 5px;
+}
+
+.ho th {
+  border-bottom: 1px solid;
+}
+
+.zebra {
+  background: #eee;
+}
+
+.ss {
+  float: right;
+  margin: 0 0 1.75em 1.75em;
+  font-size: medium;
+}
+
+aside {
+  display: block;
+  padding: 0.75em;
+  border: 1px solid #000;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+  font-style: oblique;
+  margin: 1.75em 0;
+}
+
+.advice {
+  display: block;
+  padding: 0.75em;
+  border: 1px solid #000;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+  font-style: oblique;
+  margin: 1.75em 0;
+  min-height: 148px;
+  
 }
