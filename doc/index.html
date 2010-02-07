@@ -277,24 +277,113 @@ client.subscribe(destination_2, <mark>onmessage</mark>);
   
 <h3 id=ack>Acknowledgment</h3>
 
-<p> this is regular test</p>
+<p>By default, Stomp messages will be automatically acknowledged by the server before the message
+  is delivered to the client.</p>
+<p>The client can chose instead to handle message acknowledgement by subscribing to a destination and
+  specify a <code>ack</code> header set to <code>'client'</code>.</p>
+<p>In that case, the client must use the <code>ack()</code> method to inform the server that it has
+  acknowledge the message. The methods takes a mandatory <code>message_id</code> corresponding to the message
+  to acknowledge.</p>
+  
+<pre>
+  <code>
+    client.subscribe("/queue/test", <mark>{ack: 'client'}</mark>, function(message) {
+      // do something with the message
+      ...
+      // and acknowledge it
+      var message_id = message.headers['message-id']
+      <mark>client.ack</mark>(message_id);
+    });
+  </code>
+</pre>
 
 <h3 id=transaction>Transactions</h3>
 
-<p> this is regular test</p>
+<p>Messages can be sent and acknowledged <em>in a transaction</em>.</p>
+<p>A transaction is started by the client using its <code>begin()</code> method
+  which takes a mandatory <code>transaction</code>, a String which uniquely identifies the
+  transaction.</p>
+The client can then send and acknowledge messages in the transasction by specifying a 
+<code>transaction</code> set with the transaction name.</p>
+<p>A transaction is completed by the client by calling its <code>commit()</code> method.
+  Alternatively, the client can abort the transaction by calling its <code>abort</code> method.</p>
 
+  <pre>
+    <code>
+      var txid = "unique_transaction_identifier";
+      // start the transaction
+      <mark>client.begin</mark>(txid);
+      // send the message in a transaction
+      client.send("/queue/test", <mark>{transaction: txid}</mark>, "message in a transaction");
+      // commit the transaction to effectively send the message
+      <mark>client.commit</mark>(txid);
+    </code>
+  </pre>
+
+    <div class=advice>
+        <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
+        <p>If you forget to add the <code>transaction</code> header when calling <code>send()</code>
+          the message will <em>not</em> be part of the transaction and will be sent directly without
+          waiting for the completion of the transaction.</p>
+        <pre style="clear:both">
+            <code>var txid = "unique_transaction_identifier";
+              // start the transaction
+              <mark>client.begin</mark>(txid);
+              // oops! send the message outside the transaction
+              client.send("/queue/test", <mark>{}</mark>, "I thought I was in a transaction");
+              <mark>client.abort</mark>(txid); // Too late! the message has been sent
+            </code>
+          </pre>
+    </div>
+    
 <h3 id=debug>Debug</h3>
 
-<p> this is regular test</p>
+<p>There are few tests in the code and it is helpful to see what is sent and received
+  from the library to debug application.</p>
+<p>The client can set the <code>debug</code> to a function with takes a <code>String</code> argument
+  to see all the debug statements of the library:</p>
+<pre>
+  <code>
+    <mark>client.debug</mark> = function(str) {
+      // append the log to a #debug div somewhere in the page using JQuery:
+      $("#debug").append(str + "\n");
+    };
+</pre>
+</code>      
 
 </section>
 
 <section>
 <h2 id=example>Example</h2>
 
+<p>The source code contains a chat example in <kbd>examples/chat/index.html</kbd></p>
 
-<p> this is regular test</p>
+<p>You need to start a Stomp server with support for Web Socket (using for example <a href=#hornetq>HornetQ</a>).</p>
+<p>Click on the <kbd>Connect</kbd> button to connect to the server and subscribe to the <code>/queue/test/</code> queue.</p>
+<p>You can then type messages in the form at the bottom of the page to send Stomp messages to the queue.
+  Messages received by the client will be displayed at the top of the page.</p>
+<p>You can also send regular Stomp messages and see them displayed in the browser. For
+  example using directly <kbd>telnet</kbd> on Stomp default port:</p>
+<pre>
+  <samp>$ </samp><kbd>telnet localhost 61613</kbd>
+  <kbd>CONNECT
+  login:guest
+  passcode:guest
 
+  ^@
+  </kbd>
+</pre>
+<p><kbd>^@</kbd> is a null (<kbd>control-@</kbd> in ASCII) byte.</p>
+<pre>
+  SEND
+  destination:/queue/test
+
+  Hello from TCP!
+  ^@
+  </kdb>
+</pre>
+
+<p>You should now have received this message in your browser.</p>
 </section>
 
 <section>
