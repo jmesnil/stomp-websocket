@@ -34,6 +34,7 @@ $(document).ready(function(){
     client.disconnect(function() {
       $('#disconnect').fadeOut({ duration: 'fast' });
       $('#connect').fadeIn();
+      $('#send_form_input').addAttr('disabled');
     });
     return false;
   });
