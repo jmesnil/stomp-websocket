@@ -256,15 +256,15 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <p>The body of a Stomp message must be a <code>String</code>. If you want to send and receive
   <a href=http://json.org/>JSON</a> objects, you can use <code>JSON.stringify()</code> and <code>JSON.parse()</code> to transform the JSON
-  object to a String and vice versa</p>
+  object to a String and vice versa.</p>
 
 <pre><code>
-  var payload = {quote: 'APPL', value: 195.46};
-  client.send("/topic/stocks", {}, <mark>JSON.stringify(payload)</mark>);
+  var quote = {symbol: 'APPL', value: 195.46};
+  client.send("/topic/stocks", {}, <mark>JSON.stringify(quote)</mark>);
 
   client.subcribe("/topic/stocks", function(message) {
-    var payload = <mark>JSON.parse(message.body)</mark>;
-    alert(payload.quote + " is at " + payload.value);
+    var quote = <mark>JSON.parse(message.body)</mark>;
+    alert(quote.symbol + " is at " + quote.value);
   };
 </code></pre>
 
