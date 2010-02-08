@@ -252,6 +252,25 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <p> The method also takes an optional <code>headers</code> argument if the client needs to pass additional headers.</p>
 
+<h3 id=json>JSON support</h3>
+
+<p>The body of a Stomp message must be a <code>String</code>. If you want to send and receive
+  <a href=http://json.org/>JSON</a> objects, you can use <code>JSON.stringify()</code> and <code>JSON.parse()</code> to transform the JSON
+  object to a String and vice versa</p>
+
+<pre><code>
+  var payload = {quote: 'APPL', value: 195.46};
+  client.send("/topic/stocks", {}, <mark>JSON.stringify(payload)</mark>);
+
+  client.subcribe("/topic/stocks", function(message) {
+    var payload = <mark>JSON.parse(message.body)</mark>;
+    alert(payload.quote + " is at " + payload.value);
+  };
+</code></pre>
+
+</p>
+
+
 <h3 id=ack>Acknowledgment</h3>
 
 <p>By default, Stomp messages will be automatically acknowledged by the server before the message
