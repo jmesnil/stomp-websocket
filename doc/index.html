@@ -93,7 +93,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <h3 id=frame>Stomp Frame</h3>
 
-<p>Stomp on WebSocket provides a straighforward mapping from a Stomp frame to a JavaScript
+<p>Stomp on Web Socket provides a straighforward mapping from a Stomp frame to a JavaScript
   object.</p>
 
 <table class=st>
@@ -112,7 +112,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <p>Stomp JavaScript clients will communicate to a Stomp server using a ws URL</p>
 <p>To create a Stomp client JavaScript object, you need to call <code>Stomp.client(url)</code>
-  with the URL corresponding to the server's WebSocket endpoint:
+  with the URL corresponding to the server's Web Socket endpoint:
 
 <pre><code>
   var url = ws://localhost:61614/stomp
@@ -124,7 +124,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 <h3 id=connection>Connection to the server</h3>
 
 <p>Once a Stomp client is created, it must call its <code>connect()</code> method to effectively
-  connect and authenticate to the Stomp server. The method takes 2 mandatory arguments,
+  connect and authenticate to the Stomp server. The method takes two mandatory arguments,
   <code>login</code> and <code>passcode</code> corresponding to the user credentials.</p>
 <p>Behind the scene, the client will open a connection using a Web Socket and send
   a <a href=http://activemq.apache.org/stomp/stomp10/specification.html#connect>CONNECT</a> frame.</p>
