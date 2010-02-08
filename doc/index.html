@@ -57,7 +57,7 @@ it explained the idea behind Web Sockets:</p>
     no headers are exchanged once the single connection has been established. To use this new
     API and protocol and take advantage of the simpler programming model and more
     efficient network traffic, you do need a new server implementation to communicate
-    with</p>
+    with.</p>
 </blockquote>
 
 <p>The API is part of <a href=>HTML5</a> and is currently only supported by Google Chrome but modern Web browsers
@@ -72,10 +72,10 @@ it explained the idea behind Web Sockets:</p>
 <p>This library is not a <em>pure</em> Stomp client. It is aimed to run on the Web Sockets protocol which
   is not TCP. Basically, the Web Sockets protocol requires a <em>handshake</em> between the browser's 
   client and the server to ensure the browser's "same-origin" security model remains in effect.</p>
-<p>This means that this library can not connect to regular Stomp broker since they would not understand
+<p>This means that this library can not connect to regular Stomp brokers since they would not understand
   the handshake initiated by the Web Socket which is not part of the Stomp protocol and would
   likely reject the connection.</p>
-<p>There are ongoing work to add Web Socket support to Stomp brokers such as HornetQ and 
+<p>There are ongoing works to add Web Socket support to Stomp brokers such as HornetQ and 
   <a href=http://activemq.apache.org>ActiveMQ</a> so that they will accept Stomp connections over 
   the Web Sockets protocol.</p>
 
@@ -107,7 +107,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <h3 id=frame>Stomp Frame</h3>
 
-<p>Stomp on Web Socket provides a straighforward mapping from a Stomp frame to a JavaScript
+<p>Stomp on Web Socket provides a straightforward mapping from a Stomp frame to a JavaScript
   object.</p>
 
 <table class=st>
@@ -124,16 +124,14 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <h3 id=client>Create a Stomp client</h3>
 
-<p>Stomp JavaScript clients will communicate to a Stomp server using a ws URL</p>
+<p>Stomp JavaScript clients will communicate to a Stomp server using a <code>ws://</code> URL.</p>
 <p>To create a Stomp client JavaScript object, you need to call <code>Stomp.client(url)</code>
   with the URL corresponding to the server's Web Socket endpoint:
 
 <pre><code>
-  var url = ws://localhost:61614/stomp
+  var url = "ws://localhost:61614/stomp";
   var client = <mark>Stomp.client(url)</mark>;
 </code></pre>
-
-<p><code>client</code> will communicate with the Stomp server using the <code>url</code>.</p>
 
 <h3 id=connection>Connection to the server</h3>
 
@@ -157,7 +155,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
   optional <code>error_callback</code> argument which will be called if the client is not able
   to connect to the server.
   The callback will be called with a single argument, an error object corresponding to Stomp
-  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#error>ERROR</a> frame</p>
+  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#error>ERROR</a> frame:</p>
   
 <pre><code>
   client.connect(login, passcode, connect_callback, <mark>error_callback</mark>);
@@ -242,7 +240,7 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 </code></pre>
 
 <p>The client specifies that it will handle the message acknowledgement and is interested to receive
-  only messages matching the selector <code>location = 'Europe'</code></p>
+  only messages matching the selector <code>location = 'Europe'</code>.</p>
 
 <div class=advice>
   <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
@@ -252,8 +250,8 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
   onmessage = function(message) {
     // called every time the client receives a message
   }
-  client.subscribe(destination_1, <mark>onmessage</mark>);
-  client.subscribe(destination_2, <mark>onmessage</mark>);
+  client.subscribe("queue/test", <mark>onmessage</mark>);
+  client.subscribe("queue/another", <mark>onmessage</mark>);
   </code></pre>
 </div>
 
