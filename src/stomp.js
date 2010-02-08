@@ -1,17 +1,9 @@
-// client can implement the eventhandlers:
-// * onconnect    => to be notified when it is connected to the STOMP server
-// * ondisconnect => to be notified when it is disconnected from the STOMP server
-// * onreceive    => to receive STOMP messages
-// * onreceipt    => to receive STOMP receipts
-// * onerror      => to receive STOMP errors
-//
-// client can also define a debug(str) handler to display debug infos
+// (c) 2010 Jeff Mesnil -- http://jmesnil.net/
 
 (function(window) {
   
   var Stomp = {};
 
-  // TODO frame function should not be exposed once we can really talk to a Stomp server
   Stomp.frame = function(command, headers, body) {
     return {
       command: command,
@@ -74,7 +66,7 @@
   Stomp.client = function (url){
 
     var that, ws, login, passcode;
-    // subscriptions callback indexed by destination
+    // subscription callbacks indexed by destination
     var subscriptions = {};
 
     debug = function(str) {
@@ -85,12 +77,6 @@
 
     onmessage = function(evt) {
       debug('<<< ' + evt.data);
-      // next, check what type of message RECEIPT, ERROR, CONNECTED, RECEIVE
-      // and create appropriate js objects and calls handler for received messags
-      // when CONNECTED is received, call onconnect
-      // when RECEIVE is received, call onreceive
-      // when ERROR is received, call onerror
-      // when RECEIPT is received, call onreceipt
       var frame = Stomp.unmarshall(evt.data);
       if (frame.command === "CONNECTED" && that.connectCallback) {
         that.connectCallback(frame);
@@ -128,7 +114,7 @@
       ws.onopen    = function() {
         debug('Web Socket Opened...');
         transmit("CONNECT", {login: login, passcode: passcode});
-        // onconnect handler will be called from onmessage when a CONNECTED frame is received
+        // connectCallback handler will be called from onmessage when a CONNECTED frame is received
       };
       login = login_;
       passcode = passcode_;
@@ -137,7 +123,6 @@
 
     that.disconnect = function(disconnectCallback) {
       transmit("DISCONNECT");
-      // send to the server a DISCONNECT frame
       ws.close();
       if (disconnectCallback) {
         disconnectCallback();
