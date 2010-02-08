@@ -143,3 +143,9 @@ aside {
   min-height: 148px;
   
 }
+
+.ss span {
+  display: block;
+  text-align: center;
+  border-bottom: 3px double;
+}

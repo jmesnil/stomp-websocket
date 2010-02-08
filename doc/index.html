@@ -31,6 +31,8 @@
 <section>
 <h2 id=websockets>What is the Web Sockets API?</h2>
 
+<p class=ss style="width:248px"><img width=248 src=i/johnny_automatic/johnny_automatic_follow_the_leader.svg><br>
+  <span id=live-web-sockets></span></p>
 <p><a href=http://dev.w3.org/html5/websockets/>Web Sockets</a> are "TCP for the Web".</p>
 <p>When Google announced the availability of
 <a href=http://blog.chromium.org/2009/12/web-sockets-now-available-in-google.html>Web Sockets in Google Chrome</a>,
@@ -57,8 +59,10 @@ it explained the idea behind Web Sockets:</p>
     efficient network traffic, you do need a new server implementation to communicate
     with</p>
 </blockquote>
+
 <p>The API is part of <a href=>HTML5</a> and is currently only supported by Google Chrome but modern Web browsers
   (Firefox, Safari) have ongoing work to support it too.</p>
+
 
 </section>
 
@@ -278,9 +282,6 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
   };
 </code></pre>
 
-</p>
-
-
 <h3 id=ack>Acknowledgment</h3>
 
 <p>By default, Stomp messages will be automatically acknowledged by the server before the message
@@ -380,12 +381,12 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 <p><kbd>^@</kbd> is a null (<kbd>control-@</kbd> in ASCII) byte.</p>
 
 <pre>
-  SEND
+  <kbd>SEND
   destination:/queue/test
 
   Hello from TCP!
   ^@
-  </kdb>
+  </kbd>
 </pre>
 
 <p>You should now have received this message in your browser.</p>

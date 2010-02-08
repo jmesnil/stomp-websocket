@@ -25,6 +25,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 $(document).ready(function() {
 	hideTOC();
+	$("#live-web-sockets").html(supports("WebSocket" in window, "Web Sockets"));
 }); /* document.ready */
 
 function hideTOC() {
@@ -51,4 +52,14 @@ function showTOC() {
     }
     toc = '<a href="javascript:hideTOC()">hide table of contents</a><ol>' + toc.substring(4);
     $("#toc").html(toc);
+}
+
+function supports(bool, suffix) {
+  var s = "Your browser ";
+  if (bool) {
+    s += "supports " + suffix + ".";
+  } else {
+    s += "does not support " + suffix + ". :(";
+  }
+  return s;
 }
