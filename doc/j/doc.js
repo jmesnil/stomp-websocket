@@ -1,5 +1,4 @@
 /*
-The rest of this script is
 Copyright (c) 2009, Mark Pilgrim, All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
