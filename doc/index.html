@@ -65,6 +65,16 @@ it explained the idea behind Web Sockets:</p>
 <section>
 <h2 id=requirements>Server Requirements</h2>
 
+<p>This library is not a <em>pure</em> Stomp client. It is aimed to run on the Web Sockets protocol which
+  is not TCP. Basically, the Web Sockets protocol requires a <em>handshake</em> between the browser's 
+  client and the server to ensure the browser's "same-origin" security model remains in effect.</p>
+<p>This means that this library can not connect to regular Stomp broker since they would not understand
+  the handshake initiated by the Web Socket which is not part of the Stomp protocol and would
+  likely reject the connection.</p>
+<p>There are ongoing work to add Web Socket support to Stomp brokers such as HornetQ and 
+  <a href=http://activemq.apache.org>ActiveMQ</a> so that they will accept Stomp connections over 
+  the Web Sockets protocol.</p>
+
 <h3 id=hornetq>HornetQ prototype</h3>
 
 <p><a href=http://jboss.org/hornetq>HornetQ</a> is the Open Source messaging system developed
