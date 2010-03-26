@@ -66,7 +66,8 @@
   Stomp.client = function (url){
 
     var that, ws, login, passcode;
-    // subscription callbacks indexed by destination
+    var counter = 0; // used to index subscribers
+    // subscription callbacks indexed by subscriber's ID
     var subscriptions = {};
 
     debug = function(str) {
@@ -81,7 +82,7 @@
       if (frame.command === "CONNECTED" && that.connectCallback) {
         that.connectCallback(frame);
       } else if (frame.command === "MESSAGE") {
-        var onreceive = subscriptions[frame.headers.destination];
+        var onreceive = subscriptions[frame.headers.subscription];
         if (onreceive) {
           onreceive(frame);
         }
@@ -137,8 +138,10 @@
 
     that.subscribe = function(destination, callback, headers) {
       var headers = headers || {};
+      var id = "sub-" + counter++;
       headers.destination = destination;
-      subscriptions[destination] = callback;
+      headers.id = id;
+      subscriptions[id] = callback;
       transmit("SUBSCRIBE", headers);
     };
 
