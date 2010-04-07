@@ -40,7 +40,7 @@
 
     // Parse headers
     var line = idx = null;
-    for (i in headerLines) {
+    for (var i = 0; i < headerLines.length; i++) {
       line = headerLines[i];
       idx = line.indexOf(':');
       headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
