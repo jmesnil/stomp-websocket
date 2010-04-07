@@ -31,7 +31,7 @@
     return str.replace(/^\s+/g,'').replace(/\s+$/g,'');
   };
 
-  Stomp.unmarshall = function(data) {
+  Stomp.unmarshal = function(data) {
     var divider = data.search(/\n\n/),
         headerLines = data.substring(0, divider).split('\n'),
         command = headerLines.shift(),
@@ -58,7 +58,7 @@
     return Stomp.frame(command, headers, body);
   };
 
-  Stomp.marshall = function(command, headers, body) {
+  Stomp.marshal = function(command, headers, body) {
     return Stomp.frame(command, headers, body).toString() + '\0';
   };
   
@@ -77,7 +77,7 @@
 
     onmessage = function(evt) {
       debug('<<< ' + evt.data);
-      var frame = Stomp.unmarshall(evt.data);
+      var frame = Stomp.unmarshal(evt.data);
       if (frame.command === "CONNECTED" && that.connectCallback) {
         that.connectCallback(frame);
       } else if (frame.command === "MESSAGE") {
@@ -93,7 +93,7 @@
     };
 
     transmit = function(command, headers, body) {
-      var out = Stomp.marshall(command, headers, body);
+      var out = Stomp.marshal(command, headers, body);
       debug(">>> " + out);
       ws.send(out);
     };
