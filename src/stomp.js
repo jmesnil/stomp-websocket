@@ -29,33 +29,32 @@
 
   trim = function(str) {
     return str.replace(/^\s+/g,'').replace(/\s+$/g,'');
-  }
+  };
 
   Stomp.unmarshall = function(data) {
-    var command, headers, body;
-    var lines = data.split('\n');
-    command = lines[0];
-    headers = {};
-    var pos;
-    for (pos = 1; pos < lines.length ; pos++) {
-      if (lines[pos] === '') {
-        break;
-      }
-      var pair = lines[pos].split(':');
-      headers[trim(pair[0])] = trim(pair[1]);
+    var divider = data.search(/\n\n/),
+        headerLines = data.substring(0, divider).split('\n'),
+        command = headerLines.shift(),
+        headers = {},
+        body = '';
+
+    // Parse headers
+    var line = idx = null;
+    for (i in headerLines) {
+      line = headerLines[i];
+      idx = line.indexOf(':');
+      headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
     }
-    pos++;
-    if(lines[pos] === '') {
-      // no body
-    } else {
-      body = "";
-      for (i = pos; i < lines.length; i++) {
-        if (i >= pos) {
-          pos += '\n'
-        }
-        body += lines[i];
-      }
+
+    // Parse body, stopping at the first \0 found.
+    // TODO: Add support for content-length header.
+    var chr = null;
+    for (var i = divider + 2; i < data.length; i++) {
+      chr = data.charAt(i);
+      if (chr === '\0') break;
+      body += chr;
     }
+
     return Stomp.frame(command, headers, body);
   };
 
@@ -97,7 +96,7 @@
       var out = Stomp.marshall(command, headers, body);
       debug(">>> " + out);
       ws.send(out);
-    }
+    };
 
     that = {};
 

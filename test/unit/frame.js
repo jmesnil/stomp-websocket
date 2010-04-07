@@ -11,17 +11,33 @@ test("marshall a SEND frame", function() {
 });
 
 test("unmarshall a CONNECTED frame", function() {
-  var data = "CONNECTED\nsession-id: 1234\n\n";
+  var data = "CONNECTED\nsession-id: 1234\n\n\0";
   var frame = Stomp.unmarshall(data);
-  equals("CONNECTED", frame.command);
-  same({'session-id': "1234"}, frame.headers);
-  ok(frame.body === undefined);
+  equals(frame.command, "CONNECTED");
+  same(frame.headers, {'session-id': "1234"});
+  equals(frame.body, '');
 });
 
 test("unmarshall a RECEIVE frame", function() {
-  var data = "RECEIVE\nfoo: abc\nbar: 1234\n\nhello, world!";
+  var data = "RECEIVE\nfoo: abc\nbar: 1234\n\nhello, world!\0";
   var frame = Stomp.unmarshall(data);
-  equals("RECEIVE", frame.command);
-  same({foo : 'abc', bar: "1234"}, frame.headers);
-  equals("hello, world!", frame.body);
+  equals(frame.command, "RECEIVE");
+  same(frame.headers, {foo: 'abc', bar: "1234"});
+  equals(frame.body, "hello, world!");
+});
+
+test("unmarshall should not include the null byte in the body", function() {
+  var body1 = 'Just the text please.',
+      body2 = 'And the newline\n',
+      msg = "MESSAGE\ndestination: /queue/test\nmessage-id: 123\n\n";
+
+  equals(Stomp.unmarshall(msg + body1 + '\0').body, body1);
+  equals(Stomp.unmarshall(msg + body2 + '\0').body, body2);
+});
+
+test("unmarshall should support colons (:) in header values", function() {
+  var dest = 'foo:bar:baz',
+      msg = "MESSAGE\ndestination: " + dest + "\nmessage-id: 456\n\n\0";
+
+  equals(Stomp.unmarshall(msg).headers.destination, dest);
 });
