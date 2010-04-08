@@ -142,12 +142,13 @@
       headers.id = id;
       subscriptions[id] = callback;
       transmit("SUBSCRIBE", headers);
+      return id;
     };
 
-    that.unsubscribe = function(destination, headers) {
+    that.unsubscribe = function(id, headers) {
       var headers = headers || {};
-      headers.destination = destination;
-      delete subscriptions[destination];
+      headers.id = id;
+      delete subscriptions[id];
       transmit("UNSUBSCRIBE", headers);
     };
     
