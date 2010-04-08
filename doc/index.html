@@ -219,8 +219,10 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
   <code>callback</code>, a function with one <code>message</code> argument.
 
 <pre><code>
-  <mark>client.subscribe</mark>("/queue/test", callback);
+  id = <mark>client.subscribe</mark>("/queue/test", callback);
 </code></pre>
+<p>The <code>subscribe()</code> methods returns an id that correspond to the client subscription. You can use this
+  subscription ID later on to unsubscribe the client from this destination.</p>
 
 <p>The client will send a Stomp
   <a href=http://activemq.apache.org/stomp/stomp10/specification.html#subscribe>SUBSCRIBE</a> frame to the server
@@ -249,7 +251,6 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
 
 <p>The client specifies that it will handle the message acknowledgement and is interested to receive
   only messages matching the selector <code>location = 'Europe'</code>.</p>
-
 <div class=advice>
   <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
   <p>If you want to subscribe the client to multiple destinations, you can use the same callback to receive all
@@ -263,11 +264,15 @@ It also accepts <em>Stomp on Web Sockets</em> from the URL <code>ws://localhost:
   </code></pre>
 </div>
 
-<p>To stop receiving messages, the client can use its <code>unsubscribe</code> method.
-  The method takes a <code>destination</code> argument corresponding to the destination to unsubscribe from.</p>
+<p>To stop receiving messages, the client can use its <code>unsubscribe()</code> method.
+  The method takes a <code>id</code> argument corresponding to the subscription ID to unsubscribe from.</p>
 
 <pre><code>
-  <mark>client.unsubscribe</mark>("/queue/test");
+  id = client.subscribe(...);
+  
+  ...
+  
+  <mark>client.unsubscribe</mark>(id);
 </code></pre>
 
 <p> The method also takes an optional <code>headers</code> argument if the client needs to pass additional headers.</p>
