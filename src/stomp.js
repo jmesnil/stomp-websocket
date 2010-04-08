@@ -51,7 +51,9 @@
     var chr = null;
     for (var i = divider + 2; i < data.length; i++) {
       chr = data.charAt(i);
-      if (chr === '\0') break;
+      if (chr === '\0') {
+         break;
+      }
       body += chr;
     }
 
