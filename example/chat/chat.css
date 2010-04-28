@@ -80,3 +80,20 @@ body {
 .status {
   background-color: #DDD;
 }
+
+form dt {
+   clear:both;
+   width:19%;
+   float:left;
+   text-align:right;
+}
+
+form dd {
+   float:left;
+   width:80%;
+   margin:0 0 0.5em 0.25em;
+}
+
+input {
+   width: 320px;
+}

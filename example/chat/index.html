@@ -6,32 +6,37 @@
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js'></script>
     <script src='../../src/stomp.js'></script>
     <script src='chat.js'></script>
+    <script>
+    $(document).ready(function() {
+      var supported = ("WebSocket" in window);
+      if(!supported) {
+        var msg = "Your browser does not support Web Sockets. This example will not work properly.<br>";
+        msg += "Please use a Web Browser with Web Sockets support (WebKit or Google Chrome).";
+        $("#connect").html(msg);
+      }
+    });
+    </script>
   </head>
   <body>
     <div id='connect'>
       <form id='connect_form'>
-         <ol>
-            <li>
-               <label for=connect_url>Server URL</label>
-               <input name=url id='connect_url' value='ws://localhost:61614/stomp'>
-            </li>
-            <li>
-               <label for=connect_login>Login</label>
-               <input id='connect_login' placeholder="User Login" value="guest">
-            </li>
-            <li>
-               <label for=connect_passcode>Password</label>
-               <input id='connect_passcode' type=password placeholder="User Password" value="guest">
-            </li>
-            <li>
-               <label for=destination>Destination</label>
-               <input id='destination' placeholder="Destination" value="/queue/test">
-            </li>
-            <li>
-               <input type=submit id='connect_submit' value="Connect">
-            </li>
-        </ol>
+         <dl>
+           <dt><label for=connect_url>Server URL</label></dt>
+           <dd><input name=url id='connect_url' value='ws://localhost:61614/stomp'></dd>
+           <dt><label for=connect_login>Login</label></dt>
+           <dd><input id='connect_login' placeholder="User Login" value="guest"></dd>
+           <dt><label for=connect_passcode>Password</label></dt>
+           <dd><input id='connect_passcode' type=password placeholder="User Password" value="guest"></dd>
+           <dt><label for=destination>Destination</label></dt>
+           <dd><input id='destination' placeholder="Destination" value="/queue/test"></dd>
+           <dt>&nbsp;</dt>
+           <dd><input type=submit id='connect_submit' value="Connect"></dd>
+        </dl>
       </form>
+
+      <p>Use the form above to connect to the Stomp server and subscribe to the destination.</p>
+      <p>Once connected, you can send messages to the destination with the text field at the bottom of this page</p>
+
     </div>
     <div id="disconnect">
       <form id='disconnect_form'>
