@@ -1,7 +1,7 @@
 $(document).ready(function(){
   
   TEST = {
-    destination : "/queue/test",
+    destination : "jms.topic.chat",
     login : "guest",
     password : "guest",
     url : "ws://localhost:61614/stomp",
