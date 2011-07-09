@@ -14,7 +14,7 @@
         if (headers) {
           for (header in headers) {
             if(headers.hasOwnProperty(header)) {
-              out = out + header + ': ' + headers[header] + '\n';
+              out = out + header + ':' + headers[header] + '\n';
             }
           }
         }
