@@ -11,16 +11,37 @@ This is a fork based on the work by [jmsenil](http://github.com/jmesnil/stomp-we
    * Cleaner/simpler, but still just JavaScript
  * Pluggable WebSocket objects (MozWebSocket, JsSock)
 
-The project now depends on CoffeeScript, Node.js, JsMockito, and Jasmine for development, but in return testing does not depend on the browser. This project infrastructure will lead to better test coverage and better mocking. For this reason, the library will be more suited for building on top of it.
+The project now depends on CoffeeScript, Node.js, and Jasmine for development, but in return testing does not depend on the browser. This project infrastructure will lead to better test coverage and better mocking. For this reason, the library will be more suited for building on top of it.
 
 Online [documentation][doc] describes the library API.
 
-## Test
+## Requirements
 
-* Checkout the project
+ * Node.js and NPM
+ * NPM packages
+   * coffee-script
+   * jasmine-node
+   * growl (optional)
+
+## Building and Testing
+
+To build JavaScript:
+
+    cake build
+
+To run tests:
+
+    cake test
+
+To continuously run tests on file changes:
+
+    cake watch
+
+## Browser Tests
+
 * Make sure you have a running Stomp broker which supports the Web Sockets protocol
  (see the [documentation][doc])
-* Open in your web browser the project's [test page](test/index.html)
+* Open in your web browser the project's [test page](browsertests/index.html)
 * Check all tests pass
 
 ## Use
