@@ -1,6 +1,6 @@
 # Stomp over Web Socket 
 
-This is a fork based on the work by [jmsenil](http://github.com/jmesnil/stomp-websocket). The goals are:
+This is a fork of the work started by [jmsenil](http://github.com/jmesnil/stomp-websocket). The goals of this fork are:
 
  * Better mocking of a Stomp WebSocket server
    * Eliminating the need for running a broker to test
