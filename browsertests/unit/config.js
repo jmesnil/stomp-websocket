@@ -4,7 +4,7 @@ $(document).ready(function(){
     destination : "jms.topic.chat",
     login : "guest",
     password : "guest",
-    url : "ws://localhost:61614/stomp",
+    url : "ws://localhost:9000/stomp",
     timeout: 2000,
     debug : function(str) {
       $("#debug").append(str + "\n");
