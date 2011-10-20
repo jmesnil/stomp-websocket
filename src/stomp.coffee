@@ -1,61 +1,50 @@
 Stomp =
-  frame: `function(command, headers, body) {
-    return {
-      command: command,
-      headers: headers,
-      body: body,
-      toString: function() {
-        var out = command + '\n';
-        if (headers) {
-          for (header in headers) {
-            if(headers.hasOwnProperty(header)) {
-              out = out + header + ': ' + headers[header] + '\n';
-            }
-          }
-        }
-        out = out + '\n';
-        if (body) {
-          out = out + body;
-        }
-        return out;
-      }
-    }
-  }`
-  unmarshal: `function(data) {
-    var divider = data.search(/\n\n/),
-        headerLines = data.substring(0, divider).split('\n'),
-        command = headerLines.shift(),
-        headers = {},
-        body = '';
+  frame: (command, headers=[], body='') ->
+    command: command
+    headers: headers
+    body: body
+    receipt: headers.receipt?
+    transaction: headers.transaction?
+    destination: headers.destination?
+    subscription: headers.subscription?
+    error: null
+    toString: ->
+      lines = [command]
+      for own name, value of headers
+        lines.push("#{name}: #{value}")
+      lines.push('\n'+body)
+      return lines.join('\n')
+  
+  unmarshal: (data) ->
+    divider = data.search(/\n\n/)
+    headerLines = data.substring(0, divider).split('\n')
+    command = headerLines.shift()
+    headers = {}
+    body = ''
+    trim = (str) ->
+      str.replace(/^\s+/g,'').replace(/\s+$/g,'')
 
-    trim = function(str) {
-      return str.replace(/^\s+/g,'').replace(/\s+$/g,'');
-    };
-
-    // Parse headers
-    var line = idx = null;
-    for (var i = 0; i < headerLines.length; i++) {
-      line = headerLines[i];
-      idx = line.indexOf(':');
-      headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
-    }
+    # Parse headers
+    line = idx = null
+    for i in [0...headerLines.length]
+      line = headerLines[i]
+      idx = line.indexOf(':')
+      headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
     
-    // Parse body, stopping at the first \0 found.
-    // TODO: Add support for content-length header.
-    var chr = null;
-    for (var i = divider + 2; i < data.length; i++) {
-      chr = data.charAt(i);
-      if (chr === '\0') {
-         break;
-      }
-      body += chr;
-    }
+    # Parse body, stopping at the first \0 found.
+    # TODO: Add support for content-length header.
+    chr = null;
+    for i in [(divider + 2)...data.length]
+      chr = data.charAt(i)
+      if chr is '\0'
+         break
+      body += chr
 
-    return Stomp.frame(command, headers, body);
-  }`
-  marshal: `function(command, headers, body) {
-    return Stomp.frame(command, headers, body).toString() + '\0';
-  }`
+    return Stomp.frame(command, headers, body)
+  
+  marshal: (command, headers, body) ->
+    Stomp.frame(command, headers, body).toString() + '\0'
+  
   client: (url) ->
     new Client url
   
