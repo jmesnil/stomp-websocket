@@ -1,5 +1,3 @@
-Event = (type) -> {'type': type}
-
 class WebSocketMock
   constructor: (@url) ->
     @onclose = ->
@@ -10,37 +8,35 @@ class WebSocketMock
     @bufferedAmount = 0
     @extensions = ''
     @protocol = ''
-    setTimeout((=> @handle_open()), 0)
+    setTimeout(@handle_open, 0)
   
   # WebSocket API
   
   close: ->
-    setTimeout(@handle_close, 0)
+    @handle_close()
     @readyState = 2
    
   send: (msg) ->
     if @readyState isnt 1 then return false
-    setTimeout((=> @handle_send(msg)), 0)
+    @handle_send(msg)
     return true
   
   # Helpers
   
   _accept: ->
     @readyState = 1
-    @onopen(Event('open'))
+    @onopen({'type': 'open'})
   
   _shutdown: ->
     @readyState = 3
-    @onclose(Event('close'))
+    @onclose({'type': 'close'})
   
   _error: ->
     @readyState = 3
-    @onerror(Event('error'))
+    @onerror({'type': 'error'})
   
   _respond: (data) ->
-    event = Event('message')
-    event.data = data
-    @onmessage(event)
+    @onmessage({'type': 'message', 'data': data})
     
   # Handlers
   
