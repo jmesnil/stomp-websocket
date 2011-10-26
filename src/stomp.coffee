@@ -63,9 +63,9 @@ class Client
     @ws.send(out)
   
   connect: (login_, passcode_, connectCallback, errorCallback) ->
-    client = this
     @debug?("Opening Web Socket...")
-    @ws = new WebSocket(@url)
+    klass = WebSocketStompMock or WebSocket
+    @ws = new klass(@url)
     @ws.onmessage = (evt) =>
       @debug?('<<< ' + evt.data)
       frame = Stomp.unmarshal(evt.data)
@@ -80,7 +80,7 @@ class Client
       #else if frame.command is "ERROR"
       #  @onerror?(frame)
     @ws.onclose   = =>
-      msg = "Whoops! Lost connection to " + client.url
+      msg = "Whoops! Lost connection to " + @url
       @debug?(msg)
       errorCallback?(msg)
     @ws.onopen    = =>
@@ -132,4 +132,4 @@ if window?
   window.Stomp = Stomp
 else
   exports.Stomp = Stomp
-  WebSocket = require('./test/server.mock.js').StompServerMock
+  WebSocketStompMock = require('./test/server.mock.js').StompServerMock

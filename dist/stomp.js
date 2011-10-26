@@ -1,5 +1,5 @@
 (function() {
-  var Client, Stomp, WebSocket;
+  var Client, Stomp, WebSocketStompMock;
   var __hasProp = Object.prototype.hasOwnProperty, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Stomp = {
     frame: function(command, headers, body) {
@@ -81,12 +81,12 @@
       return this.ws.send(out);
     };
     Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback) {
-      var client;
-      client = this;
+      var klass;
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
       }
-      this.ws = new WebSocket(this.url);
+      klass = WebSocketStompMock || WebSocket;
+      this.ws = new klass(this.url);
       this.ws.onmessage = __bind(function(evt) {
         var frame, onreceive;
         if (typeof this.debug === "function") {
@@ -103,7 +103,7 @@
       }, this);
       this.ws.onclose = __bind(function() {
         var msg;
-        msg = "Whoops! Lost connection to " + client.url;
+        msg = "Whoops! Lost connection to " + this.url;
         if (typeof this.debug === "function") {
           this.debug(msg);
         }
@@ -190,6 +190,6 @@
     window.Stomp = Stomp;
   } else {
     exports.Stomp = Stomp;
-    WebSocket = require('./test/server.mock.js').StompServerMock;
+    WebSocketStompMock = require('./test/server.mock.js').StompServerMock;
   }
 }).call(this);
