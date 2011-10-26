@@ -1,21 +1,12 @@
 # Stomp over Web Socket 
 
-This is a fork of the work started by [jmsenil](http://github.com/jmesnil/stomp-websocket). The goals of this fork are:
-
- * Better mocking of a Stomp WebSocket server
-   * Eliminating the need for running a broker to test
- * Node.js based testing
-   * No need for a browser
- * Stomp/1.1 compatibility
- * Rewrite in CoffeeScript (most contentious, I'm sure)
-   * Cleaner/simpler, but still just JavaScript
- * Pluggable WebSocket objects (MozWebSocket, JsSock)
-
-The project now depends on CoffeeScript, Node.js, and Jasmine for development, but in return testing does not depend on the browser. This project infrastructure will lead to better test coverage and better mocking. For this reason, the library will be more suited for building on top of it.
+The library file is located in `dist/stomp.js`.
+It does not require any dependency (except WebSocket support from the browser!)
 
 Online [documentation][doc] describes the library API.
 
-## Requirements
+## Development Requirements
+For development (testing, building) the project requires Node.js, CoffeeScript, and Jasmine. This allows us to run tests without the browser continuously during development (see `cake watch`). 
 
  * Node.js and NPM
  * NPM packages
@@ -49,9 +40,14 @@ To continuously run tests on file changes:
 The project contains an [chat example](example/chat/index.html) using stomp-websockets
 to send and receive Stomp messages from a server.
 
+## Todo
+
+ * Stomp/1.1 compatibility
+ * Pluggable WebSocket objects (MozWebSocket, JsSock)
+
 ## Authors
 
  * [jmsenil](http://github.com/jmesnil)
- * Jeff Lindsay
+ * [Jeff Lindsay](http://github.com/progrium)
 
 [doc]: http://jmesnil.net/stomp-websocket/doc/
