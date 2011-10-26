@@ -8,7 +8,7 @@ test("Connect to an invalid Stomp server", function() {
     function() {
       start();
     });
-    stop(TEST.timeout);
+  stop(TEST.timeout);
 });
 
 test("Connect to a valid Stomp server", function() {
@@ -18,7 +18,7 @@ test("Connect to a valid Stomp server", function() {
     function() {
       start();
     });
-    stop(TEST.timeout);
+  stop(TEST.timeout);
 });
 
 test("Disconnect", function() {
@@ -31,5 +31,5 @@ test("Disconnect", function() {
         start();
       });
     });
-    stop(TEST.timeout);
+  stop(TEST.timeout);
 });
