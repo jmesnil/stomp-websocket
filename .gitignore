@@ -2,5 +2,5 @@ pkg
 .settings
 bin
 data
-dist
+dist/test
 TODO.txt
