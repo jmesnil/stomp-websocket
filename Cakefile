@@ -4,13 +4,19 @@ util   = require 'util'
 
 task 'watch', 'Watch for changes in coffee files to build and test', ->
     util.log "Watching for changes in src and test"
+    lastTest = 0
     watchDir 'src', ->
       invoke 'build:src'
       invoke 'build:test'
     watchDir 'test', ->
       invoke 'build:test'
-    watchDir 'dist/test', ->
-      invoke 'test'
+    watchDir 'dist/test', (file)->
+      # We only want to run tests once (a second), 
+      # even if a bunch of test files change
+      time = new Date().getTime()
+      if (time-lastTest) > 1000
+        lastTest = time
+        invoke 'test'
 
 task 'test', 'Run the tests', ->
   util.log "Running tests..."
