@@ -3,10 +3,11 @@ Stomp =
     command: command
     headers: headers
     body: body
-    receipt: headers.receipt?
-    transaction: headers.transaction?
-    destination: headers.destination?
-    subscription: headers.subscription?
+    id: headers.id
+    receipt: headers.receipt
+    transaction: headers.transaction
+    destination: headers.destination
+    subscription: headers.subscription
     error: null
     toString: ->
       lines = [command]
@@ -52,6 +53,7 @@ class Client
   constructor: (@url) ->
     # used to index subscribers
     @counter = 0 
+    @connected = false
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {};
   
@@ -64,32 +66,32 @@ class Client
     client = this
     @debug?("Opening Web Socket...")
     @ws = new WebSocket(@url)
-    @ws.onmessage = (evt) ->
-      client.debug?('<<< ' + evt.data)
+    @ws.onmessage = (evt) =>
+      @debug?('<<< ' + evt.data)
       frame = Stomp.unmarshal(evt.data)
-      if frame.command is "CONNECTED" and client.connectCallback
-        client.connectCallback(frame)
+      if frame.command is "CONNECTED" and connectCallback
+        @connected = true
+        connectCallback(frame)
       else if frame.command is "MESSAGE"
-        onreceive = client.subscriptions[frame.headers.subscription]
+        onreceive = @subscriptions[frame.headers.subscription]
         onreceive?(frame)
-      else if frame.command is "RECEIPT"
-        client.onreceipt?(frame)
-      else if frame.command is "ERROR"
-        client.onerror?(frame)
-    @ws.onclose   = ->
+      #else if frame.command is "RECEIPT"
+      #  @onreceipt?(frame)
+      #else if frame.command is "ERROR"
+      #  @onerror?(frame)
+    @ws.onclose   = =>
       msg = "Whoops! Lost connection to " + client.url
-      client.debug?(msg)
+      @debug?(msg)
       errorCallback?(msg)
-    @ws.onopen    = ->
-      client.debug?('Web Socket Opened...')
-      client._transmit("CONNECT", {login: login_, passcode: passcode_})
-    @login = login_
-    @passcode = passcode_
+    @ws.onopen    = =>
+      @debug?('Web Socket Opened...')
+      @_transmit("CONNECT", {login: login_, passcode: passcode_})
     @connectCallback = connectCallback
   
   disconnect: (disconnectCallback) ->
     @_transmit("DISCONNECT")
     @ws.close()
+    @connected = false
     disconnectCallback?()
   
   send: (destination, headers={}, body='') ->
@@ -130,3 +132,4 @@ if window?
   window.Stomp = Stomp
 else
   exports.Stomp = Stomp
+  WebSocket = require('./test/server.mock.js').StompServerMock
