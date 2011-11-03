@@ -82,20 +82,16 @@ it explained the idea behind Web Sockets:</p>
 <h3 id=hornetq>HornetQ</h3>
 
 <p><a href=http://jboss.org/hornetq>HornetQ</a> is the Open Source messaging system developed
-  by Red Hat and JBoss. Support for Stomp on Web Sockets is available for HornetQ subversion trunk.</p>
-<p>To start HornetQ with support for Stomp on Web Sockets, run the following steps:</p>
+  by Red Hat and JBoss.</p>
+  
+<p>To start HornetQ with support for Stomp on Web Sockets, <a href=http://www.jboss.org/hornetq/downloads.html>download the latest version</a> and run the following steps:</p>
 
 <pre>
-  <samp>$ </samp><kbd>svn co http://anonsvn.jboss.org/repos/hornetq/trunk/ hornetq</kbd>
-  <samp>...</samp>
-  <samp>$ </samp><kbd>cd hornetq </kbd>
-  <samp>$ </samp><kbd>./build.sh distro</kbd>
-  <samp>...</samp>
-  <samp>$ </samp><kbd>cd build/hornetq-2.1.0.BETA3/bin</kbd>
+  <samp>$ </samp><kbd>cd hornetq-x.y.z/bin</kbd>
   <samp>$ </samp><kbd>./run.sh ../examples/jms/stomp-websockets/server0</kbd>
   <samp>...
-  Started Netty Acceptor version 3.2.0.BETA1-r2215 localhost:61614 for STOMP_WS protocol
-  HornetQ Server version 2.0.0.GA (Hornet Queen, 113) started</samp>
+  Started Netty Acceptor version 3.2.3.Final-r${buildNumber} localhost:61614 for STOMP_WS protocol
+  HornetQ Server version 2.2.5.Final (HQ_2_2_5_FINAL_AS7, 121) [d11ee32e-0653-11e1-81fd-001ec29e77e5] started</samp>
 </pre>
 
 <p>HornetQ is now started and listens to Stomp over Web Sockets on the port <code>61614</code>.<br>
