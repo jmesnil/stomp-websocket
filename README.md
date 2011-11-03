@@ -47,7 +47,7 @@ to send and receive Stomp messages from a server.
 
 ## Authors
 
- * [jmsenil](http://github.com/jmesnil)
+ * [Jeff Mesnil](http://jmesnil.net/)
  * [Jeff Lindsay](http://github.com/progrium)
 
 [doc]: http://jmesnil.net/stomp-websocket/doc/
