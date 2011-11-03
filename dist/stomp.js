@@ -25,7 +25,7 @@
           for (name in headers) {
             if (!__hasProp.call(headers, name)) continue;
             value = headers[name];
-            lines.push("" + name + ": " + value);
+            lines.push("" + name + ":" + value);
           }
           lines.push('\n' + body);
           return lines.join('\n');

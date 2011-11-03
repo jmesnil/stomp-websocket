@@ -12,7 +12,7 @@ Stomp =
     toString: ->
       lines = [command]
       for own name, value of headers
-        lines.push("#{name}: #{value}")
+        lines.push("#{name}:#{value}")
       lines.push('\n'+body)
       return lines.join('\n')
   

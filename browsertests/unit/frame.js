@@ -2,12 +2,12 @@ module("Stomp Frame");
 
 test("marshal a CONNECT frame", function() {
   var out = Stomp.marshal("CONNECT", {login: 'jmesnil', passcode: 'wombats'});
-  equals(out, "CONNECT\nlogin: jmesnil\npasscode: wombats\n\n\0");
+  equals(out, "CONNECT\nlogin:jmesnil\npasscode:wombats\n\n\0");
 });
 
 test("marshal a SEND frame", function() {
   var out = Stomp.marshal("SEND", {destination: '/queue/test'}, "hello, world!");
-  equals(out, "SEND\ndestination: /queue/test\n\nhello, world!\0");
+  equals(out, "SEND\ndestination:/queue/test\n\nhello, world!\0");
 });
 
 test("unmarshal a CONNECTED frame", function() {
