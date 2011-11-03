@@ -64,7 +64,8 @@ class Client
   
   connect: (login_, passcode_, connectCallback, errorCallback) ->
     @debug?("Opening Web Socket...")
-    klass = WebSocketStompMock or WebSocket
+    klass = WebSocketStompMock or WebSocketInBrowserClass
+    @debug?('using class' + klass)
     @ws = new klass(@url)
     @ws.onmessage = (evt) =>
       @debug?('<<< ' + evt.data)
@@ -130,6 +131,7 @@ class Client
 
 if window?
   window.Stomp = Stomp
+  WebSocketInBrowserClass = if "MozWebSocket" in window then MozWebSocket else WebSocket
 else
   exports.Stomp = Stomp
   WebSocketStompMock = require('./test/server.mock.js').StompServerMock

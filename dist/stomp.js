@@ -1,6 +1,11 @@
 (function() {
-  var Client, Stomp, WebSocketStompMock;
-  var __hasProp = Object.prototype.hasOwnProperty, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var Client, Stomp, WebSocketInBrowserClass, WebSocketStompMock;
+  var __hasProp = Object.prototype.hasOwnProperty, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   Stomp = {
     frame: function(command, headers, body) {
       if (headers == null) {
@@ -85,7 +90,10 @@
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
       }
-      klass = WebSocketStompMock || WebSocket;
+      klass = WebSocketStompMock || WebSocketInBrowserClass;
+      if (typeof this.debug === "function") {
+        this.debug('using class' + klass);
+      }
       this.ws = new klass(this.url);
       this.ws.onmessage = __bind(function(evt) {
         var frame, onreceive;
@@ -188,6 +196,7 @@
   })();
   if (typeof window !== "undefined" && window !== null) {
     window.Stomp = Stomp;
+    WebSocketInBrowserClass = __indexOf.call(window, "MozWebSocket") >= 0 ? MozWebSocket : WebSocket;
   } else {
     exports.Stomp = Stomp;
     WebSocketStompMock = require('./test/server.mock.js').StompServerMock;
