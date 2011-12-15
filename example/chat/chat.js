@@ -16,7 +16,7 @@ $(document).ready(function(){
     };
     // the client is notified when it is connected to the server.
     var onconnect = function(frame) {
-      debug("connected to Stomp");
+      client.debug("connected to Stomp");
       $('#connect').fadeOut({ duration: 'fast' });
       $('#disconnect').fadeIn();
       $('#send_form_input').removeAttr('disabled');
