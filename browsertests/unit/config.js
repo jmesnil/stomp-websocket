@@ -5,6 +5,7 @@ $(document).ready(function(){
     login : "guest",
     password : "guest",
     url : "ws://localhost:9000/stomp",
+    badUrl: "ws://localhost:9001/stomp",
     timeout: 2000,
     debug : function(str) {
       $("#debug").append(str + "\n");
