@@ -1,3 +1,8 @@
+###
+Copyright (C) 2010 Jeff Mesnil -- http://jmesnil.net/
+Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
+###
+
 Stomp =
   frame: (command, headers=[], body='') ->
     command: command
@@ -66,9 +71,19 @@ class Client
     @debug?("Opening Web Socket...")
     klass = WebSocketStompMock or WebSocket
     @ws = new klass(@url)
+    @ws.binaryType = "arraybuffer"
     @ws.onmessage = (evt) =>
-      @debug?('<<< ' + evt.data)
-      frame = Stomp.unmarshal(evt.data)
+      data = if evt.data instanceof ArrayBuffer
+        view = new Uint8Array( evt.data )
+        @debug?('--- got data length: ' + view.length)
+        data = ""
+        for i in view
+          data += String.fromCharCode(i)
+        data
+      else
+        evt.data
+      @debug?('<<< ' + data)
+      frame = Stomp.unmarshal(data)
       if frame.command is "CONNECTED" and connectCallback
         @connected = true
         connectCallback(frame)

@@ -1,14 +1,17 @@
+
+/*
+Copyright (C) 2010 Jeff Mesnil -- http://jmesnil.net/
+Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
+*/
+
 (function() {
-  var Client, Stomp, WebSocketStompMock;
-  var __hasProp = Object.prototype.hasOwnProperty, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var Client, Stomp, WebSocketStompMock,
+    __hasProp = Object.prototype.hasOwnProperty;
+
   Stomp = {
     frame: function(command, headers, body) {
-      if (headers == null) {
-        headers = [];
-      }
-      if (body == null) {
-        body = '';
-      }
+      if (headers == null) headers = [];
+      if (body == null) body = '';
       return {
         command: command,
         headers: headers,
@@ -51,9 +54,7 @@
       chr = null;
       for (i = _ref2 = divider + 2, _ref3 = data.length; _ref2 <= _ref3 ? i < _ref3 : i > _ref3; _ref2 <= _ref3 ? i++ : i--) {
         chr = data.charAt(i);
-        if (chr === '\0') {
-          break;
-        }
+        if (chr === '\0') break;
         body += chr;
       }
       return Stomp.frame(command, headers, body);
@@ -65,82 +66,92 @@
       return new Client(url);
     }
   };
+
   Client = (function() {
+
     function Client(url) {
       this.url = url;
       this.counter = 0;
       this.connected = false;
       this.subscriptions = {};
     }
+
     Client.prototype._transmit = function(command, headers, body) {
       var out;
       out = Stomp.marshal(command, headers, body);
-      if (typeof this.debug === "function") {
-        this.debug(">>> " + out);
-      }
+      if (typeof this.debug === "function") this.debug(">>> " + out);
       return this.ws.send(out);
     };
+
     Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback) {
-      var klass;
-      if (typeof this.debug === "function") {
-        this.debug("Opening Web Socket...");
-      }
+      var klass,
+        _this = this;
+      if (typeof this.debug === "function") this.debug("Opening Web Socket...");
       klass = WebSocketStompMock || WebSocket;
       this.ws = new klass(this.url);
-      this.ws.onmessage = __bind(function(evt) {
-        var frame, onreceive;
-        if (typeof this.debug === "function") {
-          this.debug('<<< ' + evt.data);
-        }
-        frame = Stomp.unmarshal(evt.data);
+      this.ws.binaryType = "arraybuffer";
+      this.ws.onmessage = function(evt) {
+        var data, frame, i, onreceive, view;
+        data = (function() {
+          var _i, _len;
+          if (evt.data instanceof ArrayBuffer) {
+            view = new Uint8Array(evt.data);
+            if (typeof this.debug === "function") {
+              this.debug('--- got data length: ' + view.length);
+            }
+            data = "";
+            for (_i = 0, _len = view.length; _i < _len; _i++) {
+              i = view[_i];
+              data += String.fromCharCode(i);
+            }
+            return data;
+          } else {
+            return evt.data;
+          }
+        }).call(_this);
+        if (typeof _this.debug === "function") _this.debug('<<< ' + data);
+        frame = Stomp.unmarshal(data);
         if (frame.command === "CONNECTED" && connectCallback) {
-          this.connected = true;
+          _this.connected = true;
           return connectCallback(frame);
         } else if (frame.command === "MESSAGE") {
-          onreceive = this.subscriptions[frame.headers.subscription];
+          onreceive = _this.subscriptions[frame.headers.subscription];
           return typeof onreceive === "function" ? onreceive(frame) : void 0;
         }
-      }, this);
-      this.ws.onclose = __bind(function() {
+      };
+      this.ws.onclose = function() {
         var msg;
-        msg = "Whoops! Lost connection to " + this.url;
-        if (typeof this.debug === "function") {
-          this.debug(msg);
-        }
+        msg = "Whoops! Lost connection to " + _this.url;
+        if (typeof _this.debug === "function") _this.debug(msg);
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
-      }, this);
-      this.ws.onopen = __bind(function() {
-        if (typeof this.debug === "function") {
-          this.debug('Web Socket Opened...');
-        }
-        return this._transmit("CONNECT", {
+      };
+      this.ws.onopen = function() {
+        if (typeof _this.debug === "function") _this.debug('Web Socket Opened...');
+        return _this._transmit("CONNECT", {
           login: login_,
           passcode: passcode_
         });
-      }, this);
+      };
       return this.connectCallback = connectCallback;
     };
+
     Client.prototype.disconnect = function(disconnectCallback) {
       this._transmit("DISCONNECT");
       this.ws.close();
       this.connected = false;
       return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
     };
+
     Client.prototype.send = function(destination, headers, body) {
-      if (headers == null) {
-        headers = {};
-      }
-      if (body == null) {
-        body = '';
-      }
+      if (headers == null) headers = {};
+      if (body == null) body = '';
       headers.destination = destination;
       return this._transmit("SEND", headers, body);
     };
+
     Client.prototype.subscribe = function(destination, callback, headers) {
       var id;
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       id = "sub-" + this.counter++;
       headers.destination = destination;
       headers.id = id;
@@ -148,48 +159,47 @@
       this._transmit("SUBSCRIBE", headers);
       return id;
     };
+
     Client.prototype.unsubscribe = function(id, headers) {
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       headers.id = id;
       delete this.subscriptions[id];
       return this._transmit("UNSUBSCRIBE", headers);
     };
+
     Client.prototype.begin = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       headers.transaction = transaction;
       return this._transmit("BEGIN", headers);
     };
+
     Client.prototype.commit = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       headers.transaction = transaction;
       return this._transmit("COMMIT", headers);
     };
+
     Client.prototype.abort = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       headers.transaction = transaction;
       return this._transmit("ABORT", headers);
     };
+
     Client.prototype.ack = function(message_id, headers) {
-      if (headers == null) {
-        headers = {};
-      }
+      if (headers == null) headers = {};
       headers["message-id"] = message_id;
       return this._transmit("ACK", headers);
     };
+
     return Client;
+
   })();
+
   if (typeof window !== "undefined" && window !== null) {
     window.Stomp = Stomp;
   } else {
     exports.Stomp = Stomp;
     WebSocketStompMock = require('./test/server.mock.js').StompServerMock;
   }
+
 }).call(this);
