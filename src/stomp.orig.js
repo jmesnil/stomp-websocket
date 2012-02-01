@@ -1,4 +1,5 @@
 // (c) 2010 Jeff Mesnil -- http://jmesnil.net/
+// Copyright (C) FuseSource, Inc. --  http://fusesource.com
 
 (function(window) {
   
@@ -78,8 +79,17 @@
     };
 
     onmessage = function(evt) {
-      debug('<<< ' + evt.data);
-      var frame = Stomp.unmarshal(evt.data);
+      var data = evt.data
+      if (data instanceof ArrayBuffer) {
+        view = new Uint8Array(data);
+        data = "";
+        var i, len;
+        for (i = 0, len = view.length; i < len; i++) {
+          data += String.fromCharCode(view[i]);
+        }
+      }
+      debug('<<< ' + data);
+      var frame = Stomp.unmarshal(data);
       if (frame.command === "CONNECTED" && that.connectCallback) {
         that.connectCallback(frame);
       } else if (frame.command === "MESSAGE") {
