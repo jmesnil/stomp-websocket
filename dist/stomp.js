@@ -135,6 +135,8 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
           return typeof onreceive === "function" ? onreceive(frame) : void 0;
         } else if (frame.command === "ERROR") {
           return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
+        } else {
+          return typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0;
         }
       };
       this.ws.onclose = function() {

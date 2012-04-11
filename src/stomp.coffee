@@ -90,10 +90,10 @@ class Client
       else if frame.command is "MESSAGE"
         onreceive = @subscriptions[frame.headers.subscription]
         onreceive?(frame)
-      #else if frame.command is "RECEIPT"
-      #  @onreceipt?(frame)
       else if frame.command is "ERROR"
-        errorCallback?(msg)  
+        errorCallback?(msg)
+      else
+        @debug?("Unhandled frame: " + frame)
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to " + @url
       @debug?(msg)
