@@ -98,6 +98,8 @@ class Client
       msg = "Whoops! Lost connection to " + @url
       @debug?(msg)
       errorCallback?(msg)
+    @ws.onerror = (event)=>
+      errorCallback?(event)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       @_transmit("CONNECT", {login: login_, passcode: passcode_})

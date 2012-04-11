@@ -147,6 +147,9 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         }
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
+      this.ws.onerror = function(event) {
+        return typeof errorCallback === "function" ? errorCallback(event) : void 0;
+      };
       this.ws.onopen = function() {
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
