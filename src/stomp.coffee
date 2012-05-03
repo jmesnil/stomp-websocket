@@ -21,6 +21,7 @@ Stomp =
       lines.push('\n'+body)
       return lines.join('\n')
   
+  # unmarshall a single frame
   unmarshal: (data) ->
     divider = data.search(/\n\n/)
     headerLines = data.substring(0, divider).split('\n')
@@ -47,7 +48,13 @@ Stomp =
       body += chr
 
     return Stomp.frame(command, headers, body)
-  
+
+  # Web socket servers can send multiple frames in a single websocket message.
+  # Split the data before unmarshalling every single STOMP frame
+  unmarshal_multi: (multi_datas) ->
+    datas = (Stomp.unmarshal(data) for data in multi_datas.split(/\x00\n*/) when data && data.length > 0)
+    return datas
+
   marshal: (command, headers, body) ->
     Stomp.frame(command, headers, body).toString() + '\x00'
   
@@ -83,17 +90,19 @@ class Client
       else
         evt.data
       @debug?('<<< ' + data)
-      frame = Stomp.unmarshal(data)
-      if frame.command is "CONNECTED" and connectCallback
-        @connected = true
-        connectCallback(frame)
-      else if frame.command is "MESSAGE"
-        onreceive = @subscriptions[frame.headers.subscription]
-        onreceive?(frame)
-      #else if frame.command is "RECEIPT"
-      #  @onreceipt?(frame)
-      #else if frame.command is "ERROR"
-      #  @onerror?(frame)
+      for frame in Stomp.unmarshal_multi(data)
+        if frame.command is "CONNECTED" and connectCallback
+          @connected = true
+          connectCallback(frame)
+        else if frame.command is "MESSAGE"
+          onreceive = @subscriptions[frame.headers.subscription]
+          onreceive?(frame)
+        #else if frame.command is "RECEIPT"
+        #  @onreceipt?(frame)
+        else if frame.command is "ERROR"
+          errorCallback?(frame)
+        else
+          @debug?("Unhandled frame: " + frame)
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to " + @url
       @debug?(msg)

@@ -67,6 +67,22 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       }
       return Stomp.frame(command, headers, body);
     },
+    unmarshal_multi: function(multi_datas) {
+      var data, datas;
+      datas = (function() {
+        var _i, _len, _ref, _results;
+        _ref = multi_datas.split(/\x00\n*/);
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          data = _ref[_i];
+          if (data && data.length > 0) {
+            _results.push(Stomp.unmarshal(data));
+          }
+        }
+        return _results;
+      })();
+      return datas;
+    },
     marshal: function(command, headers, body) {
       return Stomp.frame(command, headers, body).toString() + '\x00';
     },
@@ -105,7 +121,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       this.ws = new klass(this.url);
       this.ws.binaryType = "arraybuffer";
       this.ws.onmessage = function(evt) {
-        var data, frame, i, onreceive, view;
+        var data, frame, i, onreceive, view, _i, _len, _ref, _results;
         data = (function() {
           var _i, _len;
           if (evt.data instanceof ArrayBuffer) {
@@ -126,14 +142,23 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         if (typeof _this.debug === "function") {
           _this.debug('<<< ' + data);
         }
-        frame = Stomp.unmarshal(data);
-        if (frame.command === "CONNECTED" && connectCallback) {
-          _this.connected = true;
-          return connectCallback(frame);
-        } else if (frame.command === "MESSAGE") {
-          onreceive = _this.subscriptions[frame.headers.subscription];
-          return typeof onreceive === "function" ? onreceive(frame) : void 0;
+        _ref = Stomp.unmarshal_multi(data);
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          frame = _ref[_i];
+          if (frame.command === "CONNECTED" && connectCallback) {
+            _this.connected = true;
+            _results.push(connectCallback(frame));
+          } else if (frame.command === "MESSAGE") {
+            onreceive = _this.subscriptions[frame.headers.subscription];
+            _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
+          } else if (frame.command === "ERROR") {
+            _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
+          } else {
+            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0);
+          }
         }
+        return _results;
       };
       this.ws.onclose = function() {
         var msg;
