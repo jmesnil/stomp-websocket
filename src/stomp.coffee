@@ -42,14 +42,14 @@ Stomp =
     chr = null;
     for i in [(divider + 2)...data.length]
       chr = data.charAt(i)
-      if chr is '\0'
+      if chr is '\x00'
          break
       body += chr
 
     return Stomp.frame(command, headers, body)
   
   marshal: (command, headers, body) ->
-    Stomp.frame(command, headers, body).toString() + '\0'
+    Stomp.frame(command, headers, body).toString() + '\x00'
   
   client: (url) ->
     new Client url
