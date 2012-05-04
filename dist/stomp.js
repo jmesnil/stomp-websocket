@@ -11,6 +11,9 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
     __hasProp = {}.hasOwnProperty;
 
   Stomp = {
+    Headers: {
+      CONTENT_LENGTH: 'content-length'
+    },
     frame: function(command, headers, body) {
       if (headers == null) {
         headers = [];
@@ -42,7 +45,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       };
     },
     unmarshal: function(data) {
-      var body, chr, command, divider, headerLines, headers, i, idx, line, trim, _i, _j, _ref, _ref1, _ref2;
+      var body, chr, command, divider, headerLines, headers, i, idx, len, line, start, trim, _i, _j, _ref, _ref1, _ref2;
       divider = data.search(/\n\n/);
       headerLines = data.substring(0, divider).split('\n');
       command = headerLines.shift();
@@ -57,13 +60,19 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         idx = line.indexOf(':');
         headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
       }
-      chr = null;
-      for (i = _j = _ref1 = divider + 2, _ref2 = data.length; _ref1 <= _ref2 ? _j < _ref2 : _j > _ref2; i = _ref1 <= _ref2 ? ++_j : --_j) {
-        chr = data.charAt(i);
-        if (chr === '\x00') {
-          break;
+      if (headers[Stomp.Headers.CONTENT_LENGTH]) {
+        len = parseInt(headers[Stomp.Headers.CONTENT_LENGTH]);
+        start = divider + 2;
+        body = ('' + data).substring(start, start + len);
+      } else {
+        chr = null;
+        for (i = _j = _ref1 = divider + 2, _ref2 = data.length; _ref1 <= _ref2 ? _j < _ref2 : _j > _ref2; i = _ref1 <= _ref2 ? ++_j : --_j) {
+          chr = data.charAt(i);
+          if (chr === '\x00') {
+            break;
+          }
+          body += chr;
         }
-        body += chr;
       }
       return Stomp.frame(command, headers, body);
     },

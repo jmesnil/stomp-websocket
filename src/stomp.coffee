@@ -4,6 +4,11 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
 ###
 
 Stomp =
+
+  Headers: {
+    CONTENT_LENGTH: 'content-length'
+  }
+
   frame: (command, headers=[], body='') ->
     command: command
     headers: headers
@@ -36,15 +41,19 @@ Stomp =
       line = headerLines[i]
       idx = line.indexOf(':')
       headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
-    
-    # Parse body, stopping at the first \0 found.
-    # TODO: Add support for content-length header.
-    chr = null;
-    for i in [(divider + 2)...data.length]
-      chr = data.charAt(i)
-      if chr is '\x00'
-         break
-      body += chr
+
+    if (headers[Stomp.Headers.CONTENT_LENGTH])
+      len = parseInt(headers[Stomp.Headers.CONTENT_LENGTH])
+      start = divider + 2
+      body = (''+ data).substring(start, start + len)
+    else
+      # Parse body, stopping at the first \0 found.
+      chr = null;
+      for i in [(divider + 2)...data.length]
+        chr = data.charAt(i)
+        if chr is '\x00'
+          break
+        body += chr
 
     return Stomp.frame(command, headers, body)
   
