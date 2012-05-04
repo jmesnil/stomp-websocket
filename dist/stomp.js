@@ -240,12 +240,22 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       return this._transmit("ABORT", headers);
     };
 
-    Client.prototype.ack = function(message_id, headers) {
+    Client.prototype.ack = function(message_id, subscription, headers) {
       if (headers == null) {
         headers = {};
       }
       headers["message-id"] = message_id;
+      headers["subscription"] = subscription;
       return this._transmit("ACK", headers);
+    };
+
+    Client.prototype.nack = function(message_id, subscription, headers) {
+      if (headers == null) {
+        headers = {};
+      }
+      headers["message-id"] = message_id;
+      headers["subscription"] = subscription;
+      return this._transmit("NACK", headers);
     };
 
     return Client;

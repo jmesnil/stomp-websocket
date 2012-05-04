@@ -160,10 +160,15 @@ class Client
     headers.transaction = transaction
     @_transmit("ABORT", headers)
   
-  ack: (message_id, headers={}) ->
+  ack: (message_id, subscription, headers={}) ->
     headers["message-id"] = message_id
+    headers["subscription"] = subscription
     @_transmit("ACK", headers)
   
+  nack: (message_id, subscription, headers={}) ->
+    headers["message-id"] = message_id
+    headers["subscription"] = subscription
+    @_transmit("NACK", headers)
 
 if window?
   window.Stomp = Stomp
