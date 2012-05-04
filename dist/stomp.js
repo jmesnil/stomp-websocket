@@ -12,7 +12,16 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
 
   Stomp = {
     Headers: {
-      CONTENT_LENGTH: 'content-length'
+      CONTENT_LENGTH: 'content-length',
+      ACCEPT_VERSION: 'accept-version',
+      VERSION: 'version'
+    },
+    Versions: {
+      VERSION_1_0: '1.0',
+      VERSION_1_1: '1.1',
+      supportedVersions: function() {
+        return Stomp.Versions.VERSION_1_0 + ',' + Stomp.Versions.VERSION_1_1;
+      }
     },
     frame: function(command, headers, body) {
       if (headers == null) {
@@ -153,13 +162,16 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       this.ws.onopen = function() {
+        var headers;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
         }
-        return _this._transmit("CONNECT", {
+        headers = {
           login: login_,
           passcode: passcode_
-        });
+        };
+        headers[Stomp.Headers.ACCEPT_VERSION] = Stomp.Versions.supportedVersions();
+        return _this._transmit("CONNECT", headers);
       };
       return this.connectCallback = connectCallback;
     };

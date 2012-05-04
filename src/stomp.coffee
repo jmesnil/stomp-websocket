@@ -6,7 +6,15 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
 Stomp =
 
   Headers: {
-    CONTENT_LENGTH: 'content-length'
+    CONTENT_LENGTH : 'content-length',
+    ACCEPT_VERSION : 'accept-version',
+    VERSION        : 'version'
+  }
+  Versions: {
+    VERSION_1_0 : '1.0',
+    VERSION_1_1 : '1.1',
+
+    supportedVersions : -> Stomp.Versions.VERSION_1_0 + ',' + Stomp.Versions.VERSION_1_1
   }
 
   frame: (command, headers=[], body='') ->
@@ -109,7 +117,12 @@ class Client
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
-      @_transmit("CONNECT", {login: login_, passcode: passcode_})
+      headers = {
+         login: login_,
+         passcode: passcode_,
+      }
+      headers[Stomp.Headers.ACCEPT_VERSION] = Stomp.Versions.supportedVersions()
+      @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
   
   disconnect: (disconnectCallback) ->
