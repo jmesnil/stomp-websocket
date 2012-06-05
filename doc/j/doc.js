@@ -25,11 +25,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 $(document).ready(function() {
 	hideTOC();
-	$("#live-web-sockets").html(supports("WebSocket" in window, "Web Sockets"));
+	$("#live-web-sockets").html(supports("WebSocket" in window, "WebSockets"));
 }); /* document.ready */
 
 function hideTOC() {
-    var toc = '<a href="javascript:showTOC()">show table of contents</a>';
+    var toc = '<a href="javascript:showTOC()">Show Table of Contents</a>';
     $("#toc").html(toc);
 }
 
@@ -50,7 +50,7 @@ function showTOC() {
 	toc += '</ol>';
 	level -= 1;
     }
-    toc = '<a href="javascript:hideTOC()">hide table of contents</a><ol>' + toc.substring(4);
+    toc = '<a href="javascript:hideTOC()">Hide Table of Contents</a><ol>' + toc.substring(4);
     $("#toc").html(toc);
 }
 

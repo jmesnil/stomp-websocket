@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Stomp on Web Sockets</title>
+<title>STOMP Over WebSocket</title>
 <!--[if IE]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
@@ -12,47 +12,46 @@
 
 <body>
 <header>
-<h1>Stomp On Web Sockets</h1>
+<h1>STOMP Over WebSocket</h1>
 </header>
 
 <p id="toc">&nbsp;</p>
 
 <section>
-<h2 id=stomp>What is Stomp?</h2>
+<h2 id=stomp>What is STOMP?</h2>
 
 <p><img src=i/johnny_automatic/johnny_automatic_elephant_climbing.svg></p>
-<p><a href=http://stomp.codehaus.org>Stomp</a> is a simple text-orientated messaging protocol.
-  It defines an <a href=http://activemq.apache.org/stomp/stomp10/specification.html>interoperable wire format</a> 
-  so that any of the available <a href=http://stomp.codehaus.org/Clients>Stomp Clients</a> can communicate with any
-  <a href=http://stomp.codehaus.org/Brokers>Stomp Message Broker</a> to provide easy and widespread
-  messaging interoperability among languages, platforms and brokers.</p>
+<p><a href=http://stomp.github.com/>STOMP</a> is a simple text-orientated messaging protocol.
+  It defines an <a href=http://stomp.github.com/stomp-specification-1.1.html>interoperable wire format</a> 
+  so that any of the available STOMP clients can communicate with any STOMP message broker to provide easy and widespread
+  messaging interoperability among languages and platforms (the STOMP web site has a <a href=http://stomp.github.com/implementations.html>list of STOMP client and server implementations</a>.</p>
 </section>
 
 <section>
-<h2 id=websockets>What is the Web Sockets API?</h2>
+<h2 id=websockets>What is the WebSocket API?</h2>
 
 <p class=ss style="width:248px"><img width=248 src=i/johnny_automatic/johnny_automatic_follow_the_leader.svg><br>
   <span id=live-web-sockets></span></p>
-<p><a href=http://dev.w3.org/html5/websockets/>Web Sockets</a> are "TCP for the Web".</p>
+<p><a href=http://dev.w3.org/html5/websockets/>WebSockets</a> are "TCP for the Web".</p>
 <p>When Google announced the availability of
-<a href=http://blog.chromium.org/2009/12/web-sockets-now-available-in-google.html>Web Sockets in Google Chrome</a>,
-it explained the idea behind Web Sockets:</p>
+<a href=http://blog.chromium.org/2009/12/web-sockets-now-available-in-google.html>WebSocket in Google Chrome</a>,
+it explained the idea behind WebSockets:</p>
 <blockquote>
-  <p>The Web Sockets API enables web applications to handle bidirectional communications
+  <p>The WebSocket API enables web applications to handle bidirectional communications
     with server-side process in a straightforward way. Developers have been using XMLHttpRequest
     ("XHR") for such purposes, but XHR makes developing web applications that communicate back
     and forth to the server unnecessarily complex. XHR is basically asynchronous HTTP,
     and because you need to use a tricky technique like long-hanging GET for sending data
     from the server to the browser, simple tasks rapidly become complex. As opposed to XMLHttpRequest,
-    Web Sockets provide a real bidirectional communication channel in your browser.
-    Once you get a Web Socket connection, you can send data from browser to server by calling
+    WebSockets provide a real bidirectional communication channel in your browser.
+    Once you get a WebSocket connection, you can send data from browser to server by calling
     a send() method, and receive data from server to browser by an onmessage event handler.</p>
 
-  <p>In addition to the new Web Sockets API, there is also a new protocol
-    (the "web socket protocol") that the browser uses to communicate with servers.
+  <p>In addition to the new WebSocket API, there is also a new protocol
+    (the "WebSocket Protocol") that the browser uses to communicate with servers.
     The protocol is not raw TCP because it needs to provide the browser's "same-origin"
-    security model. It's also not HTTP because web socket traffic differers from HTTP's
-    request-response model. Web socket communications using the new web socket protocol
+    security model. It's also not HTTP because WebSocket traffic differers from HTTP's
+    request-response model. WebSocket communications using the new WebSocket protocol
     should use less bandwidth because, unlike a series of XHRs and hanging GETs,
     no headers are exchanged once the single connection has been established. To use this new
     API and protocol and take advantage of the simpler programming model and more
@@ -67,22 +66,21 @@ it explained the idea behind Web Sockets:</p>
 <section>
 <h2 id=requirements>Server Requirements</h2>
 
-<p>This library is not a <em>pure</em> Stomp client. It is aimed to run on the Web Sockets protocol which
-  is not TCP. Basically, the Web Sockets protocol requires a <em>handshake</em> between the browser's 
+<p>This library is not a <em>pure</em> STOMP client. It is aimed to run on the WebSockets protocol which
+  is not TCP. Basically, the WebSocket protocol requires a <em>handshake</em> between the browser's 
   client and the server to ensure the browser's "same-origin" security model remains in effect.</p>
-<p>This means that this library can not connect to regular Stomp brokers since they would not understand
-  the handshake initiated by the Web Socket which is not part of the Stomp protocol and would
+<p>This means that this library can not connect to regular STOMP brokers since they would not understand
+  the handshake initiated by the WebSocket which is not part of the STOMP protocol and would
   likely reject the connection.</p>
-<p>There are ongoing works to add Web Socket support to Stomp brokers such as HornetQ and 
-  <a href=http://activemq.apache.org>ActiveMQ</a> so that they will accept Stomp connections over 
-  the Web Sockets protocol.</p>
+<p>There are ongoing works to add WebSocket support to STOMP broker so that they will accept STOMP connections over 
+  the WebSocket protocol.</p>
 
 <h3 id=hornetq>HornetQ</h3>
 
 <p><a href=http://jboss.org/hornetq>HornetQ</a> is the Open Source messaging system developed
   by Red Hat and JBoss.</p>
   
-<p>To start HornetQ with support for Stomp on Web Sockets, <a href=http://www.jboss.org/hornetq/downloads.html>download the latest version</a> and run the following steps:</p>
+<p>To start HornetQ with support for STOMP Over WebSocket, <a href=http://www.jboss.org/hornetq/downloads.html>download the latest version</a> and run the following steps:</p>
 
 <pre>
   <samp>$ </samp><kbd>cd hornetq-x.y.z/bin</kbd>
@@ -92,31 +90,31 @@ it explained the idea behind Web Sockets:</p>
   HornetQ Server version 2.2.5.Final (HQ_2_2_5_FINAL_AS7, 121) [d11ee32e-0653-11e1-81fd-001ec29e77e5] started</samp>
 </pre>
 
-<p>HornetQ is now started and listens to Stomp over Web Sockets on the port <code>61614</code>.<br>
-It accepts <em>Web Sockets connections</em> from the URL <code>ws://localhost:61614/stomp</code></p>
+<p>HornetQ is now started and listens to STOMP over WebSocket on the port <code>61614</code>.<br>
+It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:61614/stomp</code></p>
 </section>
 
-<p>To configure and run HornetQ with Stomp on Web Sockets enabled, follow the
+<p>To configure and run HornetQ with STOMP Over WebSocket enabled, follow the
   <a href=http://hornetq.sourceforge.net/docs/hornetq-2.1.2.Final/user-manual/en/html/interoperability.html#stomp.websockets>instructions</a>.</p>
 
 <h3 id=activemq>ActiveMQ</h3>
 
 <p><a href=http://activemq.apache.org>ActiveMQ</a> is the Open Source messaging system developed by Apache.
-  Starting with 5.4 snapshots, ActiveMQ supports Stomp on Web Sockets.</p>
-<p>To configure and run ActiveMQ with Stomp on Web Sockets enabled, follow the
+  Starting with 5.4 snapshots, ActiveMQ supports STOMP Over WebSocket.</p>
+<p>To configure and run ActiveMQ with STOMP Over WebSocket enabled, follow the
   <a href=http://activemq.apache.org/websockets.html>instructions</a>.</p>
 
 <h3 id=apollo>ActiveMQ Apollo</h3>
 
 <p><a href=http://activemq.apache.org/apollo/>ActiveMQ Apollo</a> is the next generation of ActiveMQ broker.
-  From the start, Apollo supports Stomp on Web Sockets.</p>
-<p>To configure and run Apollo with Stomp on Web Sockets enabled, follow the
+  From the start, Apollo supports STOMP Over WebSocket.</p>
+<p>To configure and run Apollo with STOMP Over WebSocket enabled, follow the
   <a href=http://activemq.apache.org/apollo/documentation/user-manual.html#WebSocket_Transports>instructions</a>.</p>
 
 <h3 id=rabbitmq>RabbitMQ</h3>
 
 <p><a href=http://www.rabbitmq.com/>RabbitMQ</a> is Open Source messaging system sponsored by VMware.
-<p>To configure and run RabbitMQ with Stomp on Web Sockets enabled, follow the
+<p>To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow the
   <a href=http://www.rabbitmq.com/blog/2012/05/14/introducing-rabbitmq-web-stomp/>instructions</a>.</p>
 
 <section>
@@ -128,11 +126,11 @@ It accepts <em>Web Sockets connections</em> from the URL <code>ws://localhost:61
 
 <p>This JavaScript file is generated from <a href=http://jashkenas.github.com/coffee-script/>CoffeeScript</a> files. See the <a href=#contribute>Contribute</a> section to download the source code.
 
-<h2 id=api>Stomp API</h2>
+<h2 id=api>STOMP API</h2>
 
 <h3 id=alternative>Alternative to WebSocket class</h3>
 
-<p>Web browsers supports different versions of the Web Socket protocol. Some older browsers does not provide the Web Socket JavaScript or expose it under another name. By default, stomp-websocket will use the Web browser native <code>WebSocket</code> class to create the Web Socket. However it is possible to specify another type of Web Socket by setting the <code>Stomp.WebSocketClass</code> variable.
+<p>Web browsers supports different versions of the WebSocket protocol. Some older browsers does not provide the WebSocket JavaScript or expose it under another name. By default, <code>stomp.js</code> will use the Web browser native <code>WebSocket</code> class to create the WebSocket. However it is possible to specify another type of WebSocket by setting the <code>Stomp.WebSocketClass</code> variable.
 <p>For example, it is possible to use the implementation provided by the <a href=https://github.com/sockjs/sockjs-client>SockJS</a> project which falls back to a variety of browser-specific transport protocols instead:
 
 <pre><code>
@@ -145,11 +143,11 @@ It accepts <em>Web Sockets connections</em> from the URL <code>ws://localhost:61
   &lt;/script>
 </code></pre>
 
-Regardless of the WebSocket implementation that is used, the Stomp API remains the same.
+Regardless of the WebSocket implementation that is used, the STOMP API remains the same.
 
-<h3 id=frame>Stomp Frame</h3>
+<h3 id=frame>STOMP Frame</h3>
 
-<p>Stomp on Web Socket provides a straightforward mapping from a Stomp frame to a JavaScript
+<p>STOMP Over WebSocket provides a straightforward mapping from a STOMP frame to a JavaScript
   object.</p>
 
 <table class=st>
@@ -164,11 +162,11 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
   but the <code>headers</code> can be empty if the frame has no headers.
   The <code>body</code> can be <code>null</code> if the frame does not have a body.</p>
 
-<h3 id=client>Create a Stomp client</h3>
+<h3 id=client>Create a STOMP client</h3>
 
-<p>Stomp JavaScript clients will communicate to a Stomp server using a <code>ws://</code> URL.</p>
-<p>To create a Stomp client JavaScript object, you need to call <code>Stomp.client(url)</code>
-  with the URL corresponding to the server's Web Socket endpoint:
+<p>STOMP JavaScript clients will communicate to a STOMP server using a <code>ws://</code> URL.</p>
+<p>To create a STOMP client JavaScript object, you need to call <code>Stomp.client(url)</code>
+  with the URL corresponding to the server's WebSocket endpoint:
 
 <pre><code>
   var url = "ws://localhost:61614/stomp";
@@ -177,11 +175,11 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 
 <h3 id=connection>Connection to the server</h3>
 
-<p>Once a Stomp client is created, it must call its <code>connect()</code> method to effectively
-  connect and authenticate to the Stomp server. The method takes two mandatory arguments,
+<p>Once a STOMP client is created, it must call its <code>connect()</code> method to effectively
+  connect and authenticate to the STOMP server. The method takes two mandatory arguments,
   <code>login</code> and <code>passcode</code> corresponding to the user credentials.</p>
-<p>Behind the scene, the client will open a connection using a Web Socket and send
-  a <a href=http://activemq.apache.org/stomp/stomp10/specification.html#connect>CONNECT</a> frame.</p>
+<p>Behind the scene, the client will open a connection using a WebSocket and send
+  a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>CONNECT</a> frame.</p>
 <p>The connection is done asynchronously: you have no guarantee to be effectively connected when
   the call to <code>connect</code> returns. To be notified of the connection, you can pass a
   <code>connect_callback</code> function to the <code>connect()</code> method:</p>
@@ -189,15 +187,15 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
   <mark>client.connect</mark>(login, passcode, connect_callback);
 
   <mark>connect_callback</mark> = function() {
-    // called back after the client is connected and authenticated to the Stomp server
+    // called back after the client is connected and authenticated to the STOMP server
   };
 </code></pre>
 
 <p>But what happens if the connection fails? the <code>connect()</code> method accepts an
   optional <code>error_callback</code> argument which will be called if the client is not able
   to connect to the server.
-  The callback will be called with a single argument, an error object corresponding to Stomp
-  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#error>ERROR</a> frame:</p>
+  The callback will be called with a single argument, an error object corresponding to STOMP
+  <a href=http://stomp.github.com/stomp-specification-1.1.html#ERROR>ERROR</a> frame:</p>
   
 <pre><code>
   client.connect(login, passcode, connect_callback, <mark>error_callback</mark>);
@@ -222,19 +220,19 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 
 <h3 id=send>Send messages</h3>
 
-<p>When the client is connected to the server, it can send Stomp messages using
+<p>When the client is connected to the server, it can send STOMP messages using
   the <code>send()</code> method. The method takes a mandatory <code>destination</code>
-  argument corresponding to the Stomp destination. It also takes two optional
+  argument corresponding to the STOMP destination. It also takes two optional
   arguments: <code>headers</code>, a JavaScript object containing additional
   message headers and <code>body</code>, a String object.</p>
 
 <pre><code>
-  <mark>client.send</mark>("/queue/test", {priority: 9}, "Hello, Stomp");
+  <mark>client.send</mark>("/queue/test", {priority: 9}, "Hello, STOMP");
 </code></pre>
 
-<p>The client will send a Stomp
-  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#send>SEND</a> frame to <code>/queue/test</code> destination
-  with a header <code>priority</code> set to <code>9</code> and a body <code>Hello, Stomp</code>.</p>
+<p>The client will send a STOMP
+  <a href=http://stomp.github.com/stomp-specification-1.1.html#SEND>SEND</a> frame to <code>/queue/test</code> destination
+  with a header <code>priority</code> set to <code>9</code> and a body <code>Hello, STOMP</code>.</p>
 
 <div class=advice>
   <img style="float:left" width=120 src="i/johnny_automatic/johnny_automatic_advise_from_the_doctor.svg">
@@ -247,7 +245,7 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 
 <h3 id=subscribe>Subscribe and receive messages</h3>
 
-<p>To receive messages in the browser, the Stomp client must first subscribe to a destination.</p>
+<p>To receive messages in the browser, the STOMP client must first subscribe to a destination.</p>
 <p>You can use the <code>subscribe()</code> method to subscribe to a destination. The method takes 2 mandatory
   arguments: <code>destination</code>, a String corresponding to the destination and
   <code>callback</code>, a function with one <code>message</code> argument.
@@ -258,15 +256,15 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 <p>The <code>subscribe()</code> methods returns an id that correspond to the client subscription. You can use this
   subscription ID later on to unsubscribe the client from this destination.</p>
 
-<p>The client will send a Stomp
-  <a href=http://activemq.apache.org/stomp/stomp10/specification.html#subscribe>SUBSCRIBE</a> frame to the server
+<p>The client will send a STOMP
+  <a href=http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE>SUBSCRIBE</a> frame to the server
   and register the callback. Every time the server
-  send a message to the client, the client will in turn call the callback with a Stomp Frame object
+  send a message to the client, the client will in turn call the callback with a STOMP Frame object
   corresponding to the message:</p>
 
 <pre><code>
   <mark>callback</mark> = function(message) {
-    // called when the client receives a Stomp message from the server
+    // called when the client receives a STOMP message from the server
     if (message.body) {
       alert("got message with body " + message.body)
     } else {
@@ -313,7 +311,7 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 
 <h3 id=json>JSON support</h3>
 
-<p>The body of a Stomp message must be a <code>String</code>. If you want to send and receive
+<p>The body of a STOMP message must be a <code>String</code>. If you want to send and receive
   <a href=http://json.org/>JSON</a> objects, you can use <code>JSON.stringify()</code> and <code>JSON.parse()</code> to transform the JSON
   object to a String and vice versa.</p>
 
@@ -329,7 +327,7 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 
 <h3 id=ack>Acknowledgment</h3>
 
-<p>By default, Stomp messages will be automatically acknowledged by the server before the message
+<p>By default, STOMP messages will be automatically acknowledged by the server before the message
   is delivered to the client.</p>
 <p>The client can chose instead to handle message acknowledgement by subscribing to a destination and
   specify a <code>ack</code> header set to <code>'client'</code>.</p>
@@ -403,12 +401,12 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 <h2 id=example>Example</h2>
 
 <p>The source code contains a chat example in <kbd>examples/chat/index.html</kbd></p>
-<p>You need to start a Stomp server with support for Web Socket (using for example <a href=#hornetq>HornetQ</a>).</p>
+<p>You need to start a STOMP server with support for WebSocket (using for example <a href=#hornetq>HornetQ</a>).</p>
 <p>Click on the <kbd>Connect</kbd> button to connect to the server and subscribe to the <code>/queue/test/</code> queue.</p>
-<p>You can then type messages in the form at the bottom of the page to send Stomp messages to the queue.
+<p>You can then type messages in the form at the bottom of the page to send STOMP messages to the queue.
   Messages received by the client will be displayed at the top of the page.</p>
-<p>You can also send regular Stomp messages and see them displayed in the browser. For
-  example using directly <kbd>telnet</kbd> on Stomp default port:</p>
+<p>You can also send regular STOMP messages and see them displayed in the browser. For
+  example using directly <kbd>telnet</kbd> on STOMP default port:</p>
 
 <pre>
   <samp>$ </samp><kbd>telnet localhost 61613</kbd>

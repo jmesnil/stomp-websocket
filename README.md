@@ -1,7 +1,7 @@
-# Stomp over Web Socket 
+# STOMP 0ver WebSocket 
 
 The library file is located in `dist/stomp.js`.
-It does not require any dependency (except WebSocket support from the browser!)
+It does not require any dependency (except WebSocket support from the browser or an alternative to WebSocket!)
 
 Online [documentation][doc] describes the library API.
 
@@ -30,20 +30,19 @@ To continuously run tests on file changes:
 
 ## Browser Tests
 
-* Make sure you have a running Stomp broker which supports the Web Sockets protocol
+* Make sure you have a running STOMP broker which supports the WebSocket protocol
  (see the [documentation][doc])
 * Open in your web browser the project's [test page](browsertests/index.html)
 * Check all tests pass
 
 ## Use
 
-The project contains an [chat example](example/chat/index.html) using stomp-websockets
+The project contains an [chat example](example/chat/index.html) using stomp.js
 to send and receive Stomp messages from a server.
 
 ## Todo
 
- * Stomp/1.1 compatibility
- * Pluggable WebSocket objects (MozWebSocket, JsSock)
+ * STOMP/1.1 compatibility
 
 ## Authors
 
