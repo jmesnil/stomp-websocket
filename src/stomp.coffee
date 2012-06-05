@@ -76,7 +76,7 @@ class Client
   
   connect: (login_, passcode_, connectCallback, errorCallback) ->
     @debug?("Opening Web Socket...")
-    klass = WebSocketStompMock or WebSocket
+    klass = Stomp.WebSocketClass || WebSocket
     @ws = new klass(@url)
     @ws.binaryType = "arraybuffer"
     @ws.onmessage = (evt) =>
@@ -156,4 +156,4 @@ if window?
   window.Stomp = Stomp
 else
   exports.Stomp = Stomp
-  WebSocketStompMock = require('./test/server.mock.js').StompServerMock
+  Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock
