@@ -450,7 +450,7 @@ Regardless of the WebSocket implementation that is used, the Stomp API remains t
 </section>
 
 <footer>
-&copy; 2012 <a href="http://jmesnil.net/">Jeff Mesnil</a>
+&copy; 2011 <a href="http://jmesnil.net/">Jeff Mesnil</a>
 </footer>
 
 <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js'></script>
