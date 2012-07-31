@@ -109,7 +109,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       return this.ws.send(out);
     };
 
-    Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback) {
+    Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_) {
       var klass,
         _this = this;
       if (typeof this.debug === "function") {
@@ -172,7 +172,8 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         }
         return _this._transmit("CONNECT", {
           login: login_,
-          passcode: passcode_
+          passcode: passcode_,
+          host: vhost_
         });
       };
       return this.connectCallback = connectCallback;

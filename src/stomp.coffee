@@ -74,7 +74,7 @@ class Client
     @debug?(">>> " + out)
     @ws.send(out)
   
-  connect: (login_, passcode_, connectCallback, errorCallback) ->
+  connect: (login_, passcode_, connectCallback, errorCallback, vhost_) ->
     @debug?("Opening Web Socket...")
     klass = Stomp.WebSocketClass || WebSocket
     @ws = new klass(@url)
@@ -109,7 +109,7 @@ class Client
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
-      @_transmit("CONNECT", {login: login_, passcode: passcode_})
+      @_transmit("CONNECT", {login: login_, passcode: passcode_, host: vhost_})
     @connectCallback = connectCallback
   
   disconnect: (disconnectCallback) ->
