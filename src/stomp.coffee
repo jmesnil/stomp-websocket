@@ -80,7 +80,7 @@ class Client
     @ws = new klass(@url)
     @ws.binaryType = "arraybuffer"
     @ws.onmessage = (evt) =>
-      data = if evt.data instanceof ArrayBuffer
+      data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
         view = new Uint8Array( evt.data )
         @debug?('--- got data length: ' + view.length)
         data = ""
