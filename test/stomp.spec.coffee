@@ -1,6 +1,17 @@
 Stomp = require('../stomp.js').Stomp
+StompServerMock = require('./server.mock.js').StompServerMock
 
 describe "Stomp", ->
+  it "lets you connect to a server with a websocket and get a callback", ->
+    ws = new StompServerMock("ws://mocked/stomp/server")
+    client = Stomp.over(ws)
+    connected = false
+    client.connect("guest", "guest", ->
+      connected = true
+    )
+    waitsFor -> connected
+    runs -> expect(client.connected).toBe(true)
+  
   it "lets you connect to a server and get a callback", ->
     client = Stomp.client("ws://mocked/stomp/server")
     connected = false

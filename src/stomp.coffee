@@ -59,26 +59,29 @@ Stomp =
     Stomp.frame(command, headers, body).toString() + '\x00'
   
   client: (url) ->
-    new Client url
+    klass = Stomp.WebSocketClass || WebSocket
+    ws = new klass(url)
+    new Client ws
+
+  over: (ws) ->
+    new Client ws
   
 class Client
-  constructor: (@url) ->
+  constructor: (@ws) ->
+    @ws.binaryType = "arraybuffer"
     # used to index subscribers
     @counter = 0 
     @connected = false
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {};
-  
+
   _transmit: (command, headers, body) ->
     out = Stomp.marshal(command, headers, body)
     @debug?(">>> " + out)
     @ws.send(out)
-  
+
   connect: (login_, passcode_, connectCallback, errorCallback, vhost_) ->
     @debug?("Opening Web Socket...")
-    klass = Stomp.WebSocketClass || WebSocket
-    @ws = new klass(@url)
-    @ws.binaryType = "arraybuffer"
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
         view = new Uint8Array( evt.data )

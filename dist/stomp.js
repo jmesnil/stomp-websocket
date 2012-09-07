@@ -87,14 +87,21 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       return Stomp.frame(command, headers, body).toString() + '\x00';
     },
     client: function(url) {
-      return new Client(url);
+      var klass, ws;
+      klass = Stomp.WebSocketClass || WebSocket;
+      ws = new klass(url);
+      return new Client(ws);
+    },
+    over: function(ws) {
+      return new Client(ws);
     }
   };
 
   Client = (function() {
 
-    function Client(url) {
-      this.url = url;
+    function Client(ws) {
+      this.ws = ws;
+      this.ws.binaryType = "arraybuffer";
       this.counter = 0;
       this.connected = false;
       this.subscriptions = {};
@@ -110,14 +117,10 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
     };
 
     Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_) {
-      var klass,
-        _this = this;
+      var _this = this;
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
       }
-      klass = Stomp.WebSocketClass || WebSocket;
-      this.ws = new klass(this.url);
-      this.ws.binaryType = "arraybuffer";
       this.ws.onmessage = function(evt) {
         var data, frame, i, onreceive, view, _i, _len, _ref, _results;
         data = (function() {
