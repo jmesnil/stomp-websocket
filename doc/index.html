@@ -128,28 +128,6 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 
 <h2 id=api>STOMP API</h2>
 
-<h3 id=alternative>Alternative to WebSocket class</h3>
-
-<p>Web browsers supports different versions of the WebSocket protocol. Some older browsers does not provide the WebSocket JavaScript or expose it under another name. By default, <code>stomp.js</code> will use the Web browser native <code>WebSocket</code> class to create the WebSocket.
-<p>However it is possible to use other type of WebSockets by using the <code>Stomp.over(ws)</code> method.
-This method expects an object that conforms to the WebSocket definition>
-
-<p>For example, it is possible to use the implementation provided by the <a href=https://github.com/sockjs/sockjs-client>SockJS</a> project which falls back to a variety of browser-specific transport protocols instead:
-
-<pre><code>
-  &lt;script src="http://cdn.sockjs.org/sockjs-0.3.min.js">&lt;/script>
-  &lt;script>
-    // use SockJS implementation instead of the browser's native implementation
-    <mark>var ws = new SockJS(url);</mark>
-    <mark>var client = Stomp.over(ws)</mark>
-    [...]
-  &lt;/script>
-</code></pre>
-</strike>
-
-<p>Use <code>Stomp.client(url)</code> to use regular WebSockets or use <code>Stomp.over(ws)</code> if you required another type of WebSocket.
-<p>Apart from this initialization, the STOMP API remains the same in both cases.
-
 <h3 id=frame>STOMP Frame</h3>
 
 <p>STOMP Over WebSocket provides a straightforward mapping from a STOMP frame to a JavaScript
@@ -177,6 +155,28 @@ This method expects an object that conforms to the WebSocket definition>
   var url = "ws://localhost:61614/stomp";
   var client = <mark>Stomp.client(url)</mark>;
 </code></pre>
+
+<h3 id=alternative>Create a STOMP client with a WebSocket</h3>
+
+<p>Web browsers supports different versions of the WebSocket protocol. Some older browsers does not provide the WebSocket JavaScript or expose it under another name. By default, <code>stomp.js</code> will use the Web browser native <code>WebSocket</code> class to create the WebSocket.
+<p>However it is possible to use other type of WebSockets by using the <code>Stomp.over(ws)</code> method.
+This method expects an object that conforms to the WebSocket definition.
+
+<p>For example, it is possible to use the implementation provided by the <a href=https://github.com/sockjs/sockjs-client>SockJS</a> project which falls back to a variety of browser-specific transport protocols instead:
+
+<pre><code>
+  &lt;script src="http://cdn.sockjs.org/sockjs-0.3.min.js">&lt;/script>
+  &lt;script>
+    // use SockJS implementation instead of the browser's native implementation
+    <mark>var ws = new SockJS(url);</mark>
+    <mark>var client = Stomp.over(ws)</mark>
+    [...]
+  &lt;/script>
+</code></pre>
+</strike>
+
+<p>Use <code>Stomp.client(url)</code> to use regular WebSockets or use <code>Stomp.over(ws)</code> if you required another type of WebSocket.
+<p>Apart from this initialization, the STOMP API remains the same in both cases.
 
 <h3 id=connection>Connection to the server</h3>
 
