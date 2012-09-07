@@ -170,14 +170,18 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       this.ws.onopen = function() {
+        var headers;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
         }
-        return _this._transmit("CONNECT", {
+        headers = {
           login: login_,
-          passcode: passcode_,
-          host: vhost_
-        });
+          passcode: passcode_
+        };
+        if (vhost_) {
+          headers["host"] = vhost_;
+        }
+        return _this._transmit("CONNECT", headers);
       };
       return this.connectCallback = connectCallback;
     };

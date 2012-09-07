@@ -112,7 +112,9 @@ class Client
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
-      @_transmit("CONNECT", {login: login_, passcode: passcode_, host: vhost_})
+      headers = {login: login_, passcode: passcode_}
+      headers["host"] = vhost_ if vhost_
+      @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
   
   disconnect: (disconnectCallback) ->
