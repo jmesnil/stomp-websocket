@@ -168,8 +168,8 @@ This method expects an object that conforms to the WebSocket definition.
   &lt;script src="http://cdn.sockjs.org/sockjs-0.3.min.js">&lt;/script>
   &lt;script>
     // use SockJS implementation instead of the browser's native implementation
-    <mark>var ws = new SockJS(url);</mark>
-    <mark>var client = Stomp.over(ws)</mark>
+    var ws = new SockJS(url);
+    var client = <mark>Stomp.over(ws)</mark>;
     [...]
   &lt;/script>
 </code></pre>
