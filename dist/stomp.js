@@ -209,9 +209,13 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       if (headers == null) {
         headers = {};
       }
-      id = "sub-" + this.counter++;
+      if (typeof headers.id === 'undefined' || headers.id.length === 0) {
+        id = "sub-" + this.counter++;
+        headers.id = id;
+      } else {
+        id = headers.id;
+      }
       headers.destination = destination;
-      headers.id = id;
       this.subscriptions[id] = callback;
       this._transmit("SUBSCRIBE", headers);
       return id;
