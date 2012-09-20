@@ -128,9 +128,12 @@ class Client
     @_transmit("SEND", headers, body)
   
   subscribe: (destination, callback, headers={}) ->
-    id = "sub-" + @counter++
+    if typeof(headers.id) == 'undefined' || headers.id.length == 0
+      id = "sub-" + @counter++
+      headers.id = id
+    else
+      id = headers.id
     headers.destination = destination
-    headers.id = id
     @subscriptions[id] = callback
     @_transmit("SUBSCRIBE", headers)
     return id
