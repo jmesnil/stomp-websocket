@@ -1,0 +1,16 @@
+{
+  "name": "stomp-websocket",
+  "preferGlobal": "true",
+  "version": "0.1.0",
+  "author": "Jeff Mesnil <jmesnil@gmail.com",
+  "description": "STOMP over Web Sockets",
+  "scripts": {
+    "build": "cake build",
+    "test": "cake test"
+  },
+  "devDependencies": {
+  "coffee-script": "latest",
+  "coffeelint": "latest",
+  "jasmine-node": "latest"
+  }
+}

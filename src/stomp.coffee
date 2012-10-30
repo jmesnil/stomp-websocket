@@ -40,11 +40,11 @@ Stomp =
     
     # Parse body, stopping at the first \0 found.
     # TODO: Add support for content-length header.
-    chr = null;
+    chr = null
     for i in [(divider + 2)...data.length]
       chr = data.charAt(i)
       if chr is '\x00'
-         break
+        break
       body += chr
 
     return Stomp.frame(command, headers, body)
@@ -70,10 +70,10 @@ class Client
   constructor: (@ws) ->
     @ws.binaryType = "arraybuffer"
     # used to index subscribers
-    @counter = 0 
+    @counter = 0
     @connected = false
     # subscription callbacks indexed by subscriber's ID
-    @subscriptions = {};
+    @subscriptions = {}
 
   _transmit: (command, headers, body) ->
     out = Stomp.marshal(command, headers, body)
