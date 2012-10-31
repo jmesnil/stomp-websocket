@@ -16,6 +16,8 @@ For development (testing, building) the project requires Node.js, CoffeeScript, 
 
 ## Building and Testing
 
+[![Build Status](https://secure.travis-ci.org/jmesnil/stomp-websocket.png)](http://travis-ci.org/jmesnil/stomp-websocket)
+
 To build JavaScript:
 
     cake build
@@ -27,6 +29,7 @@ To run tests:
 To continuously run tests on file changes:
 
     cake watch
+
 
 ## Browser Tests
 
