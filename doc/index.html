@@ -156,6 +156,8 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
   var client = <mark>Stomp.client(url)</mark>;
 </code></pre>
 
+<p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocol provided by the library: <code>v10.stomp</code> (for STOMP 1.0 specification). This second parameter can either be a single string or an array of strings to specify multiple subprotocols.
+
 <h3 id=alternative>Create a STOMP client with a WebSocket</h3>
 
 <p>Web browsers supports different versions of the WebSocket protocol. Some older browsers does not provide the WebSocket JavaScript or expose it under another name. By default, <code>stomp.js</code> will use the Web browser native <code>WebSocket</code> class to create the WebSocket.

@@ -58,9 +58,9 @@ Stomp =
   marshal: (command, headers, body) ->
     Stomp.frame(command, headers, body).toString() + '\x00'
   
-  client: (url) ->
+  client: (url, protocols = 'v10.stomp') ->
     klass = Stomp.WebSocketClass || WebSocket
-    ws = new klass(url)
+    ws = new klass(url, protocols)
     new Client ws
 
   over: (ws) ->

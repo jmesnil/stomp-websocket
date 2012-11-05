@@ -86,10 +86,13 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
     marshal: function(command, headers, body) {
       return Stomp.frame(command, headers, body).toString() + '\x00';
     },
-    client: function(url) {
+    client: function(url, protocols) {
       var klass, ws;
+      if (protocols == null) {
+        protocols = 'v10.stomp';
+      }
       klass = Stomp.WebSocketClass || WebSocket;
-      ws = new klass(url);
+      ws = new klass(url, protocols);
       return new Client(ws);
     },
     over: function(ws) {
