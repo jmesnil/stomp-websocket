@@ -4,6 +4,17 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
 ###
 
 Stomp =
+
+  HEADERS:
+    HOST: 'host'
+    ACCEPT_VERSION: 'accept-version'
+
+  VERSIONS:
+      VERSION_1_0: '1.0'
+
+      supportedVersions: ->
+        '1.0,1.1'
+
   frame: (command, headers=[], body='') ->
     command: command
     headers: headers
@@ -113,7 +124,8 @@ class Client
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       headers = {login: login_, passcode: passcode_}
-      headers["host"] = vhost_ if vhost_
+      headers[Stomp.HEADERS.HOST] = vhost_ if vhost_
+      headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions()
       @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
   
@@ -158,7 +170,6 @@ class Client
   ack: (message_id, headers={}) ->
     headers["message-id"] = message_id
     @_transmit("ACK", headers)
-  
 
 if window?
   window.Stomp = Stomp

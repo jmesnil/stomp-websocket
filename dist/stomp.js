@@ -11,6 +11,16 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
     __hasProp = {}.hasOwnProperty;
 
   Stomp = {
+    HEADERS: {
+      HOST: 'host',
+      ACCEPT_VERSION: 'accept-version'
+    },
+    VERSIONS: {
+      VERSION_1_0: '1.0',
+      supportedVersions: function() {
+        return '1.0,1.1';
+      }
+    },
     frame: function(command, headers, body) {
       if (headers == null) {
         headers = [];
@@ -182,8 +192,9 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
           passcode: passcode_
         };
         if (vhost_) {
-          headers["host"] = vhost_;
+          headers[Stomp.HEADERS.HOST] = vhost_;
         }
+        headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions();
         return _this._transmit("CONNECT", headers);
       };
       return this.connectCallback = connectCallback;
