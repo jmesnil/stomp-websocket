@@ -7,6 +7,8 @@ task 'watch', 'Watch for changes in coffee files to build and test', ->
     lastTest = 0
     watchDir 'src', ->
       invoke 'build:src'
+      invoke 'build:min'
+      invoke 'build:doc'
       invoke 'build:test'
     watchDir 'test', ->
       invoke 'build:test'

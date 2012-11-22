@@ -1,8 +1,15 @@
-###
-Copyright (C) 2010 Jeff Mesnil -- http://jmesnil.net/
-Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
-###
+# **STOMP Over Web Socket** is a JavaScript STOMP Client using HTML5
+# Web Sockets API.
+#
+# * Copyright (C) 2010-2012 [Jeff Mesnil](http://jmesnil.net/)
+# * Copyright (C) 2012 [FuseSource, Inc.](http://fusesource.com)
+#
+# This library supports:
+#
+# * [STOMP 1.0](http://stomp.github.com/stomp-specification-1.0.html)
+# * [STOMP 1.1](http://stomp.github.com/stomp-specification-1.1.html)
 
+# The library is accessed through this Stomp object.
 Stomp =
 
   HEADERS:
@@ -16,19 +23,25 @@ Stomp =
     VERSION_1_1: '1.1'
     VERSION_1_2: '1.2'
 
+    # Versions of STOMP specifications supported
     supportedVersions: ->
       '1.1,1.0'
 
+  # ##STOMP frame
   frame: (command, headers=[], body='') ->
     command: command
     headers: headers
     body: body
+    # **FIXME** all these fields should be discarded
+    # (but it may break compatibility)
     id: headers.id
     receipt: headers.receipt
     transaction: headers.transaction
     destination: headers.destination
     subscription: headers.subscription
     error: null
+    # Provides a textual representation of the frame
+    # suitable to be sent to the server
     toString: ->
       lines = [command]
       for own name, value of headers
@@ -36,13 +49,14 @@ Stomp =
       lines.push('\n'+body)
       return lines.join('\n')
   
-  # unmarshall a single frame
+  # Unmarshall a single frame
   unmarshal: (data) ->
     divider = data.search(/\n\n/)
     headerLines = data.substring(0, divider).split('\n')
     command = headerLines.shift()
     headers = {}
     body = ''
+    # utility function to trim any whitespace from a string
     trim = (str) ->
       str.replace(/^\s+/g,'').replace(/\s+$/g,'')
 
@@ -54,7 +68,7 @@ Stomp =
       headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
     
     # Parse body, stopping at the first \0 found.
-    # TODO: Add support for content-length header.
+    # **TODO** Add support for content-length header.
     chr = null
     for i in [(divider + 2)...data.length]
       chr = data.charAt(i)
@@ -65,32 +79,67 @@ Stomp =
     return Stomp.frame(command, headers, body)
 
   # Web socket servers can send multiple frames in a single websocket message.
+  #
   # Split the data before unmarshalling every single STOMP frame
   unmarshal_multi: (multi_datas) ->
+    # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
+    # contained in a *single WebSocket frame*.
     datas = (Stomp.unmarshal(data) for data in multi_datas.split(/\x00\n*/) when data && data.length > 0)
     return datas
 
+  # Marshall a Stomp frame
   marshal: (command, headers, body) ->
     Stomp.frame(command, headers, body).toString() + '\x00'
-  
-  client: (url, protocols = 'v10.stomp') ->
+
+  # This method creates a WebSocket client that is connected to
+  # the STOMP server located at the url.
+  client: (url, protocols = 'v10.stomp,v11.stomp') ->
+    # This is a hack to allow another implementation than the standard
+    # HTML5 WebSocket class.
+    #
+    # It is possible to use another class by calling
+    #
+    #     Stomp.WebSocketClass = MozWebSocket
+    #
+    # *prior* to call `Stomp.client()`.
+    #
+    # This hack is deprecated and  `Stomp.over()` method should be used
+    # instead.
     klass = Stomp.WebSocketClass || WebSocket
     ws = new klass(url, protocols)
     new Client ws
 
+  # This method is an alternative to `Stomp.client()` to let the user
+  # specify the WebSocket to use (either a standard HTML5 WebSocket or
+  # a similar object).
   over: (ws) ->
     new Client ws
-  
+
+# This class represent the STOMP client.
+#
+# All STOMP protocol is exposed as methods of this class (`connect()`,
+# `send()`, etc.)
+#
+# For debugging purpose, it is possible to set a `debug(message)` method
+# on a client instance to receive debug messages (including the actual
+# transmission of the STOMP frames over the WebSocket:
+#
+#     client.debug = function(str) {
+#         // append the debug log to a #debug div
+#         $("#debug").append(str + "\n");
+#     };
 class Client
   constructor: (@ws) ->
     @ws.binaryType = "arraybuffer"
     # used to index subscribers
     @counter = 0
     @connected = false
+    # Heartbeat properties of the client
     @heartbeat = {
-      # send heartbeat every 10s
+      # send heartbeat every 10s by default (value is in ms)
       outgoing: 10000
       # do not want to receive heartbeats (for now...)
+      # **TODO** support server heartbeat to detect stale server
       incoming: 0
     }
     # subscription callbacks indexed by subscriber's ID
@@ -106,7 +155,7 @@ class Client
     if serverVersion == Stomp.VERSIONS.VERSION_1_1 or
         serverVersion == Stomp.VERSIONS.VERSION_1_2
       [serverOutgoing, serverIncoming] = headers[Stomp.HEADERS.HEART_BEAT].split(",")
-      # TODO close the connection if the server does not send heart beat (sx, cy)
+      # **TODO** close the connection if the server does not send heart beat (sx, cy)
       serverIncoming = parseInt(serverIncoming)
       unless @heartbeat.outgoing == 0 or serverIncoming == 0
         ttl = Math.max(@heartbeat.outgoing, serverIncoming)
