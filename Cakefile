@@ -29,11 +29,17 @@ task 'test', 'Run the tests', ->
 
 task 'build', 'Build source and tests', ->
   invoke 'build:src'
+  invoke 'build:min'
   invoke 'build:test'
 
 task 'build:src', 'Build the src files into lib', ->
   util.log "Compiling src..."
   exec "coffee -o dist/ -c src/", (err, stdout, stderr) -> 
+    handleError(err) if err
+
+task 'build:min', 'Build the minified files into lib', ->
+  util.log "Minify src..."
+  exec "./node_modules/.bin/grunt min:dist", (err, stdout, stderr) -> 
     handleError(err) if err
 
 task 'build:test', 'Build the test files into lib/test', ->

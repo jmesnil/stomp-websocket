@@ -11,6 +11,7 @@
   "devDependencies": {
   "coffee-script": "latest",
   "coffeelint": "latest",
-  "jasmine-node": "latest"
+  "jasmine-node": "latest",
+  "grunt": "latest"
   }
 }
