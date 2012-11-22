@@ -30,6 +30,7 @@ task 'test', 'Run the tests', ->
 task 'build', 'Build source and tests', ->
   invoke 'build:src'
   invoke 'build:min'
+  invoke 'build:doc'
   invoke 'build:test'
 
 task 'build:src', 'Build the src files into lib', ->
@@ -40,6 +41,11 @@ task 'build:src', 'Build the src files into lib', ->
 task 'build:min', 'Build the minified files into lib', ->
   util.log "Minify src..."
   exec "./node_modules/.bin/grunt min:dist", (err, stdout, stderr) -> 
+    handleError(err) if err
+
+task 'build:doc', 'Build docco documentation', ->
+  util.log "Building doc..."
+  exec "./node_modules/.bin/docco -o doc/ src/*.coffee", (err, stdout, stderr) -> 
     handleError(err) if err
 
 task 'build:test', 'Build the test files into lib/test', ->

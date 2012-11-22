@@ -12,6 +12,7 @@
   "coffee-script": "latest",
   "coffeelint": "latest",
   "jasmine-node": "latest",
-  "grunt": "latest"
+  "grunt": "latest",
+  "docco": "latest"
   }
 }
