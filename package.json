@@ -6,7 +6,7 @@
   "description": "STOMP over Web Sockets",
   "scripts": {
     "build": "cake build",
-    "test": "cake test"
+    "test": "coffeelint -f coffeelint.json -r src && cake test"
   },
   "devDependencies": {
   "coffee-script": "latest",

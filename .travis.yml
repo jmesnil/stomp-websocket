@@ -6,5 +6,4 @@ before_script:
   - ./node_modules/.bin/cake build
 
 script:
-  - ./node_modules/.bin/coffeelint  -f coffeelint.json -r src
   - npm test
