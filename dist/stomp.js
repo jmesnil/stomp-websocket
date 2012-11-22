@@ -13,12 +13,16 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
   Stomp = {
     HEADERS: {
       HOST: 'host',
-      ACCEPT_VERSION: 'accept-version'
+      ACCEPT_VERSION: 'accept-version',
+      VERSION: 'version',
+      HEART_BEAT: 'heart-beat'
     },
     VERSIONS: {
       VERSION_1_0: '1.0',
+      VERSION_1_1: '1.1',
+      VERSION_1_2: '1.2',
       supportedVersions: function() {
-        return '1.0,1.1';
+        return '1.1,1.0';
       }
     },
     frame: function(command, headers, body) {
@@ -117,6 +121,10 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       this.ws.binaryType = "arraybuffer";
       this.counter = 0;
       this.connected = false;
+      this.heartbeat = {
+        outgoing: 10000,
+        incoming: 0
+      };
       this.subscriptions = {};
     }
 
@@ -129,8 +137,31 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       return this.ws.send(out);
     };
 
-    Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_) {
+    Client.prototype._setupHeartbeat = function(headers) {
+      var ping, self, serverIncoming, serverOutgoing, serverVersion, ttl, _ref;
+      serverVersion = headers[Stomp.HEADERS.VERSION];
+      if (serverVersion === Stomp.VERSIONS.VERSION_1_1 || serverVersion === Stomp.VERSIONS.VERSION_1_2) {
+        _ref = headers[Stomp.HEADERS.HEART_BEAT].split(","), serverOutgoing = _ref[0], serverIncoming = _ref[1];
+        serverIncoming = parseInt(serverIncoming);
+        if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
+          ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
+          if (typeof this.debug === "function") {
+            this.debug("send ping every " + ttl + "ms");
+          }
+          self = this;
+          ping = function() {
+            return self.ws.send('\x0A');
+          };
+          return this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(ping, ttl) : void 0;
+        }
+      }
+    };
+
+    Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_, heartbeat) {
       var _this = this;
+      if (heartbeat == null) {
+        heartbeat = "10000,0";
+      }
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
       }
@@ -153,6 +184,9 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
             return evt.data;
           }
         }).call(_this);
+        if (data === '\x0A') {
+          return;
+        }
         if (typeof _this.debug === "function") {
           _this.debug('<<< ' + data);
         }
@@ -162,6 +196,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
           frame = _ref[_i];
           if (frame.command === "CONNECTED" && connectCallback) {
             _this.connected = true;
+            _this._setupHeartbeat(frame.headers);
             _results.push(connectCallback(frame));
           } else if (frame.command === "MESSAGE") {
             onreceive = _this.subscriptions[frame.headers.subscription];
@@ -169,7 +204,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
           } else if (frame.command === "ERROR") {
             _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
           } else {
-            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0);
+            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + JSON.stringify(frame)) : void 0);
           }
         }
         return _results;
@@ -183,7 +218,7 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       this.ws.onopen = function() {
-        var headers;
+        var cx, cy, headers, _ref;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
         }
@@ -194,6 +229,10 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
         if (vhost_) {
           headers[Stomp.HEADERS.HOST] = vhost_;
         }
+        headers[Stomp.HEADERS.HEART_BEAT] = heartbeat;
+        _ref = heartbeat.split(","), cx = _ref[0], cy = _ref[1];
+        _this.heartbeat.outgoing = parseInt(cx);
+        _this.heartbeat.incoming = parseInt(cy);
         headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions();
         return _this._transmit("CONNECT", headers);
       };
@@ -204,6 +243,11 @@ Copyright (C) 2012 FuseSource, Inc. -- http://fusesource.com
       this._transmit("DISCONNECT");
       this.ws.close();
       this.connected = false;
+      if (this.pinger) {
+        if (typeof window !== "undefined" && window !== null) {
+          window.clearInterval(this.pinger);
+        }
+      }
       return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
     };
 

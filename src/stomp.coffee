@@ -8,12 +8,16 @@ Stomp =
   HEADERS:
     HOST: 'host'
     ACCEPT_VERSION: 'accept-version'
+    VERSION: 'version'
+    HEART_BEAT: 'heart-beat'
 
   VERSIONS:
-      VERSION_1_0: '1.0'
+    VERSION_1_0: '1.0'
+    VERSION_1_1: '1.1'
+    VERSION_1_2: '1.2'
 
-      supportedVersions: ->
-        '1.0,1.1'
+    supportedVersions: ->
+      '1.1,1.0'
 
   frame: (command, headers=[], body='') ->
     command: command
@@ -83,6 +87,12 @@ class Client
     # used to index subscribers
     @counter = 0
     @connected = false
+    @heartbeat = {
+      # send heartbeat every 10s
+      outgoing: 10000
+      # do not want to receive heartbeats (for now...)
+      incoming: 0
+    }
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {}
 
@@ -91,7 +101,27 @@ class Client
     @debug?(">>> " + out)
     @ws.send(out)
 
-  connect: (login_, passcode_, connectCallback, errorCallback, vhost_) ->
+  _setupHeartbeat: (headers) ->
+    serverVersion = headers[Stomp.HEADERS.VERSION]
+    if serverVersion == Stomp.VERSIONS.VERSION_1_1 or
+        serverVersion == Stomp.VERSIONS.VERSION_1_2
+      [serverOutgoing, serverIncoming] = headers[Stomp.HEADERS.HEART_BEAT].split(",")
+      # TODO close the connection if the server does not send heart beat (sx, cy)
+      serverIncoming = parseInt(serverIncoming)
+      unless @heartbeat.outgoing == 0 or serverIncoming == 0
+        ttl = Math.max(@heartbeat.outgoing, serverIncoming)
+        @debug?("send ping every " + ttl + "ms")
+        self = this
+        ping = () ->
+          self.ws.send('\x0A')
+        @pinger = window?.setInterval(ping, ttl)
+
+  connect: (login_,
+      passcode_,
+      connectCallback,
+      errorCallback,
+      vhost_,
+      heartbeat="10000,0") ->
     @debug?("Opening Web Socket...")
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
@@ -103,10 +133,12 @@ class Client
         data
       else
         evt.data
+      return if data == '\x0A' # heart beat
       @debug?('<<< ' + data)
       for frame in Stomp.unmarshal_multi(data)
         if frame.command is "CONNECTED" and connectCallback
           @connected = true
+          @_setupHeartbeat(frame.headers)
           connectCallback(frame)
         else if frame.command is "MESSAGE"
           onreceive = @subscriptions[frame.headers.subscription]
@@ -116,7 +148,7 @@ class Client
         else if frame.command is "ERROR"
           errorCallback?(frame)
         else
-          @debug?("Unhandled frame: " + frame)
+          @debug?("Unhandled frame: " + JSON.stringify(frame))
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to " + @url
       @debug?(msg)
@@ -125,6 +157,10 @@ class Client
       @debug?('Web Socket Opened...')
       headers = {login: login_, passcode: passcode_}
       headers[Stomp.HEADERS.HOST] = vhost_ if vhost_
+      headers[Stomp.HEADERS.HEART_BEAT] = heartbeat
+      [cx, cy] = heartbeat.split(",")
+      @heartbeat.outgoing = parseInt(cx)
+      @heartbeat.incoming = parseInt(cy)
       headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions()
       @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
@@ -133,6 +169,7 @@ class Client
     @_transmit("DISCONNECT")
     @ws.close()
     @connected = false
+    window?.clearInterval(@pinger) if @pinger
     disconnectCallback?()
   
   send: (destination, headers={}, body='') ->
