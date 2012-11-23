@@ -36,14 +36,6 @@ Stomp =
     command: command
     headers: headers
     body: body
-    # **FIXME** all these fields should be discarded
-    # (but it may break compatibility)
-    id: headers.id
-    receipt: headers.receipt
-    transaction: headers.transaction
-    destination: headers.destination
-    subscription: headers.subscription
-    error: null
     # Provides a textual representation of the frame
     # suitable to be sent to the server
     toString: ->

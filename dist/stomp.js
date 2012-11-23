@@ -30,12 +30,6 @@
         command: command,
         headers: headers,
         body: body,
-        id: headers.id,
-        receipt: headers.receipt,
-        transaction: headers.transaction,
-        destination: headers.destination,
-        subscription: headers.subscription,
-        error: null,
         toString: function() {
           var lines, name, value;
           lines = [command];

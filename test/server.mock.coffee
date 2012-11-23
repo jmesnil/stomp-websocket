@@ -1,5 +1,6 @@
 WebSocketMock = require('./websocket.mock.js').WebSocketMock
 Stomp = require('../stomp.js').Stomp
+console = require 'console'
 
 class StompServerMock extends WebSocketMock
   # WebSocketMock handlers
@@ -25,10 +26,10 @@ class StompServerMock extends WebSocketMock
     @_respond(Stomp.marshal(command, headers, body))
     
   stomp_send_receipt: (frame) ->
-    if frame.error?
-      @stomp_send("ERROR", {'receipt-id': frame.receipt, 'message': frame.error})
+    if frame.headers.message?
+      @stomp_send("ERROR", {'receipt-id': frame.headers['receipt-id'], 'message': frame.headers.message})
     else
-      @stomp_send("RECEIPT", {'receipt-id': frame.receipt})
+      @stomp_send("RECEIPT", {'receipt-id': frame.headers['receipt-id']})
     
   stomp_send_message: (destination, subscription, message_id, body) ->
     @stomp_send("MESSAGE", {
@@ -50,33 +51,33 @@ class StompServerMock extends WebSocketMock
     @stomp_send("CONNECTED", {'session': @session_id})
     
   stomp_handle_begin: (frame) ->
-    @transactions[frame.transaction] = []
+    @transactions[frame.headers.transaction] = []
     
   stomp_handle_commit: (frame) ->
-    transaction = @transactions[frame.transaction]
+    transaction = @transactions[frame.headers.transaction]
     for frame in transaction
       @messages.push(frame.body)
-    delete @transactions[frame.transaction]
+    delete @transactions[frame.headers.transaction]
 
   stomp_handle_abort: (frame) ->
-    delete @transactions[frame.transaction]
+    delete @transactions[frame.headers.transaction]
 
   stomp_handle_send: (frame) ->
-    if frame.transaction
-      @transactions[frame.transaction].push(frame)
+    if frame.headers.transaction
+      @transactions[frame.headers.transaction].push(frame)
     else
       @messages.push(frame.body)
 
   stomp_handle_subscribe: (frame) ->
-    sub_id = frame.id or Math.random()
-    cb = (id, body) => @stomp_send_message(frame.destination, sub_id, id, body)
-    @subscriptions[sub_id] = [frame.destination, cb]
+    sub_id = frame.headers.id or Math.random()
+    cb = (id, body) => @stomp_send_message(frame.headers.destination, sub_id, id, body)
+    @subscriptions[sub_id] = [frame.headers.destination, cb]
 
   stomp_handle_unsubscribe: (frame) ->
-    if frame.id in Object.keys(@subscriptions)
-      delete @subscriptions[frame.id]
+    if frame.headers.id in Object.keys(@subscriptions)
+      delete @subscriptions[frame.headers.id]
     else
-      frame.error = "Subscription does not exist"
+      frame.headers.message = "Subscription does not exist"
         
   stomp_handle_disconnect: (frame) ->
     @_shutdown()
