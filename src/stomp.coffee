@@ -10,6 +10,13 @@
 # * [STOMP 1.1](http://stomp.github.com/stomp-specification-1.1.html)
 #
 # The library is accessed through this Stomp object.
+
+Byte =
+  # LINEFEED byte (octet 10)
+  LF: '\x0A'
+  # NULL byte (octet 0)
+  NULL: '\x00'
+
 Stomp =
 
   # Version of the JavaScript library. This can be used to check what has
@@ -42,13 +49,14 @@ Stomp =
       lines = [command]
       for own name, value of headers
         lines.push("#{name}:#{value}")
-      lines.push('\n'+body)
-      return lines.join('\n')
+      lines.push(Byte.LF + body)
+      return lines.join(Byte.LF)
   
   # Unmarshall a single frame from a `data` string
   unmarshal: (data) ->
-    divider = data.search(/\n\n/)
-    headerLines = data.substring(0, divider).split('\n')
+    # search for 2 consecutives LF byte
+    divider = data.search(///#{Byte.LF}#{Byte.LF}///)
+    headerLines = data.substring(0, divider).split(Byte.LF)
     command = headerLines.shift()
     headers = {}
     body = ''
@@ -68,7 +76,7 @@ Stomp =
     chr = null
     for i in [(divider + 2)...data.length]
       chr = data.charAt(i)
-      if chr is '\x00'
+      if chr is Byte.NULL
         break
       body += chr
 
@@ -81,12 +89,13 @@ Stomp =
   unmarshal_multi: (multi_datas) ->
     # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
     # contained in a *single WebSocket frame*.
-    datas = (Stomp.unmarshal(data) for data in multi_datas.split(/\x00\n*/) when data && data.length > 0)
+    # The data are splitted when a NULL byte (follwode by zero or many LF bytes) is found
+    datas = (Stomp.unmarshal(data) for data in multi_datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
     return datas
 
   # Marshall a Stomp frame
   marshal: (command, headers, body) ->
-    Stomp.frame(command, headers, body).toString() + '\x00'
+    Stomp.frame(command, headers, body).toString() + Byte.NULL
 
   # This method creates a WebSocket client that is connected to
   # the STOMP server located at the url.
@@ -158,7 +167,7 @@ class Client
         ttl = Math.max(@heartbeat.outgoing, serverIncoming)
         @debug?("send ping every " + ttl + "ms")
         ping = =>
-          @ws.send('\x0A')
+          @ws.send Byte.LF
         @pinger = window?.setInterval(ping, ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
@@ -179,7 +188,7 @@ class Client
         data
       else
         evt.data
-      return if data == '\x0A' # heart beat
+      return if data == Byte.LF # heart beat
       @debug?('<<< ' + data)
       # Handle STOMP frames received from the server
       for frame in Stomp.unmarshal_multi(data)
