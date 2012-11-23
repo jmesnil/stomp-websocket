@@ -11,11 +11,68 @@
 #
 # The library is accessed through this Stomp object.
 
+# Define constants for bytes used throughout the code.
 Byte =
   # LINEFEED byte (octet 10)
   LF: '\x0A'
   # NULL byte (octet 0)
   NULL: '\x00'
+
+# Representation of a [STOMP frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames)
+class Frame
+  # Frame constructor
+  constructor: (@command, @headers=[], @body='') ->
+
+  # Provides a textual representation of the frame
+  # suitable to be sent to the server
+  toString: ->
+    lines = [@command]
+    for own name, value of @headers
+      lines.push("#{name}:#{value}")
+    lines.push(Byte.LF + @body)
+    return lines.join(Byte.LF)
+
+  # Unmarshall a single STOMP frame from a `data` string
+  @_unmarshallSingle: (data) ->
+    # search for 2 consecutives LF byte
+    divider = data.search(///#{Byte.LF}#{Byte.LF}///)
+    headerLines = data.substring(0, divider).split(Byte.LF)
+    command = headerLines.shift()
+    headers = {}
+    # utility function to trim any whitespace before and after a string
+    trim= (str) ->
+      str.replace(/^\s+|\s+$/g,'')
+    # Parse headers
+    line = idx = null
+    for i in [0...headerLines.length]
+      line = headerLines[i]
+      idx = line.indexOf(':')
+      headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
+    # Parse body, stopping at the first \0 found.
+    # **TODO** Add support for content-length header.
+    body = ''
+    chr = null
+    for i in [(divider + 2)...data.length]
+      chr = data.charAt(i)
+      if chr is Byte.NULL
+        break
+      body += chr
+    return new Frame(command, headers, body)
+
+  # Split the data before unmarshalling every single STOMP frame.
+  # Web socket servers can send multiple frames in a single websocket message.
+  #
+  # `datas` is a string.
+  @unmarshall: (datas) ->
+    # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
+    # contained in a *single WebSocket frame*.
+    # The data are splitted when a NULL byte (follwode by zero or many LF bytes) is found
+    return (Frame._unmarshallSingle(data) for data in datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
+
+  # Marshall a Stomp frame
+  @marshall: (command, headers, body) ->
+    frame = new Frame(command, headers, body)
+    return frame.toString() + Byte.NULL
 
 Stomp =
 
@@ -37,65 +94,6 @@ Stomp =
     # Versions of STOMP specifications supported
     supportedVersions: ->
       '1.1,1.0'
-
-  # Representation of a [STOMP frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames)
-  frame: (command, headers=[], body='') ->
-    command: command
-    headers: headers
-    body: body
-    # Provides a textual representation of the frame
-    # suitable to be sent to the server
-    toString: ->
-      lines = [command]
-      for own name, value of headers
-        lines.push("#{name}:#{value}")
-      lines.push(Byte.LF + body)
-      return lines.join(Byte.LF)
-  
-  # Unmarshall a single frame from a `data` string
-  unmarshall: (data) ->
-    # search for 2 consecutives LF byte
-    divider = data.search(///#{Byte.LF}#{Byte.LF}///)
-    headerLines = data.substring(0, divider).split(Byte.LF)
-    command = headerLines.shift()
-    headers = {}
-    body = ''
-    # utility function to trim any whitespace before and after a string
-    trim = (str) ->
-      str.replace(/^\s+|\s+$/g,'')
-
-    # Parse headers
-    line = idx = null
-    for i in [0...headerLines.length]
-      line = headerLines[i]
-      idx = line.indexOf(':')
-      headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
-    
-    # Parse body, stopping at the first \0 found.
-    # **TODO** Add support for content-length header.
-    chr = null
-    for i in [(divider + 2)...data.length]
-      chr = data.charAt(i)
-      if chr is Byte.NULL
-        break
-      body += chr
-
-    return Stomp.frame(command, headers, body)
-
-  # Split the data before unmarshalling every single STOMP frame.
-  # Web socket servers can send multiple frames in a single websocket message.
-  #
-  # `multi_datas is a string`.
-  unmarshall_multi: (multi_datas) ->
-    # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
-    # contained in a *single WebSocket frame*.
-    # The data are splitted when a NULL byte (follwode by zero or many LF bytes) is found
-    datas = (Stomp.unmarshall(data) for data in multi_datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
-    return datas
-
-  # Marshall a Stomp frame
-  marshall: (command, headers, body) ->
-    Stomp.frame(command, headers, body).toString() + Byte.NULL
 
   # This method creates a WebSocket client that is connected to
   # the STOMP server located at the url.
@@ -152,7 +150,7 @@ class Client
     @subscriptions = {}
 
   _transmit: (command, headers, body) ->
-    out = Stomp.marshall(command, headers, body)
+    out = Frame.marshall(command, headers, body)
     @debug?(">>> " + out)
     @ws.send(out)
 
@@ -191,7 +189,7 @@ class Client
       return if data == Byte.LF # heart beat
       @debug?('<<< ' + data)
       # Handle STOMP frames received from the server
-      for frame in Stomp.unmarshall_multi(data)
+      for frame in Frame.unmarshall(data)
         # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
         if frame.command is "CONNECTED" and connectCallback
           @connected = true
@@ -289,5 +287,8 @@ class Client
 if window?
   window.Stomp = Stomp
 else
+  # For testing purpose, expose the Frame class inside Stomp to be able to
+  # marshall/unmarshall frames
+  Stomp.Frame = Frame
   exports.Stomp = Stomp
   Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock
