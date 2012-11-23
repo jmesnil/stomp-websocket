@@ -194,6 +194,8 @@
           } else if (frame.command === "MESSAGE") {
             onreceive = _this.subscriptions[frame.headers.subscription];
             _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
+          } else if (frame.command === "RECEIPT") {
+            _results.push(typeof _this.onreceipt === "function" ? _this.onreceipt(frame) : void 0);
           } else if (frame.command === "ERROR") {
             _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
           } else {

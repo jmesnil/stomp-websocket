@@ -1,5 +1,5 @@
-# **STOMP Over Web Socket** is a JavaScript STOMP Client using HTML5
-# Web Sockets API.
+# **STOMP Over Web Socket** is a JavaScript STOMP Client using
+# [HTML5 Web Sockets API](http://www.w3.org/TR/websockets).
 #
 # * Copyright (C) 2010-2012 [Jeff Mesnil](http://jmesnil.net/)
 # * Copyright (C) 2012 [FuseSource, Inc.](http://fusesource.com)
@@ -8,7 +8,7 @@
 #
 # * [STOMP 1.0](http://stomp.github.com/stomp-specification-1.0.html)
 # * [STOMP 1.1](http://stomp.github.com/stomp-specification-1.1.html)
-
+#
 # The library is accessed through this Stomp object.
 Stomp =
 
@@ -27,7 +27,7 @@ Stomp =
     supportedVersions: ->
       '1.1,1.0'
 
-  # ##STOMP frame
+  # Representation of a [STOMP frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames)
   frame: (command, headers=[], body='') ->
     command: command
     headers: headers
@@ -49,7 +49,7 @@ Stomp =
       lines.push('\n'+body)
       return lines.join('\n')
   
-  # Unmarshall a single frame
+  # Unmarshall a single frame from a `data` string
   unmarshal: (data) ->
     divider = data.search(/\n\n/)
     headerLines = data.substring(0, divider).split('\n')
@@ -78,9 +78,10 @@ Stomp =
 
     return Stomp.frame(command, headers, body)
 
+  # Split the data before unmarshalling every single STOMP frame.
   # Web socket servers can send multiple frames in a single websocket message.
   #
-  # Split the data before unmarshalling every single STOMP frame
+  # `multi_datas is a string`.
   unmarshal_multi: (multi_datas) ->
     # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
     # contained in a *single WebSocket frame*.
@@ -165,6 +166,7 @@ class Client
           self.ws.send('\x0A')
         @pinger = window?.setInterval(ping, ttl)
 
+  # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
   connect: (login_,
       passcode_,
       connectCallback,
@@ -184,16 +186,31 @@ class Client
         evt.data
       return if data == '\x0A' # heart beat
       @debug?('<<< ' + data)
+      # Handle STOMP frames received from the server
       for frame in Stomp.unmarshal_multi(data)
+        # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
         if frame.command is "CONNECTED" and connectCallback
           @connected = true
           @_setupHeartbeat(frame.headers)
           connectCallback(frame)
+        # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
         else if frame.command is "MESSAGE"
+          # the `onreceive` callback is registered when the client calls `subscribe()`
           onreceive = @subscriptions[frame.headers.subscription]
           onreceive?(frame)
-        #else if frame.command is "RECEIPT"
-        #  @onreceipt?(frame)
+        # [RECEIPT Frame](http://stomp.github.com/stomp-specification-1.1.html#RECEIPT)
+        #
+        # The client instance can set its `onreceipt` field to a function taking
+        # a frame argument that will be called when a receipt is received from
+        # the server:
+        #
+        #     client.onreceipt = function(frame) {
+        #       receiptID = frame.headers['receipt-id'];
+        #       ...
+        #     }
+        else if frame.command is "RECEIPT"
+          @onreceipt?(frame)
+        # [ERROR Frame](http://stomp.github.com/stomp-specification-1.1.html#ERROR)
         else if frame.command is "ERROR"
           errorCallback?(frame)
         else
@@ -214,6 +231,7 @@ class Client
       @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
   
+  # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
   disconnect: (disconnectCallback) ->
     @_transmit("DISCONNECT")
     @ws.close()
@@ -221,10 +239,12 @@ class Client
     window?.clearInterval(@pinger) if @pinger
     disconnectCallback?()
   
+  # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
   send: (destination, headers={}, body='') ->
     headers.destination = destination
     @_transmit("SEND", headers, body)
   
+  # [SUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE)
   subscribe: (destination, callback, headers={}) ->
     if typeof(headers.id) == 'undefined' || headers.id.length == 0
       id = "sub-" + @counter++
@@ -236,23 +256,28 @@ class Client
     @_transmit("SUBSCRIBE", headers)
     return id
   
+  # [UNSUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#UNSUBSCRIBE)
   unsubscribe: (id, headers={}) ->
     headers.id = id
     delete @subscriptions[id]
     @_transmit("UNSUBSCRIBE", headers)
   
+  # [BEGIN Frame](http://stomp.github.com/stomp-specification-1.1.html#BEGIN)
   begin: (transaction, headers={}) ->
     headers.transaction = transaction
     @_transmit("BEGIN", headers)
   
+  # [COMMIT Frame](http://stomp.github.com/stomp-specification-1.1.html#COMMIT)
   commit: (transaction, headers={}) ->
     headers.transaction = transaction
     @_transmit("COMMIT", headers)
   
+  # [ABORT Frame](http://stomp.github.com/stomp-specification-1.1.html#ABORT)
   abort: (transaction, headers={}) ->
     headers.transaction = transaction
     @_transmit("ABORT", headers)
   
+  # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
   ack: (message_id, headers={}) ->
     headers["message-id"] = message_id
     @_transmit("ACK", headers)
