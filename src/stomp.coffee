@@ -136,9 +136,9 @@ class Client
     @heartbeat = {
       # send heartbeat every 10s by default (value is in ms)
       outgoing: 10000
-      # do not want to receive heartbeats (for now...)
-      # **TODO** support server heartbeat to detect stale server
-      incoming: 0
+      # expect to receive server heartbeat at least every 10s by default
+      # (value in ms)
+      incoming: 10000
     }
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {}
@@ -150,24 +150,35 @@ class Client
 
   _setupHeartbeat: (headers) ->
     if headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
-      [serverOutgoing, serverIncoming] = headers['heart-beat'].split(",")
-      # **TODO** close the connection if the server does not send heart beat (sx, cy)
-      serverIncoming = parseInt(serverIncoming)
+      # heart-beat header received from the server looks like:
+      #
+      #     heart-beat: sx, sy
+      [serverOutgoing, serverIncoming] = (parseInt(v) for v in headers['heart-beat'].split(","))
+
       unless @heartbeat.outgoing == 0 or serverIncoming == 0
         ttl = Math.max(@heartbeat.outgoing, serverIncoming)
-        @debug?("send ping every " + ttl + "ms")
-        ping = =>
+        @debug("send PING every #{ttl}ms")
+        @pinger = window?.setInterval(=>
           @ws.send Byte.LF
-          @debug?(">> PING")
-        @pinger = window?.setInterval(ping, ttl)
+          @debug?(">>> PING")
+        , ttl)
+
+      unless @heartbeat.incoming == 0 or serverOutgoing == 0
+        ttl = Math.max(@heartbeat.incoming, serverOutgoing)
+        @debug("check PONG every #{ttl}ms")
+        @ponger = window?.setInterval(=>
+          delta = Date.now() - @serverActivity
+          # We wait twice the TTL to be flexible on window's setInterval calls
+          @_cleanUp() if delta > ttl * 2
+        , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
   connect: (login_,
       passcode_,
-      connectCallback,
+      @connectCallback,
       errorCallback,
       vhost_,
-      heartbeat="10000,0") ->
+      heartbeat="10000,10000") ->
     @debug?("Opening Web Socket...")
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
@@ -179,7 +190,10 @@ class Client
         data
       else
         evt.data
-      return if data == Byte.LF # heart beat
+      @serverActivity = Date.now()
+      if data == Byte.LF # heartbeat
+        @debug?('<<< PONG')
+        return
       @debug?('<<< ' + data)
       # Handle STOMP frames received from the server
       for frame in Frame.unmarshall(data)
@@ -211,7 +225,7 @@ class Client
         else
           @debug?("Unhandled frame: " + JSON.stringify(frame))
     @ws.onclose   = =>
-      msg = "Whoops! Lost connection to " + @url
+      msg = "Whoops! Lost connection to " + @ws.url
       @debug?(msg)
       errorCallback?(msg)
     @ws.onopen    = =>
@@ -224,16 +238,24 @@ class Client
       @heartbeat.incoming = parseInt(cy)
       headers['accept-version'] = Stomp.VERSIONS.supportedVersions()
       @_transmit("CONNECT", headers)
-    @connectCallback = connectCallback
-  
+
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
   disconnect: (disconnectCallback) ->
     @_transmit("DISCONNECT")
+    # Discard the onclose callback to avoid calling the errorCallback when
+    # the client is properly disconnected.
+    @ws.onclose = null
+    @_cleanUp()
+    disconnectCallback?()
+
+  # Clean up client resources when it is disconnected or the server did not
+  # send heart beats in a timely fashion
+  _cleanUp: () ->
     @ws.close()
     @connected = false
     window?.clearInterval(@pinger) if @pinger
-    disconnectCallback?()
-  
+    window?.clearInterval(@ponger) if @ponger
+
   # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
   send: (destination, headers={}, body='') ->
     headers.destination = destination

@@ -115,7 +115,7 @@
       this.connected = false;
       this.heartbeat = {
         outgoing: 10000,
-        incoming: 0
+        incoming: 10000
       };
       this.subscriptions = {};
     }
@@ -130,29 +130,46 @@
     };
 
     Client.prototype._setupHeartbeat = function(headers) {
-      var ping, serverIncoming, serverOutgoing, ttl, _ref, _ref1,
+      var serverIncoming, serverOutgoing, ttl, v, _ref, _ref1,
         _this = this;
       if ((_ref = headers.version) === Stomp.VERSIONS.V1_1 || _ref === Stomp.VERSIONS.V1_2) {
-        _ref1 = headers['heart-beat'].split(","), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
-        serverIncoming = parseInt(serverIncoming);
+        _ref1 = (function() {
+          var _i, _len, _ref1, _results;
+          _ref1 = headers['heart-beat'].split(",");
+          _results = [];
+          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+            v = _ref1[_i];
+            _results.push(parseInt(v));
+          }
+          return _results;
+        })(), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
         if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
           ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
-          if (typeof this.debug === "function") {
-            this.debug("send ping every " + ttl + "ms");
-          }
-          ping = function() {
+          this.debug("send PING every " + ttl + "ms");
+          this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
             _this.ws.send(Byte.LF);
             return typeof _this.debug === "function" ? _this.debug(">> PING") : void 0;
-          };
-          return this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(ping, ttl) : void 0;
+          }, ttl) : void 0;
+        }
+        if (!(this.heartbeat.incoming === 0 || serverOutgoing === 0)) {
+          ttl = Math.max(this.heartbeat.incoming, serverOutgoing);
+          this.debug("check PONG every " + ttl + "ms");
+          return this.ponger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
+            var delta;
+            delta = Date.now() - _this.serverActivity;
+            if (delta > ttl * 2) {
+              return _this._cleanUp();
+            }
+          }, ttl) : void 0;
         }
       }
     };
 
     Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_, heartbeat) {
       var _this = this;
+      this.connectCallback = connectCallback;
       if (heartbeat == null) {
-        heartbeat = "10000,0";
+        heartbeat = "10000,10000";
       }
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
@@ -176,7 +193,11 @@
             return evt.data;
           }
         }).call(_this);
+        _this.serverActivity = Date.now();
         if (data === Byte.LF) {
+          if (typeof _this.debug === "function") {
+            _this.debug('<<< PONG');
+          }
           return;
         }
         if (typeof _this.debug === "function") {
@@ -205,13 +226,13 @@
       };
       this.ws.onclose = function() {
         var msg;
-        msg = "Whoops! Lost connection to " + _this.url;
+        msg = "Whoops! Lost connection to " + _this.ws.url;
         if (typeof _this.debug === "function") {
           _this.debug(msg);
         }
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
-      this.ws.onopen = function() {
+      return this.ws.onopen = function() {
         var cx, cy, headers, _ref;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
@@ -230,11 +251,16 @@
         headers['accept-version'] = Stomp.VERSIONS.supportedVersions();
         return _this._transmit("CONNECT", headers);
       };
-      return this.connectCallback = connectCallback;
     };
 
     Client.prototype.disconnect = function(disconnectCallback) {
       this._transmit("DISCONNECT");
+      this.ws.onclose = null;
+      this._cleanUp();
+      return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
+    };
+
+    Client.prototype._cleanUp = function() {
       this.ws.close();
       this.connected = false;
       if (this.pinger) {
@@ -242,7 +268,9 @@
           window.clearInterval(this.pinger);
         }
       }
-      return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
+      if (this.ponger) {
+        return typeof window !== "undefined" && window !== null ? window.clearInterval(this.ponger) : void 0;
+      }
     };
 
     Client.prototype.send = function(destination, headers, body) {

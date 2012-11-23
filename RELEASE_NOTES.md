@@ -10,6 +10,9 @@
 
 * `connect()` method takes an additional `heartbeat` parameter which is a string of the form `"cx, cy"` expected by the [`heart-beat`](http://stomp.github.com/stomp-specification-1.1.html#Heart-beating) header of the CONNECT frame. 
 
+* the `errorCallback` passed to the `connect()` method is no longer called when the
+  client is properly disconnected by calling `disconnect()`.
+
 ### Minified version
 
 In addition to the regular `stomp.js` file, the library is also available in a minified version `stomp.min.js`
