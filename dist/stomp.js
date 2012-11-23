@@ -4,6 +4,7 @@
     __hasProp = {}.hasOwnProperty;
 
   Stomp = {
+    libVersion: "2.0.0",
     HEADERS: {
       HOST: 'host',
       ACCEPT_VERSION: 'accept-version',
