@@ -80,16 +80,10 @@ Stomp =
   # changed in the release notes
   libVersion: "2.0.0"
 
-  HEADERS:
-    HOST: 'host'
-    ACCEPT_VERSION: 'accept-version'
-    VERSION: 'version'
-    HEART_BEAT: 'heart-beat'
-
   VERSIONS:
-    VERSION_1_0: '1.0'
-    VERSION_1_1: '1.1'
-    VERSION_1_2: '1.2'
+    V1_0: '1.0'
+    V1_1: '1.1'
+    V1_2: '1.2'
 
     # Versions of STOMP specifications supported
     supportedVersions: ->
@@ -155,10 +149,8 @@ class Client
     @ws.send(out)
 
   _setupHeartbeat: (headers) ->
-    serverVersion = headers[Stomp.HEADERS.VERSION]
-    if serverVersion == Stomp.VERSIONS.VERSION_1_1 or
-        serverVersion == Stomp.VERSIONS.VERSION_1_2
-      [serverOutgoing, serverIncoming] = headers[Stomp.HEADERS.HEART_BEAT].split(",")
+    if headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
+      [serverOutgoing, serverIncoming] = headers['heart-beat'].split(",")
       # **TODO** close the connection if the server does not send heart beat (sx, cy)
       serverIncoming = parseInt(serverIncoming)
       unless @heartbeat.outgoing == 0 or serverIncoming == 0
@@ -166,6 +158,7 @@ class Client
         @debug?("send ping every " + ttl + "ms")
         ping = =>
           @ws.send Byte.LF
+          @debug?(">> PING")
         @pinger = window?.setInterval(ping, ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
@@ -224,12 +217,12 @@ class Client
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       headers = {login: login_, passcode: passcode_}
-      headers[Stomp.HEADERS.HOST] = vhost_ if vhost_
-      headers[Stomp.HEADERS.HEART_BEAT] = heartbeat
+      headers.host = vhost_ if vhost_
+      headers['heart-beat'] = heartbeat
       [cx, cy] = heartbeat.split(",")
       @heartbeat.outgoing = parseInt(cx)
       @heartbeat.incoming = parseInt(cy)
-      headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions()
+      headers['accept-version'] = Stomp.VERSIONS.supportedVersions()
       @_transmit("CONNECT", headers)
     @connectCallback = connectCallback
   

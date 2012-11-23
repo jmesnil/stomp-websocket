@@ -84,16 +84,10 @@
 
   Stomp = {
     libVersion: "2.0.0",
-    HEADERS: {
-      HOST: 'host',
-      ACCEPT_VERSION: 'accept-version',
-      VERSION: 'version',
-      HEART_BEAT: 'heart-beat'
-    },
     VERSIONS: {
-      VERSION_1_0: '1.0',
-      VERSION_1_1: '1.1',
-      VERSION_1_2: '1.2',
+      V1_0: '1.0',
+      V1_1: '1.1',
+      V1_2: '1.2',
       supportedVersions: function() {
         return '1.1,1.0';
       }
@@ -136,11 +130,10 @@
     };
 
     Client.prototype._setupHeartbeat = function(headers) {
-      var ping, serverIncoming, serverOutgoing, serverVersion, ttl, _ref,
+      var ping, serverIncoming, serverOutgoing, ttl, _ref, _ref1,
         _this = this;
-      serverVersion = headers[Stomp.HEADERS.VERSION];
-      if (serverVersion === Stomp.VERSIONS.VERSION_1_1 || serverVersion === Stomp.VERSIONS.VERSION_1_2) {
-        _ref = headers[Stomp.HEADERS.HEART_BEAT].split(","), serverOutgoing = _ref[0], serverIncoming = _ref[1];
+      if ((_ref = headers.version) === Stomp.VERSIONS.V1_1 || _ref === Stomp.VERSIONS.V1_2) {
+        _ref1 = headers['heart-beat'].split(","), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
         serverIncoming = parseInt(serverIncoming);
         if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
           ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
@@ -148,7 +141,8 @@
             this.debug("send ping every " + ttl + "ms");
           }
           ping = function() {
-            return _this.ws.send(Byte.LF);
+            _this.ws.send(Byte.LF);
+            return typeof _this.debug === "function" ? _this.debug(">> PING") : void 0;
           };
           return this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(ping, ttl) : void 0;
         }
@@ -227,13 +221,13 @@
           passcode: passcode_
         };
         if (vhost_) {
-          headers[Stomp.HEADERS.HOST] = vhost_;
+          headers.host = vhost_;
         }
-        headers[Stomp.HEADERS.HEART_BEAT] = heartbeat;
+        headers['heart-beat'] = heartbeat;
         _ref = heartbeat.split(","), cx = _ref[0], cy = _ref[1];
         _this.heartbeat.outgoing = parseInt(cx);
         _this.heartbeat.incoming = parseInt(cy);
-        headers[Stomp.HEADERS.ACCEPT_VERSION] = Stomp.VERSIONS.supportedVersions();
+        headers['accept-version'] = Stomp.VERSIONS.supportedVersions();
         return _this._transmit("CONNECT", headers);
       };
       return this.connectCallback = connectCallback;
