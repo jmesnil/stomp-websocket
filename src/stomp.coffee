@@ -53,7 +53,7 @@ Stomp =
       return lines.join(Byte.LF)
   
   # Unmarshall a single frame from a `data` string
-  unmarshal: (data) ->
+  unmarshall: (data) ->
     # search for 2 consecutives LF byte
     divider = data.search(///#{Byte.LF}#{Byte.LF}///)
     headerLines = data.substring(0, divider).split(Byte.LF)
@@ -86,15 +86,15 @@ Stomp =
   # Web socket servers can send multiple frames in a single websocket message.
   #
   # `multi_datas is a string`.
-  unmarshal_multi: (multi_datas) ->
+  unmarshall_multi: (multi_datas) ->
     # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
     # contained in a *single WebSocket frame*.
     # The data are splitted when a NULL byte (follwode by zero or many LF bytes) is found
-    datas = (Stomp.unmarshal(data) for data in multi_datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
+    datas = (Stomp.unmarshall(data) for data in multi_datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
     return datas
 
   # Marshall a Stomp frame
-  marshal: (command, headers, body) ->
+  marshall: (command, headers, body) ->
     Stomp.frame(command, headers, body).toString() + Byte.NULL
 
   # This method creates a WebSocket client that is connected to
@@ -152,7 +152,7 @@ class Client
     @subscriptions = {}
 
   _transmit: (command, headers, body) ->
-    out = Stomp.marshal(command, headers, body)
+    out = Stomp.marshall(command, headers, body)
     @debug?(">>> " + out)
     @ws.send(out)
 
@@ -191,7 +191,7 @@ class Client
       return if data == Byte.LF # heart beat
       @debug?('<<< ' + data)
       # Handle STOMP frames received from the server
-      for frame in Stomp.unmarshal_multi(data)
+      for frame in Stomp.unmarshall_multi(data)
         # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
         if frame.command is "CONNECTED" and connectCallback
           @connected = true

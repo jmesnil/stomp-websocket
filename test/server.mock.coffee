@@ -6,7 +6,7 @@ class StompServerMock extends WebSocketMock
   # WebSocketMock handlers
   
   handle_send: (msg) =>
-    @stomp_dispatch(Stomp.unmarshal(msg))
+    @stomp_dispatch(Stomp.unmarshall(msg))
   
   handle_close: =>
     @_shutdown()
@@ -23,7 +23,7 @@ class StompServerMock extends WebSocketMock
     @messages = []
   
   stomp_send: (command, headers, body=null) ->
-    @_respond(Stomp.marshal(command, headers, body))
+    @_respond(Stomp.marshall(command, headers, body))
     
   stomp_send_receipt: (frame) ->
     if frame.headers.message?

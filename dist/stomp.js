@@ -48,7 +48,7 @@
         }
       };
     },
-    unmarshal: function(data) {
+    unmarshall: function(data) {
       var body, chr, command, divider, headerLines, headers, i, idx, line, trim, _i, _j, _ref, _ref1, _ref2;
       divider = data.search(RegExp("" + Byte.LF + Byte.LF));
       headerLines = data.substring(0, divider).split(Byte.LF);
@@ -74,7 +74,7 @@
       }
       return Stomp.frame(command, headers, body);
     },
-    unmarshal_multi: function(multi_datas) {
+    unmarshall_multi: function(multi_datas) {
       var data, datas;
       datas = (function() {
         var _i, _len, _ref, _results;
@@ -83,14 +83,14 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           data = _ref[_i];
           if ((data != null ? data.length : void 0) > 0) {
-            _results.push(Stomp.unmarshal(data));
+            _results.push(Stomp.unmarshall(data));
           }
         }
         return _results;
       })();
       return datas;
     },
-    marshal: function(command, headers, body) {
+    marshall: function(command, headers, body) {
       return Stomp.frame(command, headers, body).toString() + Byte.NULL;
     },
     client: function(url, protocols) {
@@ -123,7 +123,7 @@
 
     Client.prototype._transmit = function(command, headers, body) {
       var out;
-      out = Stomp.marshal(command, headers, body);
+      out = Stomp.marshall(command, headers, body);
       if (typeof this.debug === "function") {
         this.debug(">>> " + out);
       }
@@ -183,7 +183,7 @@
         if (typeof _this.debug === "function") {
           _this.debug('<<< ' + data);
         }
-        _ref = Stomp.unmarshal_multi(data);
+        _ref = Stomp.unmarshall_multi(data);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           frame = _ref[_i];
