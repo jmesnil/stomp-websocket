@@ -131,7 +131,8 @@
     };
 
     Client.prototype._setupHeartbeat = function(headers) {
-      var ping, self, serverIncoming, serverOutgoing, serverVersion, ttl, _ref;
+      var ping, serverIncoming, serverOutgoing, serverVersion, ttl, _ref,
+        _this = this;
       serverVersion = headers[Stomp.HEADERS.VERSION];
       if (serverVersion === Stomp.VERSIONS.VERSION_1_1 || serverVersion === Stomp.VERSIONS.VERSION_1_2) {
         _ref = headers[Stomp.HEADERS.HEART_BEAT].split(","), serverOutgoing = _ref[0], serverIncoming = _ref[1];
@@ -141,9 +142,8 @@
           if (typeof this.debug === "function") {
             this.debug("send ping every " + ttl + "ms");
           }
-          self = this;
           ping = function() {
-            return self.ws.send('\x0A');
+            return _this.ws.send('\x0A');
           };
           return this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(ping, ttl) : void 0;
         }

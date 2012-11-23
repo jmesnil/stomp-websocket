@@ -161,9 +161,8 @@ class Client
       unless @heartbeat.outgoing == 0 or serverIncoming == 0
         ttl = Math.max(@heartbeat.outgoing, serverIncoming)
         @debug?("send ping every " + ttl + "ms")
-        self = this
-        ping = () ->
-          self.ws.send('\x0A')
+        ping = =>
+          @ws.send('\x0A')
         @pinger = window?.setInterval(ping, ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
