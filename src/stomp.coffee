@@ -12,6 +12,10 @@
 # The library is accessed through this Stomp object.
 Stomp =
 
+  # Version of the JavaScript library. This can be used to check what has
+  # changed in the release notes
+  libVersion = "2.0.0"
+
   HEADERS:
     HOST: 'host'
     ACCEPT_VERSION: 'accept-version'

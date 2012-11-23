@@ -1,7 +1,7 @@
 {
   "name": "stomp-websocket",
   "preferGlobal": "true",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "author": "Jeff Mesnil <jmesnil@gmail.com",
   "description": "STOMP over Web Sockets",
   "scripts": {
@@ -9,10 +9,10 @@
     "test": "coffeelint -f coffeelint.json -r src && cake test"
   },
   "devDependencies": {
-  "coffee-script": "latest",
-  "coffeelint": "latest",
-  "jasmine-node": "latest",
-  "grunt": "latest",
-  "docco": "latest"
+    "coffee-script": "latest",
+    "coffeelint": "latest",
+    "jasmine-node": "latest",
+    "grunt": "latest",
+    "docco": "latest"
   }
 }
