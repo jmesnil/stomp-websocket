@@ -56,9 +56,9 @@ Stomp =
     command = headerLines.shift()
     headers = {}
     body = ''
-    # utility function to trim any whitespace from a string
+    # utility function to trim any whitespace before and after a string
     trim = (str) ->
-      str.replace(/^\s+/g,'').replace(/\s+$/g,'')
+      str.replace(/^\s+|\s+$/g,'')
 
     # Parse headers
     line = idx = null
