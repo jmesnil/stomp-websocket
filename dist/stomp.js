@@ -12,7 +12,7 @@
 
     function Frame(command, headers, body) {
       this.command = command;
-      this.headers = headers != null ? headers : [];
+      this.headers = headers != null ? headers : {};
       this.body = body != null ? body : '';
     }
 

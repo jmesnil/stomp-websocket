@@ -9,7 +9,8 @@
 # * [STOMP 1.0](http://stomp.github.com/stomp-specification-1.0.html)
 # * [STOMP 1.1](http://stomp.github.com/stomp-specification-1.1.html)
 #
-# The library is accessed through this Stomp object.
+# The library is accessed through the `Stomp` object that is set on the `window`
+# when running in a Web browser.
 
 # Define constants for bytes used throughout the code.
 Byte =
@@ -21,7 +22,7 @@ Byte =
 # Representation of a [STOMP frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames)
 class Frame
   # Frame constructor
-  constructor: (@command, @headers=[], @body='') ->
+  constructor: (@command, @headers={}, @body='') ->
 
   # Provides a textual representation of the frame
   # suitable to be sent to the server
