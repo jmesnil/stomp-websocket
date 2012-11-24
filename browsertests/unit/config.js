@@ -1,11 +1,11 @@
 $(document).ready(function(){
   
   TEST = {
-    destination : "jms.topic.chat",
-    login : "guest",
-    password : "guest",
-    url : "ws://localhost:9000/stomp",
-    badUrl: "ws://localhost:9001/stomp",
+    destination : "/topic/chat.general",
+    login : "admin",
+    password : "password",
+    url : "ws://localhost:61623",
+    badUrl: "ws://localhost:61625",
     timeout: 2000,
     debug : function(str) {
       $("#debug").append(str + "\n");

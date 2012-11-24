@@ -5,6 +5,7 @@
 ### STOMP 1.1 support
 
 * heart-beat
+* content-length
 
 ### API change
 

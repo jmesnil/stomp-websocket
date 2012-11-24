@@ -30,12 +30,14 @@ class Frame
     lines = [@command]
     for own name, value of @headers
       lines.push("#{name}:#{value}")
+    lines.push("content-length:#{('' + @body).length}") if @body
     lines.push(Byte.LF + @body)
     return lines.join(Byte.LF)
 
   # Unmarshall a single STOMP frame from a `data` string
   @_unmarshallSingle: (data) ->
-    # search for 2 consecutives LF byte
+    # search for 2 consecutives LF byte to split the command
+    # and headers from the body
     divider = data.search(///#{Byte.LF}#{Byte.LF}///)
     headerLines = data.substring(0, divider).split(Byte.LF)
     command = headerLines.shift()
@@ -49,21 +51,28 @@ class Frame
       line = headerLines[i]
       idx = line.indexOf(':')
       headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
-    # Parse body, stopping at the first \0 found.
-    # **TODO** Add support for content-length header.
+    # Parse body
+    # check for content-length or  topping at the first NULL byte found.
     body = ''
-    chr = null
-    for i in [(divider + 2)...data.length]
-      chr = data.charAt(i)
-      if chr is Byte.NULL
-        break
-      body += chr
+    # skip the 2 LF bytes that divides the headers from the body
+    start = divider + 2
+    if headers['content-length']
+      len = parseInt headers['content-length']
+      body = ('' + data).substring(start, start + len)
+    else
+      chr = null
+      for i in [start...data.length]
+        chr = data.charAt(i)
+        break if chr is Byte.NULL
+        body += chr
     return new Frame(command, headers, body)
 
   # Split the data before unmarshalling every single STOMP frame.
   # Web socket servers can send multiple frames in a single websocket message.
   #
   # `datas` is a string.
+  #
+  # returns an *array* of Frame objects
   @unmarshall: (datas) ->
     # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
     # contained in a *single WebSocket frame*.
@@ -92,7 +101,7 @@ Stomp =
 
   # This method creates a WebSocket client that is connected to
   # the STOMP server located at the url.
-  client: (url, protocols = 'v10.stomp,v11.stomp') ->
+  client: (url, protocols = ['v10.stomp', 'v11.stomp']) ->
     # This is a hack to allow another implementation than the standard
     # HTML5 WebSocket class.
     #
@@ -301,11 +310,11 @@ class Client
     headers["message-id"] = message_id
     @_transmit "ACK", headers
 
+Stomp.Frame = Frame
 if window?
   window.Stomp = Stomp
 else
   # For testing purpose, expose the Frame class inside Stomp to be able to
   # marshall/unmarshall frames
-  Stomp.Frame = Frame
   exports.Stomp = Stomp
   Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock

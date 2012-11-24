@@ -1,9 +1,9 @@
 $(document).ready(function(){
 
-  var url = "ws://localhost:61614/stomp";
-  var login = "guest";
-  var passcode = "guest"
-  var destination = "/queue/test";
+  var url = "ws://localhost:61623";
+  var login = "admin";
+  var passcode = "password"
+  var destination = "/topic/chat.general";
   
   $("#server_url").text(url);
   $("#queue_name").text(destination);

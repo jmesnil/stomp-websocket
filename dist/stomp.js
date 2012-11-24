@@ -25,12 +25,15 @@
         value = _ref[name];
         lines.push("" + name + ":" + value);
       }
+      if (this.body) {
+        lines.push("content-length:" + ('' + this.body).length);
+      }
       lines.push(Byte.LF + this.body);
       return lines.join(Byte.LF);
     };
 
     Frame._unmarshallSingle = function(data) {
-      var body, chr, command, divider, headerLines, headers, i, idx, line, trim, _i, _j, _ref, _ref1, _ref2;
+      var body, chr, command, divider, headerLines, headers, i, idx, len, line, start, trim, _i, _j, _ref, _ref1;
       divider = data.search(RegExp("" + Byte.LF + Byte.LF));
       headerLines = data.substring(0, divider).split(Byte.LF);
       command = headerLines.shift();
@@ -45,13 +48,19 @@
         headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
       }
       body = '';
-      chr = null;
-      for (i = _j = _ref1 = divider + 2, _ref2 = data.length; _ref1 <= _ref2 ? _j < _ref2 : _j > _ref2; i = _ref1 <= _ref2 ? ++_j : --_j) {
-        chr = data.charAt(i);
-        if (chr === Byte.NULL) {
-          break;
+      start = divider + 2;
+      if (headers['content-length']) {
+        len = parseInt(headers['content-length']);
+        body = ('' + data).substring(start, start + len);
+      } else {
+        chr = null;
+        for (i = _j = start, _ref1 = data.length; start <= _ref1 ? _j < _ref1 : _j > _ref1; i = start <= _ref1 ? ++_j : --_j) {
+          chr = data.charAt(i);
+          if (chr === Byte.NULL) {
+            break;
+          }
+          body += chr;
         }
-        body += chr;
       }
       return new Frame(command, headers, body);
     };
@@ -95,7 +104,7 @@
     client: function(url, protocols) {
       var klass, ws;
       if (protocols == null) {
-        protocols = 'v10.stomp,v11.stomp';
+        protocols = ['v10.stomp', 'v11.stomp'];
       }
       klass = Stomp.WebSocketClass || WebSocket;
       ws = new klass(url, protocols);
@@ -363,10 +372,11 @@
 
   })();
 
+  Stomp.Frame = Frame;
+
   if (typeof window !== "undefined" && window !== null) {
     window.Stomp = Stomp;
   } else {
-    Stomp.Frame = Frame;
     exports.Stomp = Stomp;
     Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock;
   }
