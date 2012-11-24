@@ -145,7 +145,7 @@ class Client
 
   _transmit: (command, headers, body) ->
     out = Frame.marshall(command, headers, body)
-    @debug?(">>> " + out)
+    @debug? ">>> " + out
     @ws.send(out)
 
   _setupHeartbeat: (headers) ->
@@ -157,19 +157,21 @@ class Client
 
       unless @heartbeat.outgoing == 0 or serverIncoming == 0
         ttl = Math.max(@heartbeat.outgoing, serverIncoming)
-        @debug("send PING every #{ttl}ms")
+        @debug? "send PING every #{ttl}ms"
         @pinger = window?.setInterval(=>
           @ws.send Byte.LF
-          @debug?(">>> PING")
+          @debug? ">>> PING"
         , ttl)
 
       unless @heartbeat.incoming == 0 or serverOutgoing == 0
         ttl = Math.max(@heartbeat.incoming, serverOutgoing)
-        @debug("check PONG every #{ttl}ms")
+        @debug? "check PONG every #{ttl}ms"
         @ponger = window?.setInterval(=>
           delta = Date.now() - @serverActivity
           # We wait twice the TTL to be flexible on window's setInterval calls
-          @_cleanUp() if delta > ttl * 2
+          if delta > ttl * 2
+            @debug? "did not receive server activity for the last #{delta}ms"
+            @_cleanUp() 
         , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
@@ -179,11 +181,11 @@ class Client
       errorCallback,
       vhost_,
       heartbeat="10000,10000") ->
-    @debug?("Opening Web Socket...")
+    @debug? "Opening Web Socket..."
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
         view = new Uint8Array( evt.data )
-        @debug?('--- got data length: ' + view.length)
+        @debug? "--- got data length: #{view.length}"
         data = ""
         for i in view
           data += String.fromCharCode(i)
@@ -192,9 +194,9 @@ class Client
         evt.data
       @serverActivity = Date.now()
       if data == Byte.LF # heartbeat
-        @debug?('<<< PONG')
+        @debug? "<<< PONG"
         return
-      @debug?('<<< ' + data)
+      @debug? "<<< #{data}"
       # Handle STOMP frames received from the server
       for frame in Frame.unmarshall(data)
         # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
@@ -223,9 +225,9 @@ class Client
         else if frame.command is "ERROR"
           errorCallback?(frame)
         else
-          @debug?("Unhandled frame: " + JSON.stringify(frame))
+          @debug? "Unhandled frame: #{frame}"
     @ws.onclose   = =>
-      msg = "Whoops! Lost connection to " + @ws.url
+      msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
       errorCallback?(msg)
     @ws.onopen    = =>
@@ -237,11 +239,11 @@ class Client
       @heartbeat.outgoing = parseInt(cx)
       @heartbeat.incoming = parseInt(cy)
       headers['accept-version'] = Stomp.VERSIONS.supportedVersions()
-      @_transmit("CONNECT", headers)
+      @_transmit "CONNECT", headers
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
   disconnect: (disconnectCallback) ->
-    @_transmit("DISCONNECT")
+    @_transmit "DISCONNECT"
     # Discard the onclose callback to avoid calling the errorCallback when
     # the client is properly disconnected.
     @ws.onclose = null
@@ -259,7 +261,7 @@ class Client
   # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
   send: (destination, headers={}, body='') ->
     headers.destination = destination
-    @_transmit("SEND", headers, body)
+    @_transmit "SEND", headers, body 
   
   # [SUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE)
   subscribe: (destination, callback, headers={}) ->
@@ -270,34 +272,34 @@ class Client
       id = headers.id
     headers.destination = destination
     @subscriptions[id] = callback
-    @_transmit("SUBSCRIBE", headers)
+    @_transmit "SUBSCRIBE", headers
     return id
   
   # [UNSUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#UNSUBSCRIBE)
   unsubscribe: (id, headers={}) ->
     headers.id = id
     delete @subscriptions[id]
-    @_transmit("UNSUBSCRIBE", headers)
+    @_transmit "UNSUBSCRIBE", headers
   
   # [BEGIN Frame](http://stomp.github.com/stomp-specification-1.1.html#BEGIN)
   begin: (transaction, headers={}) ->
     headers.transaction = transaction
-    @_transmit("BEGIN", headers)
+    @_transmit "BEGIN", headers
   
   # [COMMIT Frame](http://stomp.github.com/stomp-specification-1.1.html#COMMIT)
   commit: (transaction, headers={}) ->
     headers.transaction = transaction
-    @_transmit("COMMIT", headers)
+    @_transmit "COMMIT", headers
   
   # [ABORT Frame](http://stomp.github.com/stomp-specification-1.1.html#ABORT)
   abort: (transaction, headers={}) ->
     headers.transaction = transaction
-    @_transmit("ABORT", headers)
+    @_transmit "ABORT", headers
   
   # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
   ack: (message_id, headers={}) ->
     headers["message-id"] = message_id
-    @_transmit("ACK", headers)
+    @_transmit "ACK", headers
 
 if window?
   window.Stomp = Stomp
