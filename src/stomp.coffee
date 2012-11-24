@@ -237,9 +237,7 @@ class Client
       headers = {login: login_, passcode: passcode_}
       headers.host = vhost_ if vhost_
       headers['heart-beat'] = heartbeat
-      [cx, cy] = heartbeat.split(",")
-      @heartbeat.outgoing = parseInt(cx)
-      @heartbeat.incoming = parseInt(cy)
+      [@heartbeat.outgoing, @heartbeat.incoming] = (parseInt(v) for v in heartbeat.split(","))
       headers['accept-version'] = Stomp.VERSIONS.supportedVersions()
       @_transmit "CONNECT", headers
 

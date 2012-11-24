@@ -243,7 +243,7 @@
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       return this.ws.onopen = function() {
-        var cx, cy, headers, _ref;
+        var headers, v, _ref;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
         }
@@ -255,9 +255,16 @@
           headers.host = vhost_;
         }
         headers['heart-beat'] = heartbeat;
-        _ref = heartbeat.split(","), cx = _ref[0], cy = _ref[1];
-        _this.heartbeat.outgoing = parseInt(cx);
-        _this.heartbeat.incoming = parseInt(cy);
+        _ref = (function() {
+          var _i, _len, _ref, _results;
+          _ref = heartbeat.split(",");
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            v = _ref[_i];
+            _results.push(parseInt(v));
+          }
+          return _results;
+        })(), _this.heartbeat.outgoing = _ref[0], _this.heartbeat.incoming = _ref[1];
         headers['accept-version'] = Stomp.VERSIONS.supportedVersions();
         return _this._transmit("CONNECT", headers);
       };
