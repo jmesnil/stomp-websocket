@@ -171,7 +171,7 @@ class Client
           # We wait twice the TTL to be flexible on window's setInterval calls
           if delta > ttl * 2
             @debug? "did not receive server activity for the last #{delta}ms"
-            @_cleanUp() 
+            @_cleanUp()
         , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
@@ -200,15 +200,16 @@ class Client
       # Handle STOMP frames received from the server
       for frame in Frame.unmarshall(data)
         # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
-        if frame.command is "CONNECTED" and connectCallback
+        if frame.command is "CONNECTED"
+          @debug? "connected to server #{frame.headers.server}"
           @connected = true
           @_setupHeartbeat(frame.headers)
-          connectCallback(frame)
+          @connectCallback? frame
         # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
         else if frame.command is "MESSAGE"
           # the `onreceive` callback is registered when the client calls `subscribe()`
           onreceive = @subscriptions[frame.headers.subscription]
-          onreceive?(frame)
+          onreceive? frame
         # [RECEIPT Frame](http://stomp.github.com/stomp-specification-1.1.html#RECEIPT)
         #
         # The client instance can set its `onreceipt` field to a function taking
@@ -261,8 +262,8 @@ class Client
   # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
   send: (destination, headers={}, body='') ->
     headers.destination = destination
-    @_transmit "SEND", headers, body 
-  
+    @_transmit "SEND", headers, body
+
   # [SUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE)
   subscribe: (destination, callback, headers={}) ->
     if typeof(headers.id) == 'undefined' || headers.id.length == 0

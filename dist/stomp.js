@@ -145,19 +145,26 @@
         })(), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
         if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
           ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
-          this.debug("send PING every " + ttl + "ms");
+          if (typeof this.debug === "function") {
+            this.debug("send PING every " + ttl + "ms");
+          }
           this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
             _this.ws.send(Byte.LF);
-            return typeof _this.debug === "function" ? _this.debug(">> PING") : void 0;
+            return typeof _this.debug === "function" ? _this.debug(">>> PING") : void 0;
           }, ttl) : void 0;
         }
         if (!(this.heartbeat.incoming === 0 || serverOutgoing === 0)) {
           ttl = Math.max(this.heartbeat.incoming, serverOutgoing);
-          this.debug("check PONG every " + ttl + "ms");
+          if (typeof this.debug === "function") {
+            this.debug("check PONG every " + ttl + "ms");
+          }
           return this.ponger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
             var delta;
             delta = Date.now() - _this.serverActivity;
             if (delta > ttl * 2) {
+              if (typeof _this.debug === "function") {
+                _this.debug("did not receive server activity for the last " + delta + "ms");
+              }
               return _this._cleanUp();
             }
           }, ttl) : void 0;
@@ -181,7 +188,7 @@
           if (typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer) {
             view = new Uint8Array(evt.data);
             if (typeof this.debug === "function") {
-              this.debug('--- got data length: ' + view.length);
+              this.debug("--- got data length: " + view.length);
             }
             data = "";
             for (_i = 0, _len = view.length; _i < _len; _i++) {
@@ -196,21 +203,24 @@
         _this.serverActivity = Date.now();
         if (data === Byte.LF) {
           if (typeof _this.debug === "function") {
-            _this.debug('<<< PONG');
+            _this.debug("<<< PONG");
           }
           return;
         }
         if (typeof _this.debug === "function") {
-          _this.debug('<<< ' + data);
+          _this.debug("<<< " + data);
         }
         _ref = Frame.unmarshall(data);
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           frame = _ref[_i];
-          if (frame.command === "CONNECTED" && connectCallback) {
+          if (frame.command === "CONNECTED") {
+            if (typeof _this.debug === "function") {
+              _this.debug("connected to server " + frame.headers.server);
+            }
             _this.connected = true;
             _this._setupHeartbeat(frame.headers);
-            _results.push(connectCallback(frame));
+            _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
           } else if (frame.command === "MESSAGE") {
             onreceive = _this.subscriptions[frame.headers.subscription];
             _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
@@ -219,7 +229,7 @@
           } else if (frame.command === "ERROR") {
             _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
           } else {
-            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + JSON.stringify(frame)) : void 0);
+            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0);
           }
         }
         return _results;
