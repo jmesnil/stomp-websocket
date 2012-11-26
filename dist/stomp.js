@@ -360,12 +360,26 @@
       return this._transmit("ABORT", headers);
     };
 
-    Client.prototype.ack = function(message_id, headers) {
-      if (headers == null) {
-        headers = {};
+    Client.prototype.nack = function(messageID, subscription, transaction) {
+      if (transaction == null) {
+        transaction = null;
       }
-      headers["message-id"] = message_id;
-      return this._transmit("ACK", headers);
+      return this._transmit("ACK", {
+        "message-id": messageID,
+        subscription: subscription,
+        transaction: transaction ? transaction : void 0
+      });
+    };
+
+    Client.prototype.nack = function(messageID, subscription, transaction) {
+      if (transaction == null) {
+        transaction = null;
+      }
+      return this._transmit("NACK", {
+        "message-id": messageID,
+        subscription: subscription,
+        transaction: transaction ? transaction : void 0
+      });
     };
 
     return Client;

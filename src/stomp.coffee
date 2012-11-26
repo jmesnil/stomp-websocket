@@ -306,9 +306,26 @@ class Client
     @_transmit "ABORT", headers
   
   # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
-  ack: (message_id, headers={}) ->
-    headers["message-id"] = message_id
-    @_transmit "ACK", headers
+  #
+  # * `messageID` & `subscription` are MANDATORY.
+  # * `transaction` is OPTIONAL.
+  nack: (messageID, subscription, transaction = null) ->
+    @_transmit "ACK", {
+      "message-id": messageID
+      subscription: subscription
+      transaction: transaction if transaction
+    }
+
+  # [NACK Frame](http://stomp.github.com/stomp-specification-1.1.html#NACK)
+  #
+  # * `messageID` & `subscription` are MANDATORY.
+  # * `transaction` is OPTIONAL.
+  nack: (messageID, subscription, transaction = null) ->
+    @_transmit "NACK", {
+      "message-id": messageID
+      subscription: subscription
+      transaction: transaction if transaction
+    }
 
 Stomp.Frame = Frame
 if window?

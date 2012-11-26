@@ -5,6 +5,7 @@
 ### STOMP 1.1 support
 
 * heart-beat
+* nack
 * content-length
 
 ### API change
@@ -13,6 +14,10 @@
 
 * the `errorCallback` passed to the `connect()` method is no longer called when the
   client is properly disconnected by calling `disconnect()`.
+
+* ack() method takes 3 parameters:
+  * `messageID` & `subscription` are MANDATORY.
+  * `transaction` is OPTIONAL.
 
 ### Minified version
 
