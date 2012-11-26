@@ -311,29 +311,23 @@
     };
 
     Client.prototype.subscribe = function(destination, callback, headers) {
-      var id;
       if (headers == null) {
         headers = {};
       }
-      if (typeof headers.id === 'undefined' || headers.id.length === 0) {
-        id = "sub-" + this.counter++;
-        headers.id = id;
-      } else {
-        id = headers.id;
+      if (!headers.id) {
+        headers.id = "sub-" + this.counter++;
       }
       headers.destination = destination;
-      this.subscriptions[id] = callback;
+      this.subscriptions[headers.id] = callback;
       this._transmit("SUBSCRIBE", headers);
-      return id;
+      return headers.id;
     };
 
-    Client.prototype.unsubscribe = function(id, headers) {
-      if (headers == null) {
-        headers = {};
-      }
-      headers.id = id;
+    Client.prototype.unsubscribe = function(id) {
       delete this.subscriptions[id];
-      return this._transmit("UNSUBSCRIBE", headers);
+      return this._transmit("UNSUBSCRIBE", {
+        id: id
+      });
     };
 
     Client.prototype.begin = function(transaction) {

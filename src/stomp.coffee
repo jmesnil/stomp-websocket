@@ -268,28 +268,32 @@ class Client
     window?.clearInterval(@ponger) if @ponger
 
   # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
+  #
+  # * `destination` is MANDATORY.
   send: (destination, headers={}, body='') ->
     headers.destination = destination
     @_transmit "SEND", headers, body
 
   # [SUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE)
   subscribe: (destination, callback, headers={}) ->
-    if typeof(headers.id) == 'undefined' || headers.id.length == 0
-      id = "sub-" + @counter++
-      headers.id = id
-    else
-      id = headers.id
+    # for convenience if the `id` header is not set, we create a new one for this client
+    # that will be returned to be able to unsubscribe this subscription
+    unless headers.id
+      headers.id = "sub-" + @counter++
     headers.destination = destination
-    @subscriptions[id] = callback
+    @subscriptions[headers.id] = callback
     @_transmit "SUBSCRIBE", headers
-    return id
-  
+    return headers.id
+
   # [UNSUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#UNSUBSCRIBE)
-  unsubscribe: (id, headers={}) ->
-    headers.id = id
+  #
+  # * `id` is MANDATORY.
+  unsubscribe: (id) ->
     delete @subscriptions[id]
-    @_transmit "UNSUBSCRIBE", headers
-  
+    @_transmit "UNSUBSCRIBE", {
+      id: id
+    }
+
   # [BEGIN Frame](http://stomp.github.com/stomp-specification-1.1.html#BEGIN)
   #
   # * `transaction` is MANDATORY.
