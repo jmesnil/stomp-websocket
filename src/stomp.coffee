@@ -194,13 +194,14 @@ class Client
     @debug? "Opening Web Socket..."
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
-        view = new Uint8Array( evt.data )
+        # the data is stored inside an ArrayBuffer, we decode it to get the
+        # data as a String
+        arr = new Uint8Array(evt.data)
         @debug? "--- got data length: #{view.length}"
-        data = ""
-        for i in view
-          data += String.fromCharCode(i)
-        data
+        # Return a string formed by all the char codes stored in the Uint8array
+        (String.fromCharCode(c) for c in arr).join('')
       else
+        # take the data directly from the WebSocket `data` field
         evt.data
       @serverActivity = Date.now()
       if data == Byte.LF # heartbeat

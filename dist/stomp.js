@@ -191,24 +191,16 @@
         this.debug("Opening Web Socket...");
       }
       this.ws.onmessage = function(evt) {
-        var data, frame, i, onreceive, view, _i, _len, _ref, _results;
-        data = (function() {
-          var _i, _len;
-          if (typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer) {
-            view = new Uint8Array(evt.data);
-            if (typeof this.debug === "function") {
-              this.debug("--- got data length: " + view.length);
-            }
-            data = "";
-            for (_i = 0, _len = view.length; _i < _len; _i++) {
-              i = view[_i];
-              data += String.fromCharCode(i);
-            }
-            return data;
-          } else {
-            return evt.data;
+        var arr, c, data, frame, onreceive, _i, _len, _ref, _results;
+        data = typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer ? (arr = new Uint8Array(evt.data), typeof _this.debug === "function" ? _this.debug("--- got data length: " + view.length) : void 0, ((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = arr.length; _i < _len; _i++) {
+            c = arr[_i];
+            _results.push(String.fromCharCode(c));
           }
-        }).call(_this);
+          return _results;
+        })()).join('')) : evt.data;
         _this.serverActivity = Date.now();
         if (data === Byte.LF) {
           if (typeof _this.debug === "function") {
