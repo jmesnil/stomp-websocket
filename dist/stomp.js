@@ -336,28 +336,22 @@
       return this._transmit("UNSUBSCRIBE", headers);
     };
 
-    Client.prototype.begin = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
-      headers.transaction = transaction;
-      return this._transmit("BEGIN", headers);
+    Client.prototype.begin = function(transaction) {
+      return this._transmit("BEGIN", {
+        transaction: transaction
+      });
     };
 
-    Client.prototype.commit = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
-      headers.transaction = transaction;
-      return this._transmit("COMMIT", headers);
+    Client.prototype.commit = function(transaction) {
+      return this._transmit("COMMIT", {
+        transaction: transaction
+      });
     };
 
-    Client.prototype.abort = function(transaction, headers) {
-      if (headers == null) {
-        headers = {};
-      }
-      headers.transaction = transaction;
-      return this._transmit("ABORT", headers);
+    Client.prototype.abort = function(transaction) {
+      return this._transmit("ABORT", {
+        transaction: transaction
+      });
     };
 
     Client.prototype.nack = function(messageID, subscription, transaction) {

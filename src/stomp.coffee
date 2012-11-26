@@ -291,19 +291,28 @@ class Client
     @_transmit "UNSUBSCRIBE", headers
   
   # [BEGIN Frame](http://stomp.github.com/stomp-specification-1.1.html#BEGIN)
-  begin: (transaction, headers={}) ->
-    headers.transaction = transaction
-    @_transmit "BEGIN", headers
+  #
+  # * `transaction` is MANDATORY.
+  begin: (transaction) ->
+    @_transmit "BEGIN", {
+      transaction: transaction
+    }
   
   # [COMMIT Frame](http://stomp.github.com/stomp-specification-1.1.html#COMMIT)
-  commit: (transaction, headers={}) ->
-    headers.transaction = transaction
-    @_transmit "COMMIT", headers
+  #
+  # * `transaction` is MANDATORY.
+  commit: (transaction) ->
+    @_transmit "COMMIT", {
+      transaction: transaction
+    }
   
   # [ABORT Frame](http://stomp.github.com/stomp-specification-1.1.html#ABORT)
-  abort: (transaction, headers={}) ->
-    headers.transaction = transaction
-    @_transmit "ABORT", headers
+  #
+  # * `transaction` is MANDATORY.
+  abort: (transaction) ->
+    @_transmit "ABORT", {
+      transaction: transaction
+    }
   
   # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
   #
