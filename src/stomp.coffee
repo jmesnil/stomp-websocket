@@ -84,45 +84,6 @@ class Frame
     frame = new Frame(command, headers, body)
     return frame.toString() + Byte.NULL
 
-Stomp =
-
-  # Version of the JavaScript library. This can be used to check what has
-  # changed in the release notes
-  libVersion: "2.0.0"
-
-  VERSIONS:
-    V1_0: '1.0'
-    V1_1: '1.1'
-    V1_2: '1.2'
-
-    # Versions of STOMP specifications supported
-    supportedVersions: ->
-      '1.1,1.0'
-
-  # This method creates a WebSocket client that is connected to
-  # the STOMP server located at the url.
-  client: (url, protocols = ['v10.stomp', 'v11.stomp']) ->
-    # This is a hack to allow another implementation than the standard
-    # HTML5 WebSocket class.
-    #
-    # It is possible to use another class by calling
-    #
-    #     Stomp.WebSocketClass = MozWebSocket
-    #
-    # *prior* to call `Stomp.client()`.
-    #
-    # This hack is deprecated and  `Stomp.over()` method should be used
-    # instead.
-    klass = Stomp.WebSocketClass || WebSocket
-    ws = new klass(url, protocols)
-    new Client ws
-
-  # This method is an alternative to `Stomp.client()` to let the user
-  # specify the WebSocket to use (either a standard HTML5 WebSocket or
-  # a similar object).
-  over: (ws) ->
-    new Client ws
-
 # This class represent the STOMP client.
 #
 # All STOMP protocol is exposed as methods of this class (`connect()`,
@@ -245,9 +206,9 @@ class Client
       @debug?('Web Socket Opened...')
       headers = {
         "accept-version": Stomp.VERSIONS.supportedVersions()
-        host: vhost
         "heart-beat": [@heartbeat.outgoing, @heartbeat.incoming].join(',')
       }
+      headers.host = vhost if vhost
       headers.login = login if login
       headers.passcode = passcode if passcode
       @_transmit "CONNECT", headers
@@ -327,7 +288,7 @@ class Client
   ack: (messageID, subscription, transaction = null) ->
     headers = {
       "message-id": messageID
-      subscription: subscription      
+      subscription: subscription
     }
     headers.transaction = transaction if transaction
     @_transmit "ACK", headers
@@ -339,16 +300,56 @@ class Client
   nack: (messageID, subscription, transaction = null) ->
     headers = {
       "message-id": messageID
-      subscription: subscription      
+      subscription: subscription
     }
     headers.transaction = transaction if transaction
     @_transmit "NACK", headers
 
-Stomp.Frame = Frame
+Stomp =
+
+  # Version of the JavaScript library. This can be used to check what has
+  # changed in the release notes
+  libVersion: "2.0.0"
+
+  VERSIONS:
+    V1_0: '1.0'
+    V1_1: '1.1'
+    V1_2: '1.2'
+
+    # Versions of STOMP specifications supported
+    supportedVersions: ->
+      '1.1,1.0'
+
+  # This method creates a WebSocket client that is connected to
+  # the STOMP server located at the url.
+  client: (url, protocols = ['v10.stomp', 'v11.stomp']) ->
+    # This is a hack to allow another implementation than the standard
+    # HTML5 WebSocket class.
+    #
+    # It is possible to use another class by calling
+    #
+    #     Stomp.WebSocketClass = MozWebSocket
+    #
+    # *prior* to call `Stomp.client()`.
+    #
+    # This hack is deprecated and  `Stomp.over()` method should be used
+    # instead.
+    klass = Stomp.WebSocketClass || WebSocket
+    ws = new klass(url, protocols)
+    new Client ws
+
+  # This method is an alternative to `Stomp.client()` to let the user
+  # specify the WebSocket to use (either a standard HTML5 WebSocket or
+  # a similar object).
+  over: (ws) ->
+    new Client ws
+
+  # For testing purpose, expose the Frame class inside Stomp to be able to
+  # marshall/unmarshall frames
+  Frame: Frame
+
 if window?
   window.Stomp = Stomp
 else
-  # For testing purpose, expose the Frame class inside Stomp to be able to
-  # marshall/unmarshall frames
   exports.Stomp = Stomp
   Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock

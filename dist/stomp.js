@@ -91,30 +91,6 @@
 
   })();
 
-  Stomp = {
-    libVersion: "2.0.0",
-    VERSIONS: {
-      V1_0: '1.0',
-      V1_1: '1.1',
-      V1_2: '1.2',
-      supportedVersions: function() {
-        return '1.1,1.0';
-      }
-    },
-    client: function(url, protocols) {
-      var klass, ws;
-      if (protocols == null) {
-        protocols = ['v10.stomp', 'v11.stomp'];
-      }
-      klass = Stomp.WebSocketClass || WebSocket;
-      ws = new klass(url, protocols);
-      return new Client(ws);
-    },
-    over: function(ws) {
-      return new Client(ws);
-    }
-  };
-
   Client = (function() {
 
     function Client(ws) {
@@ -247,9 +223,11 @@
         }
         headers = {
           "accept-version": Stomp.VERSIONS.supportedVersions(),
-          host: vhost,
           "heart-beat": [_this.heartbeat.outgoing, _this.heartbeat.incoming].join(',')
         };
+        if (vhost) {
+          headers.host = vhost;
+        }
         if (login) {
           headers.login = login;
         }
@@ -329,33 +307,64 @@
       });
     };
 
-    Client.prototype.nack = function(messageID, subscription, transaction) {
+    Client.prototype.ack = function(messageID, subscription, transaction) {
+      var headers;
       if (transaction == null) {
         transaction = null;
       }
-      return this._transmit("ACK", {
+      headers = {
         "message-id": messageID,
-        subscription: subscription,
-        transaction: transaction ? transaction : void 0
-      });
+        subscription: subscription
+      };
+      if (transaction) {
+        headers.transaction = transaction;
+      }
+      return this._transmit("ACK", headers);
     };
 
     Client.prototype.nack = function(messageID, subscription, transaction) {
+      var headers;
       if (transaction == null) {
         transaction = null;
       }
-      return this._transmit("NACK", {
+      headers = {
         "message-id": messageID,
-        subscription: subscription,
-        transaction: transaction ? transaction : void 0
-      });
+        subscription: subscription
+      };
+      if (transaction) {
+        headers.transaction = transaction;
+      }
+      return this._transmit("NACK", headers);
     };
 
     return Client;
 
   })();
 
-  Stomp.Frame = Frame;
+  Stomp = {
+    libVersion: "2.0.0",
+    VERSIONS: {
+      V1_0: '1.0',
+      V1_1: '1.1',
+      V1_2: '1.2',
+      supportedVersions: function() {
+        return '1.1,1.0';
+      }
+    },
+    client: function(url, protocols) {
+      var klass, ws;
+      if (protocols == null) {
+        protocols = ['v10.stomp', 'v11.stomp'];
+      }
+      klass = Stomp.WebSocketClass || WebSocket;
+      ws = new klass(url, protocols);
+      return new Client(ws);
+    },
+    over: function(ws) {
+      return new Client(ws);
+    },
+    Frame: Frame
+  };
 
   if (typeof window !== "undefined" && window !== null) {
     window.Stomp = Stomp;
