@@ -287,11 +287,9 @@ class Client
   #
   # * `messageID` & `subscription` are MANDATORY.
   # * `transaction` is OPTIONAL.
-  ack: (messageID, subscription, transaction = null) ->
-    headers = {
-      "message-id": messageID
-      subscription: subscription
-    }
+  ack: (messageID, subscription, transaction = null, headers = {}) ->
+    headers["message-id"] = messageID
+    headers.subscription = subscription
     headers.transaction = transaction if transaction
     @_transmit "ACK", headers
 
@@ -299,11 +297,9 @@ class Client
   #
   # * `messageID` & `subscription` are MANDATORY.
   # * `transaction` is OPTIONAL.
-  nack: (messageID, subscription, transaction = null) ->
-    headers = {
-      "message-id": messageID
-      subscription: subscription
-    }
+  nack: (messageID, subscription, transaction = null, headers = {}) ->
+    headers["message-id"] = messageID
+    headers.subscription = subscription
     headers.transaction = transaction if transaction
     @_transmit "NACK", headers
 
