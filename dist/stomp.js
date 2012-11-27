@@ -117,43 +117,44 @@
     Client.prototype._setupHeartbeat = function(headers) {
       var serverIncoming, serverOutgoing, ttl, v, _ref, _ref1,
         _this = this;
-      if ((_ref = headers.version) === Stomp.VERSIONS.V1_1 || _ref === Stomp.VERSIONS.V1_2) {
-        _ref1 = (function() {
-          var _i, _len, _ref1, _results;
-          _ref1 = headers['heart-beat'].split(",");
-          _results = [];
-          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            v = _ref1[_i];
-            _results.push(parseInt(v));
-          }
-          return _results;
-        })(), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
-        if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
-          ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
-          if (typeof this.debug === "function") {
-            this.debug("send PING every " + ttl + "ms");
-          }
-          this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
-            _this.ws.send(Byte.LF);
-            return typeof _this.debug === "function" ? _this.debug(">>> PING") : void 0;
-          }, ttl) : void 0;
+      if ((_ref = headers.version) !== Stomp.VERSIONS.V1_1 && _ref !== Stomp.VERSIONS.V1_2) {
+        return;
+      }
+      _ref1 = (function() {
+        var _i, _len, _ref1, _results;
+        _ref1 = headers['heart-beat'].split(",");
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          v = _ref1[_i];
+          _results.push(parseInt(v));
         }
-        if (!(this.heartbeat.incoming === 0 || serverOutgoing === 0)) {
-          ttl = Math.max(this.heartbeat.incoming, serverOutgoing);
-          if (typeof this.debug === "function") {
-            this.debug("check PONG every " + ttl + "ms");
-          }
-          return this.ponger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
-            var delta;
-            delta = Date.now() - _this.serverActivity;
-            if (delta > ttl * 2) {
-              if (typeof _this.debug === "function") {
-                _this.debug("did not receive server activity for the last " + delta + "ms");
-              }
-              return _this._cleanUp();
+        return _results;
+      })(), serverOutgoing = _ref1[0], serverIncoming = _ref1[1];
+      if (!(this.heartbeat.outgoing === 0 || serverIncoming === 0)) {
+        ttl = Math.max(this.heartbeat.outgoing, serverIncoming);
+        if (typeof this.debug === "function") {
+          this.debug("send PING every " + ttl + "ms");
+        }
+        this.pinger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
+          _this.ws.send(Byte.LF);
+          return typeof _this.debug === "function" ? _this.debug(">>> PING") : void 0;
+        }, ttl) : void 0;
+      }
+      if (!(this.heartbeat.incoming === 0 || serverOutgoing === 0)) {
+        ttl = Math.max(this.heartbeat.incoming, serverOutgoing);
+        if (typeof this.debug === "function") {
+          this.debug("check PONG every " + ttl + "ms");
+        }
+        return this.ponger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
+          var delta;
+          delta = Date.now() - _this.serverActivity;
+          if (delta > ttl * 2) {
+            if (typeof _this.debug === "function") {
+              _this.debug("did not receive server activity for the last " + delta + "ms");
             }
-          }, ttl) : void 0;
-        }
+            return _this._cleanUp();
+          }
+        }, ttl) : void 0;
       }
     };
 

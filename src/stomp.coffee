@@ -120,30 +120,31 @@ class Client
     @ws.send(out)
 
   _setupHeartbeat: (headers) ->
-    if headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
-      # heart-beat header received from the server looks like:
-      #
-      #     heart-beat: sx, sy
-      [serverOutgoing, serverIncoming] = (parseInt(v) for v in headers['heart-beat'].split(","))
+    return unless headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
 
-      unless @heartbeat.outgoing == 0 or serverIncoming == 0
-        ttl = Math.max(@heartbeat.outgoing, serverIncoming)
-        @debug? "send PING every #{ttl}ms"
-        @pinger = window?.setInterval(=>
-          @ws.send Byte.LF
-          @debug? ">>> PING"
-        , ttl)
+    # heart-beat header received from the server looks like:
+    #
+    #     heart-beat: sx, sy
+    [serverOutgoing, serverIncoming] = (parseInt(v) for v in headers['heart-beat'].split(","))
 
-      unless @heartbeat.incoming == 0 or serverOutgoing == 0
-        ttl = Math.max(@heartbeat.incoming, serverOutgoing)
-        @debug? "check PONG every #{ttl}ms"
-        @ponger = window?.setInterval(=>
-          delta = Date.now() - @serverActivity
-          # We wait twice the TTL to be flexible on window's setInterval calls
-          if delta > ttl * 2
-            @debug? "did not receive server activity for the last #{delta}ms"
-            @_cleanUp()
-        , ttl)
+    unless @heartbeat.outgoing == 0 or serverIncoming == 0
+      ttl = Math.max(@heartbeat.outgoing, serverIncoming)
+      @debug? "send PING every #{ttl}ms"
+      @pinger = window?.setInterval(=>
+        @ws.send Byte.LF
+        @debug? ">>> PING"
+      , ttl)
+
+    unless @heartbeat.incoming == 0 or serverOutgoing == 0
+      ttl = Math.max(@heartbeat.incoming, serverOutgoing)
+      @debug? "check PONG every #{ttl}ms"
+      @ponger = window?.setInterval(=>
+        delta = Date.now() - @serverActivity
+        # We wait twice the TTL to be flexible on window's setInterval calls
+        if delta > ttl * 2
+          @debug? "did not receive server activity for the last #{delta}ms"
+          @_cleanUp()
+      , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
   connect: (login,
