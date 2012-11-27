@@ -185,12 +185,11 @@ class Client
         , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
-  connect: (login_,
-      passcode_,
+  connect: (login,
+      passcode,
       @connectCallback,
       errorCallback,
-      vhost_,
-      heartbeat="10000,10000") ->
+      vhost) ->
     @debug? "Opening Web Socket..."
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
@@ -244,11 +243,13 @@ class Client
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
-      headers = {login: login_, passcode: passcode_}
-      headers.host = vhost_ if vhost_
-      headers['heart-beat'] = heartbeat
-      [@heartbeat.outgoing, @heartbeat.incoming] = (parseInt(v) for v in heartbeat.split(","))
-      headers['accept-version'] = Stomp.VERSIONS.supportedVersions()
+      headers = {
+        "accept-version": Stomp.VERSIONS.supportedVersions()
+        host: vhost
+        "heart-beat": [@heartbeat.outgoing, @heartbeat.incoming].join(',')
+      }
+      headers.login = login if login
+      headers.passcode = passcode if passcode
       @_transmit "CONNECT", headers
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)

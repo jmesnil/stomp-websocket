@@ -181,12 +181,9 @@
       }
     };
 
-    Client.prototype.connect = function(login_, passcode_, connectCallback, errorCallback, vhost_, heartbeat) {
+    Client.prototype.connect = function(login, passcode, connectCallback, errorCallback, vhost) {
       var _this = this;
       this.connectCallback = connectCallback;
-      if (heartbeat == null) {
-        heartbeat = "10000,10000";
-      }
       if (typeof this.debug === "function") {
         this.debug("Opening Web Socket...");
       }
@@ -244,29 +241,21 @@
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       return this.ws.onopen = function() {
-        var headers, v, _ref;
+        var headers;
         if (typeof _this.debug === "function") {
           _this.debug('Web Socket Opened...');
         }
         headers = {
-          login: login_,
-          passcode: passcode_
+          "accept-version": Stomp.VERSIONS.supportedVersions(),
+          host: vhost,
+          "heart-beat": [_this.heartbeat.outgoing, _this.heartbeat.incoming].join(',')
         };
-        if (vhost_) {
-          headers.host = vhost_;
+        if (login) {
+          headers.login = login;
         }
-        headers['heart-beat'] = heartbeat;
-        _ref = (function() {
-          var _i, _len, _ref, _results;
-          _ref = heartbeat.split(",");
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            v = _ref[_i];
-            _results.push(parseInt(v));
-          }
-          return _results;
-        })(), _this.heartbeat.outgoing = _ref[0], _this.heartbeat.incoming = _ref[1];
-        headers['accept-version'] = Stomp.VERSIONS.supportedVersions();
+        if (passcode) {
+          headers.passcode = passcode;
+        }
         return _this._transmit("CONNECT", headers);
       };
     };
