@@ -171,34 +171,35 @@ class Client
       @debug? "<<< #{data}"
       # Handle STOMP frames received from the server
       for frame in Frame.unmarshall(data)
-        # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
-        if frame.command is "CONNECTED"
-          @debug? "connected to server #{frame.headers.server}"
-          @connected = true
-          @_setupHeartbeat(frame.headers)
-          @connectCallback? frame
-        # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
-        else if frame.command is "MESSAGE"
-          # the `onreceive` callback is registered when the client calls `subscribe()`
-          onreceive = @subscriptions[frame.headers.subscription]
-          onreceive? frame
-        # [RECEIPT Frame](http://stomp.github.com/stomp-specification-1.1.html#RECEIPT)
-        #
-        # The client instance can set its `onreceipt` field to a function taking
-        # a frame argument that will be called when a receipt is received from
-        # the server:
-        #
-        #     client.onreceipt = function(frame) {
-        #       receiptID = frame.headers['receipt-id'];
-        #       ...
-        #     }
-        else if frame.command is "RECEIPT"
-          @onreceipt?(frame)
-        # [ERROR Frame](http://stomp.github.com/stomp-specification-1.1.html#ERROR)
-        else if frame.command is "ERROR"
-          errorCallback?(frame)
-        else
-          @debug? "Unhandled frame: #{frame}"
+        switch frame.command
+          # [CONNECTED Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECTED_Frame)
+          when "CONNECTED"
+            @debug? "connected to server #{frame.headers.server}"
+            @connected = true
+            @_setupHeartbeat(frame.headers)
+            @connectCallback? frame
+          # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
+          when "MESSAGE"
+            # the `onreceive` callback is registered when the client calls `subscribe()`
+            onreceive = @subscriptions[frame.headers.subscription]
+            onreceive? frame
+          # [RECEIPT Frame](http://stomp.github.com/stomp-specification-1.1.html#RECEIPT)
+          #
+          # The client instance can set its `onreceipt` field to a function taking
+          # a frame argument that will be called when a receipt is received from
+          # the server:
+          #
+          #     client.onreceipt = function(frame) {
+          #       receiptID = frame.headers['receipt-id'];
+          #       ...
+          #     }
+          when "RECEIPT"
+            @onreceipt?(frame)
+          # [ERROR Frame](http://stomp.github.com/stomp-specification-1.1.html#ERROR)
+          when "ERROR"
+            errorCallback?(frame)
+          else
+            @debug? "Unhandled frame: #{frame}"
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)

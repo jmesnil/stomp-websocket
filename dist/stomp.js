@@ -189,22 +189,27 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           frame = _ref[_i];
-          if (frame.command === "CONNECTED") {
-            if (typeof _this.debug === "function") {
-              _this.debug("connected to server " + frame.headers.server);
-            }
-            _this.connected = true;
-            _this._setupHeartbeat(frame.headers);
-            _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
-          } else if (frame.command === "MESSAGE") {
-            onreceive = _this.subscriptions[frame.headers.subscription];
-            _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
-          } else if (frame.command === "RECEIPT") {
-            _results.push(typeof _this.onreceipt === "function" ? _this.onreceipt(frame) : void 0);
-          } else if (frame.command === "ERROR") {
-            _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
-          } else {
-            _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0);
+          switch (frame.command) {
+            case "CONNECTED":
+              if (typeof _this.debug === "function") {
+                _this.debug("connected to server " + frame.headers.server);
+              }
+              _this.connected = true;
+              _this._setupHeartbeat(frame.headers);
+              _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
+              break;
+            case "MESSAGE":
+              onreceive = _this.subscriptions[frame.headers.subscription];
+              _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
+              break;
+            case "RECEIPT":
+              _results.push(typeof _this.onreceipt === "function" ? _this.onreceipt(frame) : void 0);
+              break;
+            case "ERROR":
+              _results.push(typeof errorCallback === "function" ? errorCallback(frame) : void 0);
+              break;
+            default:
+              _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled frame: " + frame) : void 0);
           }
         }
         return _results;
