@@ -10,8 +10,6 @@
 
 ### API change
 
-* `connect()` method takes an additional `heartbeat` parameter which is a string of the form `"cx, cy"` expected by the [`heart-beat`](http://stomp.github.com/stomp-specification-1.1.html#Heart-beating) header of the CONNECT frame. 
-
 * the `errorCallback` passed to the `connect()` method is no longer called when the
   client is properly disconnected by calling `disconnect()`.
 
@@ -23,7 +21,7 @@
 
     client.heartbeat.outgoing = 20000 // client will send heartbeats every 20000ms
     client.heartbeat.incoming = 0 // client does not want to receive heartbeats
-                                                   // from the server
+                                  // from the server
 
 ### Minified version
 

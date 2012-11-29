@@ -286,21 +286,17 @@ class Client
   # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
   #
   # * `messageID` & `subscription` are MANDATORY.
-  # * `transaction` is OPTIONAL.
-  ack: (messageID, subscription, transaction = null, headers = {}) ->
+  ack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription
-    headers.transaction = transaction if transaction
     @_transmit "ACK", headers
 
   # [NACK Frame](http://stomp.github.com/stomp-specification-1.1.html#NACK)
   #
   # * `messageID` & `subscription` are MANDATORY.
-  # * `transaction` is OPTIONAL.
-  nack: (messageID, subscription, transaction = null, headers = {}) ->
+  nack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription
-    headers.transaction = transaction if transaction
     @_transmit "NACK", headers
 
 Stomp =

@@ -313,33 +313,21 @@
       });
     };
 
-    Client.prototype.ack = function(messageID, subscription, transaction, headers) {
-      if (transaction == null) {
-        transaction = null;
-      }
+    Client.prototype.ack = function(messageID, subscription, headers) {
       if (headers == null) {
         headers = {};
       }
       headers["message-id"] = messageID;
       headers.subscription = subscription;
-      if (transaction) {
-        headers.transaction = transaction;
-      }
       return this._transmit("ACK", headers);
     };
 
-    Client.prototype.nack = function(messageID, subscription, transaction, headers) {
-      if (transaction == null) {
-        transaction = null;
-      }
+    Client.prototype.nack = function(messageID, subscription, headers) {
       if (headers == null) {
         headers = {};
       }
       headers["message-id"] = messageID;
       headers.subscription = subscription;
-      if (transaction) {
-        headers.transaction = transaction;
-      }
       return this._transmit("NACK", headers);
     };
 

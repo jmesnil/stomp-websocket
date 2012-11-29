@@ -17,7 +17,7 @@ test("Subscribe using client ack mode, send a message and ack it", function() {
         equals(receipt, frame.headers['receipt-id'])
         client.disconnect();
       }
-      client.ack(message.headers['message-id'], sub, null, {'receipt': receipt})
+      client.ack(message.headers['message-id'], sub, {'receipt': receipt})
     }
     var sub = client.subscribe(TEST.destination, onmessage, {'ack': 'client'});      
     client.send(TEST.destination, {}, body);
@@ -41,7 +41,7 @@ test("Subscribe using client ack mode, send a message and nack it", function() {
         equals(receipt, frame.headers['receipt-id'])
         client.disconnect();
       }
-      client.nack(message.headers['message-id'], sub, null, {'receipt': receipt})      	
+      client.nack(message.headers['message-id'], sub, {'receipt': receipt})      	
     }
     var sub = client.subscribe(TEST.destination, onmessage, {'ack': 'client'});      
     client.send(TEST.destination, {}, body);

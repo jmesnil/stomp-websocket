@@ -64,6 +64,15 @@ it explained the idea behind WebSockets:</p>
 </section>
 
 <section>
+<h2 id=protocols>Protocol Support</h2>
+
+<p>This library supports multiple version of STOMP protocols:
+
+<ul>
+  <li><a href=http://stomp.github.com/stomp-specification-1.0.html>STOMP 1.0</a>
+  <li><a href=http://stomp.github.com/stomp-specification-1.1.html>STOMP 1.1<a> (including <a href=#heartbeat>heart-beating</a>)
+</ul>
+
 <h2 id=requirements>Server Requirements</h2>
 
 <p>This library is not a <em>pure</em> STOMP client. It is aimed to run on the WebSockets protocol which
@@ -114,8 +123,7 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 <h3 id=rabbitmq>RabbitMQ</h3>
 
 <p><a href=http://www.rabbitmq.com/>RabbitMQ</a> is Open Source messaging system sponsored by VMware.
-<p>To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow the
-  <a href=http://www.rabbitmq.com/blog/2012/05/14/introducing-rabbitmq-web-stomp/>instructions</a>.</p>
+<p>To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow the instructions to install the <a href=http://www.rabbitmq.com/web-stomp.html>Web-Stomp plugin</a>.</p>
 
 <h3 id=stilts>Stilts &amp; Torquebox</h3>
 
@@ -129,7 +137,9 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 
 <p>You can download <a href="https://raw.github.com/jmesnil/stomp-websocket/master/dist/stomp.js">stomp.js</a> to use it in your Web applications</p>
 
-<p>This JavaScript file is generated from <a href=http://jashkenas.github.com/coffee-script/>CoffeeScript</a> files. See the <a href=#contribute>Contribute</a> section to download the source code.
+<p>A <a href="https://raw.github.com/jmesnil/stomp-websocket/master/dist/stomp.min.js">minified version</a> is also provided to be used in production.
+
+<p>This JavaScript file is generated from <a href=http://jashkenas.github.com/coffee-script/>CoffeeScript</a> files. See the <a href=#contribute>Contribute</a> section to download the source code or browse the <a href="stomp.html">annotated source code</a>
 
 <h2 id=api>STOMP API</h2>
 
@@ -161,7 +171,7 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
   var client = <mark>Stomp.client(url)</mark>;
 </code></pre>
 
-<p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocol provided by the library: <code>v10.stomp</code> (for STOMP 1.0 specification). This second parameter can either be a single string or an array of strings to specify multiple subprotocols.
+<p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocols provided by the library: <code>['v10.stomp', 'v11.stomp]'</code> (for STOMP 1.0 &amp; 1.1 specifications). This second parameter can either be a single string or an array of strings to specify multiple subprotocols.
 
 <h3 id=alternative>Create a STOMP client with a WebSocket</h3>
 
@@ -218,6 +228,14 @@ This method expects an object that conforms to the WebSocket definition.
   };
 </code></pre>
 
+v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>host</a>, pass it as the last parameter of the <code>connect()</code> method:
+
+<pre><code>
+  var host = "...";
+  client.connect(login, passcode, connect_callback, error_callback, <mark>host</mark>);
+</code></pre>
+
+
 <p>To disconnect a client from the server, you can call its <code>disconnect()</code> method.
   The disconnection is asynchronous: to be notified when the disconnection is effective,
   the <code>disconnect</code> method takes an optional <code>callback</code> argument.</p>
@@ -229,6 +247,20 @@ This method expects an object that conforms to the WebSocket definition.
 </code></pre>
 
 <p>When a client is disconnected, it can no longer send or receive messages.</p>
+
+<h3 id=heartbeat>Heart-beating</h3>
+
+<p>If the STOMP broker accepts STOMP 1.1 frames, <a href=>heart-beating</a> is enabled by default.
+
+<p>The <code>client</code> object has a <code>heartbeat</code> field which can be used to configure heart-beating by changing its <code>incoming</code> and <code>outgoing</code> integer fields (default value for both is <code>10000</code>ms):
+
+<pre><code>
+    client.<mark>heartbeat.outgoing</mark> = 20000; // client will send heartbeats every 20000ms
+    client.<mark>heartbeat.incoming</mark> = 0;     // client does not want to receive heartbeats
+                                       // from the server
+</code></pre>
+
+<p>The heart-beating is using <code>window.setInterval()</code> to regularly send heart-beats and/or check server heart-beats.
 
 <h3 id=send>Send messages</h3>
 
@@ -341,21 +373,32 @@ This method expects an object that conforms to the WebSocket definition.
 
 <p>By default, STOMP messages will be automatically acknowledged by the server before the message
   is delivered to the client.</p>
-<p>The client can chose instead to handle message acknowledgement by subscribing to a destination and
-  specify a <code>ack</code> header set to <code>'client'</code>.</p>
+<p>The client can chose instead to handle message <a href=http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE_ack_Header>acknowledgement</a> by subscribing to a destination and
+  specify a <code>ack</code> header set to <code>'client'</code> or <code>client-individual</code>.</p>
 <p>In that case, the client must use the <code>ack()</code> method to inform the server that it has
   acknowledge the message. The methods takes a mandatory <code>message_id</code> corresponding to the message
-  to acknowledge.</p>
+  to acknowledge and a <code>subscription</code> that received the message.</p>
 
 <pre><code>
-  client.subscribe("/queue/test", <mark>{ack: 'client'}</mark>, function(message) {
+  var subid = client.subscribe("/queue/test", <mark>{ack: 'client'}</mark>, function(message) {
     // do something with the message
     ...
     // and acknowledge it
     var message_id = message.headers['message-id']
-    <mark>client.ack</mark>(message_id);
+    <mark>client.ack</mark>(message_id, subid);
   });
 </code></pre>
+
+<p>The <code>ack()</code> method accepts a 3<sup>rd</sup> parameter for additional headers to pass to the acknowledgement. For example:
+
+<pre><code>
+  var txid = '...';
+  client.begin(txid);
+  client.ack(message_id, subid, <mark>{ transaction: txid, receipt: 'my-receipt' }</mark>);
+  client.commit(txid);
+</code></pre>
+
+<p>The <code>nack()</code> method can also be used to inform STOMP 1.1 brokers that the client did <em>not</em> consume the message. It takes the same parameters than the <code>ack()</code> method.
 
 <h3 id=transaction>Transactions</h3>
 
