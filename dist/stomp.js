@@ -166,7 +166,7 @@
       }
       this.ws.onmessage = function(evt) {
         var arr, c, data, frame, onreceive, _i, _len, _ref, _results;
-        data = typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer ? (arr = new Uint8Array(evt.data), typeof _this.debug === "function" ? _this.debug("--- got data length: " + view.length) : void 0, ((function() {
+        data = typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer ? (arr = new Uint8Array(evt.data), typeof _this.debug === "function" ? _this.debug("--- got data length: " + arr.length) : void 0, ((function() {
           var _i, _len, _results;
           _results = [];
           for (_i = 0, _len = arr.length; _i < _len; _i++) {

@@ -158,7 +158,7 @@ class Client
         # the data is stored inside an ArrayBuffer, we decode it to get the
         # data as a String
         arr = new Uint8Array(evt.data)
-        @debug? "--- got data length: #{view.length}"
+        @debug? "--- got data length: #{arr.length}"
         # Return a string formed by all the char codes stored in the Uint8array
         (String.fromCharCode(c) for c in arr).join('')
       else
