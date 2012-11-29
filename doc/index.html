@@ -171,7 +171,7 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
   var client = <mark>Stomp.client(url)</mark>;
 </code></pre>
 
-<p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocols provided by the library: <code>['v10.stomp', 'v11.stomp]'</code> (for STOMP 1.0 &amp; 1.1 specifications). This second parameter can either be a single string or an array of strings to specify multiple subprotocols.
+<p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocols provided by the library: <code>['v10.stomp', 'v11.stomp]'</code> (for STOMP 1.0 &amp; 1.1 specifications). This second argument can either be a single string or an array of strings to specify multiple subprotocols.
 
 <h3 id=alternative>Create a STOMP client with a WebSocket</h3>
 
@@ -228,7 +228,7 @@ This method expects an object that conforms to the WebSocket definition.
   };
 </code></pre>
 
-v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>host</a>, pass it as the last parameter of the <code>connect()</code> method:
+v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>host</a>, pass it as the last argument of the <code>connect()</code> method:
 
 <pre><code>
   var host = "...";
@@ -292,13 +292,22 @@ v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stom
 <p>To receive messages in the browser, the STOMP client must first subscribe to a destination.</p>
 <p>You can use the <code>subscribe()</code> method to subscribe to a destination. The method takes 2 mandatory
   arguments: <code>destination</code>, a String corresponding to the destination and
-  <code>callback</code>, a function with one <code>message</code> argument.
+  <code>callback</code>, a function with one <code>message</code> argument
+  and an <em>optional</em> argument <code>headers</code>, a JavaScript object for additional headers.
 
 <pre><code>
   id = <mark>client.subscribe</mark>("/queue/test", callback);
 </code></pre>
 <p>The <code>subscribe()</code> methods returns an id that correspond to the client subscription. You can use this
   subscription ID later on to unsubscribe the client from this destination.</p>
+
+<p>By default, the library will generate an unique ID if there is none provided in the headers. To use your own ID, pass it using the <code>headers</code> argument:
+
+<pre><code>
+  var mysubid = '...';
+  client.subscribe(destination, callback, <mark>{ id: mysubid }</mark>);
+</code></pre>
+
 
 <p>The client will send a STOMP
   <a href=http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE>SUBSCRIBE</a> frame to the server
@@ -317,7 +326,7 @@ v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stom
   });
 </code></pre>
 
-<p>The <code>subscribe()</code> method takes an optional <code>headers</code> parameters to specify
+<p>The <code>subscribe()</code> method takes an optional <code>headers</code> argument to specify
   additional headers when subscribing to a destination:</p>
 
 <pre><code>
@@ -389,7 +398,7 @@ v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stom
   });
 </code></pre>
 
-<p>The <code>ack()</code> method accepts a 3<sup>rd</sup> parameter for additional headers to pass to the acknowledgement. For example:
+<p>The <code>ack()</code> method accepts a 3<sup>rd</sup> argument for additional headers to pass to the acknowledgement. For example:
 
 <pre><code>
   var txid = '...';
@@ -398,7 +407,7 @@ v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stom
   client.commit(txid);
 </code></pre>
 
-<p>The <code>nack()</code> method can also be used to inform STOMP 1.1 brokers that the client did <em>not</em> consume the message. It takes the same parameters than the <code>ack()</code> method.
+<p>The <code>nack()</code> method can also be used to inform STOMP 1.1 brokers that the client did <em>not</em> consume the message. It takes the same arguments than the <code>ack()</code> method.
 
 <h3 id=transaction>Transactions</h3>
 
