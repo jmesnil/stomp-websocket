@@ -336,7 +336,7 @@
   })();
 
   Stomp = {
-    libVersion: "2.0.0",
+    libVersion: "2.0.0-next",
     VERSIONS: {
       V1_0: '1.0',
       V1_1: '1.1',
