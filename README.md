@@ -43,24 +43,6 @@ To continuously run tests on file changes:
 The project contains an [chat example](example/chat/index.html) using stomp.js
 to send and receive Stomp messages from a server.
 
-## Use Stomp Vhost / RabbitMQ/AMQP Virtual Hosts
-
-Add the `vhost` parameter during `connect()` :
-
-    client.connect(stompUser, stompPassword, 
-		function() {
-			// connect callback
-		},
-		function() {
-			// error callback
-		},
-		'berbatik_dev'		// vhost here
-	);
-
-## Todo
-
- * STOMP/1.1 compatibility
-
 ## Authors
 
  * [Jeff Mesnil](http://jmesnil.net/)
