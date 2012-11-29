@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2.0 (Date TBD)
+## 2.0 (2012/11/29)
 
 ### STOMP 1.1 support
 
@@ -15,7 +15,7 @@
 
 * ack() method takes 3 parameters:
   * `messageID` & `subscription` are MANDATORY.
-  * `transaction` is OPTIONAL.
+  * `headers` is OPTIONAL
 
 * the `client` object has a `heartbeat` field which can be used to configure heart-beating by changing its `incoming` and `outgoing` integer fields (default value for both is 10000ms):
 
