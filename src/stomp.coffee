@@ -203,6 +203,7 @@ class Client
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
+      @_cleanUp()
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')

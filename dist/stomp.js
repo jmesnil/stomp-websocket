@@ -220,6 +220,7 @@
         if (typeof _this.debug === "function") {
           _this.debug(msg);
         }
+        _this._cleanUp();
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       return this.ws.onopen = function() {
