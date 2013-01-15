@@ -143,7 +143,7 @@ class Client
         # We wait twice the TTL to be flexible on window's setInterval calls
         if delta > ttl * 2
           @debug? "did not receive server activity for the last #{delta}ms"
-          @_cleanUp()
+          @ws.close()
       , ttl)
 
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
@@ -222,13 +222,13 @@ class Client
     # Discard the onclose callback to avoid calling the errorCallback when
     # the client is properly disconnected.
     @ws.onclose = null
+    @ws.close()
     @_cleanUp()
     disconnectCallback?()
 
   # Clean up client resources when it is disconnected or the server did not
   # send heart beats in a timely fashion
   _cleanUp: () ->
-    @ws.close()
     @connected = false
     window?.clearInterval(@pinger) if @pinger
     window?.clearInterval(@ponger) if @ponger

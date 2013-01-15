@@ -152,7 +152,7 @@
             if (typeof _this.debug === "function") {
               _this.debug("did not receive server activity for the last " + delta + "ms");
             }
-            return _this._cleanUp();
+            return _this.ws.close();
           }
         }, ttl) : void 0;
       }
@@ -248,12 +248,12 @@
     Client.prototype.disconnect = function(disconnectCallback) {
       this._transmit("DISCONNECT");
       this.ws.onclose = null;
+      this.ws.close();
       this._cleanUp();
       return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
     };
 
     Client.prototype._cleanUp = function() {
-      this.ws.close();
       this.connected = false;
       if (this.pinger) {
         if (typeof window !== "undefined" && window !== null) {
