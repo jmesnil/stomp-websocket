@@ -19,7 +19,7 @@ Byte =
   # NULL byte (octet 0)
   NULL: '\x00'
 
-# Representation of a [STOMP frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames)
+# ##[STOMP Frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames) Class
 class Frame
   # Frame constructor
   constructor: (@command, @headers={}, @body='') ->
@@ -84,7 +84,7 @@ class Frame
     frame = new Frame(command, headers, body)
     return frame.toString() + Byte.NULL
 
-# This class represent the STOMP client.
+# ##STOMP Client Class
 #
 # All STOMP protocol is exposed as methods of this class (`connect()`,
 # `send()`, etc.)
@@ -300,6 +300,7 @@ class Client
     headers.subscription = subscription
     @_transmit "NACK", headers
 
+# ##The `Stomp` Object
 Stomp =
 
   # Version of the JavaScript library. This can be used to check what has
@@ -343,8 +344,15 @@ Stomp =
   # marshall/unmarshall frames
   Frame: Frame
 
+# ##Make the `Stomp` object accessible depends on the context
+
+# export in the Web Browser
 if window?
   window.Stomp = Stomp
-else
+# or as module (for tests only)
+else if exports?
   exports.Stomp = Stomp
   Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock
+# or in the current object (e.g. a WebWorker)
+else
+  self.Stomp = Stomp

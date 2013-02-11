@@ -363,9 +363,11 @@
 
   if (typeof window !== "undefined" && window !== null) {
     window.Stomp = Stomp;
-  } else {
+  } else if (typeof exports !== "undefined" && exports !== null) {
     exports.Stomp = Stomp;
     Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock;
+  } else {
+    self.Stomp = Stomp;
   }
 
 }).call(this);
