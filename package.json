@@ -13,6 +13,7 @@
     "coffeelint": "latest",
     "jasmine-node": "latest",
     "grunt": "latest",
-    "docco": "latest"
+    "docco": "latest",
+    "connect": "connect"
   }
 }
