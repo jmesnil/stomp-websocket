@@ -1,4 +1,4 @@
-# STOMP 0ver WebSocket 
+# STOMP Over WebSocket 
 
 The library file is located in `dist/stomp.js` (a minified version is available in `dist/stomp.min.js`).
 It does not require any dependency (except WebSocket support from the browser or an alternative to WebSocket!)
