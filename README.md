@@ -1,18 +1,15 @@
 # STOMP 0ver WebSocket 
 
-The library file is located in `dist/stomp.js`.
+The library file is located in `dist/stomp.js` (a minified version is available in `dist/stomp.min.js`).
 It does not require any dependency (except WebSocket support from the browser or an alternative to WebSocket!)
 
 Online [documentation][doc] describes the library API.
 
 ## Development Requirements
-For development (testing, building) the project requires Node.js, CoffeeScript, and Jasmine. This allows us to run tests without the browser continuously during development (see `cake watch`). 
 
- * Node.js and NPM
- * NPM packages
-   * coffee-script
-   * jasmine-node
-   * growl (optional)
+For development (testing, building) the project requires node.js. This allows us to run tests without the browser continuously during development (see `cake watch`). 
+
+    $ npm install
 
 ## Building and Testing
 
@@ -20,15 +17,15 @@ For development (testing, building) the project requires Node.js, CoffeeScript, 
 
 To build JavaScript:
 
-    cake build
+    $ cake build
 
 To run tests:
 
-    cake test
+    $ cake test
 
 To continuously run tests on file changes:
 
-    cake watch
+    $ cake watch
 
 
 ## Browser Tests
@@ -40,8 +37,8 @@ To continuously run tests on file changes:
 
 ## Use
 
-The project contains an [chat example](example/chat/index.html) using stomp.js
-to send and receive Stomp messages from a server.
+The project contains examples for using stomp.js
+to send and receive STOMP messages from a server directly in the Web Browser or in a WebWorker.
 
 ## Authors
 
