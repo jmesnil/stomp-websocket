@@ -92,11 +92,14 @@ it explained the idea behind WebSockets:</p>
 <p>To start HornetQ with support for STOMP Over WebSocket, <a href=http://www.jboss.org/hornetq/downloads.html>download the latest version</a> and run the following steps:</p>
 
 <pre>
-  <samp>$ </samp><kbd>cd hornetq-x.y.z/bin</kbd>
-  <samp>$ </samp><kbd>./run.sh ../examples/jms/stomp-websockets/server0</kbd>
+  <samp>$ </samp><kbd>cd hornetq-x.y.z/examples/jms/stomp-websockets</kbd>
+  <samp>$ </samp><kbd>mvn clean install</kbd>
   <samp>...
-  Started Netty Acceptor version 3.2.3.Final-r${buildNumber} localhost:61614 for STOMP_WS protocol
-  HornetQ Server version 2.2.5.Final (HQ_2_2_5_FINAL_AS7, 121) [d11ee32e-0653-11e1-81fd-001ec29e77e5] started</samp>
+  INFO: HQ221020: Started Netty Acceptor version 3.6.2.Final-c0d783c localhost:61614 for STOMP_WS protocol
+  Apr 15, 2013 1:15:33 PM org.hornetq.core.server.impl.HornetQServerImpl$SharedStoreLiveActivation run
+  INFO: HQ221007: Server is now live
+  Apr 15, 2013 1:15:33 PM org.hornetq.core.server.impl.HornetQServerImpl start
+  INFO: HQ221001: HornetQ Server version 2.3.0.CR2 (black'n'yellow2, 123) [c9e29e45-a5bd-11e2-976a-b3fef7ceb5df]</samp>
 </pre>
 
 <p>HornetQ is now started and listens to STOMP over WebSocket on the port <code>61614</code>.<br>
@@ -104,7 +107,7 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 </section>
 
 <p>To configure and run HornetQ with STOMP Over WebSocket enabled, follow the
-  <a href=http://hornetq.sourceforge.net/docs/hornetq-2.1.2.Final/user-manual/en/html/interoperability.html#stomp.websockets>instructions</a>.</p>
+  <a href=http://docs.jboss.org/hornetq/2.3.0.CR2/docs/user-manual/html/interoperability.html#stomp.websockets>instructions</a>.</p>
 
 <h3 id=activemq>ActiveMQ</h3>
 
