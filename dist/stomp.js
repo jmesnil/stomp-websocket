@@ -8,6 +8,12 @@
     NULL: '\x00'
   };
 
+  if (!Date.now) {
+    Date.now = function() {
+      return new Date().valueOf();
+    };
+  }
+
   Frame = (function() {
 
     function Frame(command, headers, body) {

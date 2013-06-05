@@ -19,6 +19,11 @@ Byte =
   # NULL byte (octet 0)
   NULL: '\x00'
 
+# Hack to provide Date.now that is not defined in IE8
+unless Date.now
+  Date.now = ->
+    new Date().valueOf()
+
 # ##[STOMP Frame](http://stomp.github.com/stomp-specification-1.1.html#STOMP_Frames) Class
 class Frame
   # Frame constructor
