@@ -88,15 +88,6 @@ class Frame
 #
 # All STOMP protocol is exposed as methods of this class (`connect()`,
 # `send()`, etc.)
-#
-# For debugging purpose, it is possible to set a `debug(message)` method
-# on a client instance to receive debug messages (including the actual
-# transmission of the STOMP frames over the WebSocket:
-#
-#     client.debug = function(str) {
-#         // append the debug log to a #debug div
-#         $("#debug").append(str + "\n");
-#     };
 class Client
   constructor: (@ws) ->
     @ws.binaryType = "arraybuffer"
@@ -114,11 +105,29 @@ class Client
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {}
 
+  # ### Debugging
+  #
+  # By default, debug messages are logged in the window's console if it is defined.
+  # This method is called for every actual transmission of the STOMP frames over the
+  # WebSocket.
+  #
+  # It is possible to set a `debug(message)` method
+  # on a client instance to handle differently the debug messages:
+  #
+  #     client.debug = function(str) {
+  #         // append the debug log to a #debug div
+  #         $("#debug").append(str + "\n");
+  #     };
+  debug: (message) ->
+    window?.console?.log message
+
+  # Base method to transmit any stomp frame
   _transmit: (command, headers, body) ->
     out = Frame.marshall(command, headers, body)
     @debug? ">>> " + out
     @ws.send(out)
 
+  # Heart-beat negotiation
   _setupHeartbeat: (headers) ->
     return unless headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
 
@@ -344,7 +353,7 @@ Stomp =
   # marshall/unmarshall frames
   Frame: Frame
 
-# ##Make the `Stomp` object accessible depends on the context
+# # `Stomp` object exportation
 
 # export in the Web Browser
 if window?
