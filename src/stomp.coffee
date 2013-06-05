@@ -131,6 +131,10 @@ class Client
   #     };
   debug: (message) ->
     window?.console?.log message
+    
+  # Utility method to get the current timestamp (Date.now is not defined in IE8)
+  now= ->
+    Date.now || new Date().valueOf
 
   # Base method to transmit any stomp frame
   _transmit: (command, headers, body) ->
@@ -167,7 +171,7 @@ class Client
       ttl = Math.max(@heartbeat.incoming, serverOutgoing)
       @debug? "check PONG every #{ttl}ms"
       @ponger = window?.setInterval(=>
-        delta = Date.now() - @serverActivity
+        delta = now() - @serverActivity
         # We wait twice the TTL to be flexible on window's setInterval calls
         if delta > ttl * 2
           @debug? "did not receive server activity for the last #{delta}ms"
@@ -220,7 +224,7 @@ class Client
       else
         # take the data directly from the WebSocket `data` field
         evt.data
-      @serverActivity = Date.now()
+      @serverActivity = now()
       if data == Byte.LF # heartbeat
         @debug? "<<< PONG"
         return

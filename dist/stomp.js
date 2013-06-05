@@ -100,6 +100,8 @@
   })();
 
   Client = (function() {
+    var now;
+
     function Client(ws) {
       this.ws = ws;
       this.ws.binaryType = "arraybuffer";
@@ -116,6 +118,10 @@
     Client.prototype.debug = function(message) {
       var _ref;
       return typeof window !== "undefined" && window !== null ? (_ref = window.console) != null ? _ref.log(message) : void 0 : void 0;
+    };
+
+    now = function() {
+      return Date.now || new Date().valueOf;
     };
 
     Client.prototype._transmit = function(command, headers, body) {
@@ -170,7 +176,7 @@
         }
         return this.ponger = typeof window !== "undefined" && window !== null ? window.setInterval(function() {
           var delta;
-          delta = Date.now() - _this.serverActivity;
+          delta = now() - _this.serverActivity;
           if (delta > ttl * 2) {
             if (typeof _this.debug === "function") {
               _this.debug("did not receive server activity for the last " + delta + "ms");
@@ -225,7 +231,7 @@
           }
           return _results;
         })()).join('')) : evt.data;
-        _this.serverActivity = Date.now();
+        _this.serverActivity = now();
         if (data === Byte.LF) {
           if (typeof _this.debug === "function") {
             _this.debug("<<< PONG");
