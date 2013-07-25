@@ -107,6 +107,10 @@ class Client
       # (value in ms)
       incoming: 10000
     }
+    # maximum *WebSocket* frame size sent by the client. If the STOMP frame
+    # is bigger than this value, the STOMP frame will be sent using multiple
+    # WebSocket frames (default is 16KiB)
+    @maxWebSocketFrameSize = 16*1024
     # subscription callbacks indexed by subscriber's ID
     @subscriptions = {}
 
@@ -130,7 +134,15 @@ class Client
   _transmit: (command, headers, body) ->
     out = Frame.marshall(command, headers, body)
     @debug? ">>> " + out
-    @ws.send(out)
+    # if necessary, split the *STOMP* frame to send it on many smaller
+    # *WebSocket* frames
+    while(true)
+      if out.length > @maxWebSocketFrameSize
+        @ws.send(out.substring(0, @maxWebSocketFrameSize))
+        out = out.substring(@maxWebSocketFrameSize)
+        @debug? "remaining = " + out.length
+      else
+        return @ws.send(out)
 
   # Heart-beat negotiation
   _setupHeartbeat: (headers) ->

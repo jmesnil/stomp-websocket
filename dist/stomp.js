@@ -105,6 +105,7 @@
         outgoing: 10000,
         incoming: 10000
       };
+      this.maxWebSocketFrameSize = 16 * 1024;
       this.subscriptions = {};
     }
 
@@ -119,7 +120,17 @@
       if (typeof this.debug === "function") {
         this.debug(">>> " + out);
       }
-      return this.ws.send(out);
+      while (true) {
+        if (out.length > this.maxWebSocketFrameSize) {
+          this.ws.send(out.substring(0, this.maxWebSocketFrameSize));
+          out = out.substring(this.maxWebSocketFrameSize);
+          if (typeof this.debug === "function") {
+            this.debug("remaining = " + out.length);
+          }
+        } else {
+          return this.ws.send(out);
+        }
+      }
     };
 
     Client.prototype._setupHeartbeat = function(headers) {
