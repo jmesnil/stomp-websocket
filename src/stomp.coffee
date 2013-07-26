@@ -1,3 +1,4 @@
+
 # **STOMP Over Web Socket** is a JavaScript STOMP Client using
 # [HTML5 Web Sockets API](http://www.w3.org/TR/websockets).
 #
@@ -11,6 +12,10 @@
 #
 # The library is accessed through the `Stomp` object that is set on the `window`
 # when running in a Web browser.
+
+###
+   Stomp Over WebSocket http://www.jmesnil.net/stomp-websocket/doc/ | Apache License V2.0
+###
 
 # Define constants for bytes used throughout the code.
 Byte =
