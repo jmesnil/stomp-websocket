@@ -218,8 +218,12 @@
               _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
               break;
             case "MESSAGE":
-              onreceive = _this.subscriptions[frame.headers.subscription];
-              _results.push(typeof onreceive === "function" ? onreceive(frame) : void 0);
+              onreceive = _this.subscriptions[frame.headers.subscription] || _this.onreceive;
+              if (onreceive) {
+                _results.push(onreceive(frame));
+              } else {
+                _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled received MESSAGE: " + frame) : void 0);
+              }
               break;
             case "RECEIPT":
               _results.push(typeof _this.onreceipt === "function" ? _this.onreceipt(frame) : void 0);

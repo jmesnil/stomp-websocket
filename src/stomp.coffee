@@ -206,9 +206,18 @@ class Client
             @connectCallback? frame
           # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
           when "MESSAGE"
-            # the `onreceive` callback is registered when the client calls `subscribe()`
-            onreceive = @subscriptions[frame.headers.subscription]
-            onreceive? frame
+            # the `onreceive` callback is registered when the client calls
+            # `subscribe()`.
+            # If there is registered subscription for the received message,
+            # we used the default `onreceive` method that the client can set.
+            # This is useful for subscriptions that are automatically created
+            # on the browser side (e.g. [RabbitMQ's temporary
+            # queues](http://www.rabbitmq.com/stomp.html)).
+            onreceive = @subscriptions[frame.headers.subscription] or @onreceive
+            if onreceive
+              onreceive frame
+            else
+              @debug? "Unhandled received MESSAGE: #{frame}"
           # [RECEIPT Frame](http://stomp.github.com/stomp-specification-1.1.html#RECEIPT)
           #
           # The client instance can set its `onreceipt` field to a function taking
