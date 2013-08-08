@@ -40,7 +40,7 @@
     };
 
     Frame._unmarshallSingle = function(data) {
-      var body, chr, command, divider, headerLines, headers, i, idx, len, line, start, trim, _i, _j, _ref, _ref1;
+      var body, chr, command, divider, headerLines, headers, i, idx, len, line, start, trim, _i, _j, _len, _ref, _ref1;
       divider = data.search(RegExp("" + Byte.LF + Byte.LF));
       headerLines = data.substring(0, divider).split(Byte.LF);
       command = headerLines.shift();
@@ -48,9 +48,9 @@
       trim = function(str) {
         return str.replace(/^\s+|\s+$/g, '');
       };
-      line = idx = null;
-      for (i = _i = 0, _ref = headerLines.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        line = headerLines[i];
+      _ref = headerLines.reverse();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        line = _ref[_i];
         idx = line.indexOf(':');
         headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1));
       }

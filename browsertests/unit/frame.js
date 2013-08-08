@@ -41,3 +41,9 @@ test("unmarshall should support colons (:) in header values", function() {
 
   equals(Stomp.Frame.unmarshall(msg)[0].headers.destination, dest);
 });
+
+test("only the 1st value of repeated headers is used", function() {
+  var msg = "MESSAGE\ndestination: /queue/test\nfoo:World\nfoo:Hello\n\n\0";
+
+  equals(Stomp.Frame.unmarshall(msg)[0].headers['foo'], 'World');
+});

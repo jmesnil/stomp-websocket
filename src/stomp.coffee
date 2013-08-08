@@ -53,10 +53,9 @@ class Frame
     # utility function to trim any whitespace before and after a string
     trim= (str) ->
       str.replace(/^\s+|\s+$/g,'')
-    # Parse headers
-    line = idx = null
-    for i in [0...headerLines.length]
-      line = headerLines[i]
+    # Parse headers in reverse order so that for repeated headers, the 1st
+    # value is used
+    for line in headerLines.reverse()
       idx = line.indexOf(':')
       headers[trim(line.substring(0, idx))] = trim(line.substring(idx + 1))
     # Parse body
