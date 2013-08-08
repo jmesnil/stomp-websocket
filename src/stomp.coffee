@@ -174,12 +174,40 @@ class Client
           @ws.close()
       , ttl)
 
+  # parse the arguments number and type to find the headers, connectCallback and 
+  # (eventually undefined) errorCallback
+  _parseConnect: (args...) ->
+    headers = {}
+    switch args.length
+      when 2
+        [headers, connectCallback] = args
+      when 3
+        if args[1] instanceof Function
+          [headers, connectCallback, errorCallback] = args
+        else
+          [headers.login, headers.passcode, connectCallback] = args
+      when 4
+        [headers.login, headers.passcode, connectCallback, errorCallback] = args
+      else
+        [headers.login, headers.passcode, connectCallback, errorCallback, headers.vhost] = args
+
+    [headers, connectCallback, errorCallback]
+
   # [CONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame)
-  connect: (login,
-      passcode,
-      @connectCallback,
-      errorCallback,
-      vhost) ->
+  #
+  # The `connect` method accepts different number of arguments and types:
+  #
+  # * `connect(headers, connectCallback)`
+  # * `connect(headers, connectCallback, errorCallback)`
+  # * `connect(login, passcode, connectCallback)`
+  # * `connect(login, passcode, connectCallback, errorCallback)`
+  # * `connect(login, passcode, connectCallback, errorCallback, vhost)`
+  #
+  # The errorCallback is optional and the 2 first forms allow to pass other
+  # headers in addition to `client`, `passcode` and `vhost`.
+  connect: (args...) ->
+    out = @_parseConnect(args...)
+    [headers, @connectCallback, errorCallback] = out
     @debug? "Opening Web Socket..."
     @ws.onmessage = (evt) =>
       data = if typeof(ArrayBuffer) != 'undefined' and evt.data instanceof ArrayBuffer
@@ -244,13 +272,8 @@ class Client
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
-      headers = {
-        "accept-version": Stomp.VERSIONS.supportedVersions()
-        "heart-beat": [@heartbeat.outgoing, @heartbeat.incoming].join(',')
-      }
-      headers.host = vhost if vhost
-      headers.login = login if login
-      headers.passcode = passcode if passcode
+      headers["accept-version"] = Stomp.VERSIONS.supportedVersions()
+      headers["heart-beat"] = [@heartbeat.outgoing, @heartbeat.incoming].join(',')
       @_transmit "CONNECT", headers
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)

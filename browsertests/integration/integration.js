@@ -17,10 +17,12 @@ $(document).ready(function(){
   // the client is notified when it is connected to the server.
   var onconnect = function(frame) {
       debug("connected to Stomp");
-      client.subscribe(destination, {receipt: 1234}, function(frame) {
-        client.unsubscribe(destination);
-        client.disconnect();
-      });
+      client.subscribe(destination,
+        function(frame) {
+          client.unsubscribe(destination);
+          client.disconnect();
+        },
+        { receipt: 1234 });
   };
   client.onerror = function(frame) {
       debug("connected to Stomp");

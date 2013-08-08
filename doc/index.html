@@ -206,16 +206,13 @@ This method expects an object that conforms to the WebSocket definition.
 <p>Behind the scene, the client will open a connection using a WebSocket and send
   a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>CONNECT</a> frame.</p>
 <p>The connection is done asynchronously: you have no guarantee to be effectively connected when
-  the call to <code>connect</code> returns. To be notified of the connection, you can pass a
+  the call to <code>connect</code> returns. To be notified of the connection, you need to pass a
   <code>connect_callback</code> function to the <code>connect()</code> method:</p>
 <pre><code>
-  <mark>client.connect</mark>(login, passcode, connect_callback);
-
-  <mark>connect_callback</mark> = function() {
+  <mark>var connect_callback</mark> = function() {
     // called back after the client is connected and authenticated to the STOMP server
   };
 </code></pre>
-
 <p>But what happens if the connection fails? the <code>connect()</code> method accepts an
   optional <code>error_callback</code> argument which will be called if the client is not able
   to connect to the server.
@@ -223,21 +220,43 @@ This method expects an object that conforms to the WebSocket definition.
   <a href=http://stomp.github.com/stomp-specification-1.1.html#ERROR>ERROR</a> frame:</p>
   
 <pre><code>
-  client.connect(login, passcode, connect_callback, <mark>error_callback</mark>);
-
-  error_callback = function(error) {
+  <mark>var error_callback</mark> = function(error) {
     // display the error's message header:
     alert(error.headers.message);
   };
 </code></pre>
 
-v<p>Finally, if the STOMP broker requires a <a href=http://stomp.github.com/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>host</a>, pass it as the last argument of the <code>connect()</code> method:
+<p>The <code>connect()</code> method accepts different number of arguments to provide a simple API to use in most cases:
 
 <pre><code>
-  var host = "...";
-  client.connect(login, passcode, connect_callback, error_callback, <mark>host</mark>);
+  <mark>client.connect</mark>(login, passcode, connectCallback);
+  <mark>client.connect</mark>(login, passcode, connectCallback, errorCallback);
+  <mark>client.connect</mark>(login, passcode, connectCallback, errorCallback, host);
 </code></pre>
 
+<p>where <code>login</code>, <code>passcode</code> are strings and <code>connectCallback</code> and <code>errorCallback</code> are functions
+  (some brokers also require to pass a <a href=http://stomp.github.io/stomp-specification-1.1.html#CONNECT_or_STOMP_Frame>host</a> String).
+
+<p>The <code>connect()</code> method also accepts two other variants if you need to pass additional headers:
+
+<pre><code>
+  <mark>client.connect</mark>(headers, connectCallback);
+  <mark>client.connect</mark>(headers, connectCallback, errorCallback);
+</code></pre>
+
+<p>where <code>header</code> is a map and <code>connectCallback</code> and <code>errorCallback</code> are functions.
+<p>Please note that if you use these forms, you <strong>must</strong> add the <code>login</code>, <code>passcode</code> (and eventually <code>host</code>)
+  headers yourself:
+
+  <pre><code>
+    var <mark>headers</mark> = {
+      login: 'mylogin',
+      passcode: 'mypasscode',
+      // additional header
+      'client-id': 'my-client-id'
+    };
+    client.connect(<mark>headers</mark>, connectCallback);
+  </code></pre>
 
 <p>To disconnect a client from the server, you can call its <code>disconnect()</code> method.
   The disconnection is asynchronous: to be notified when the disconnection is effective,
