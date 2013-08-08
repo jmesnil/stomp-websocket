@@ -174,7 +174,7 @@ class Client
           @ws.close()
       , ttl)
 
-  # parse the arguments number and type to find the headers, connectCallback and 
+  # parse the arguments number and type to find the headers, connectCallback and
   # (eventually undefined) errorCallback
   _parseConnect: (args...) ->
     headers = {}
