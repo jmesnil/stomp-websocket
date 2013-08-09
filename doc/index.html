@@ -423,10 +423,9 @@ This method expects an object that conforms to the WebSocket definition.
   to acknowledge a message as part of a transaction and ask for a receipt when the <code>ACK</code> STOMP frame has effectively be processed by the broker:
 
 <pre><code>
-  var txid = '...';
-  client.begin(txid);
-  message.ack(<mark>{ transaction: txid, receipt: 'my-receipt' }</mark>);
-  client.commit(txid);
+  var tx = client.begin();
+  message.ack(<mark>{ transaction: tx.id, receipt: 'my-receipt' }</mark>);
+  tx.commit();
 </code></pre>
 
 <p>The <code>nack()</code> method can also be used to inform STOMP 1.1 brokers that the client did <em>not</em> consume the message. It takes the same arguments than the <code>ack()</code> method.
@@ -435,21 +434,25 @@ This method expects an object that conforms to the WebSocket definition.
 
 <p>Messages can be sent and acknowledged <em>in a transaction</em>.</p>
 <p>A transaction is started by the client using its <code>begin()</code> method
-  which takes a mandatory <code>transaction</code>, a String which uniquely identifies the
-  transaction.
-  The client can then send and acknowledge messages in the transasction by specifying a
-  <code>transaction</code> set with the transaction name.</p>
-<p>A transaction is completed by the client by calling its <code>commit()</code> method.
-  Alternatively, the client can abort the transaction by calling its <code>abort</code> method.</p>
+  which takes an optional <code>transaction</code>, a String which uniquely identifies the
+  transaction. If no <code>transaction</code> is passed, the library will generate one automatically.
+<p>This methods returns a JavaScript object with a <code>id</code> attribute corresponding to the transaction ID and two methods:
+
+<ul>
+  <li><code>commit()</code> to commit the transaction
+  <li><code>abort()</code> to abort the transaction
+</ul>
+
+The client can then send and/or acknowledge messages in the transaction by specifying a
+<code>transaction</code> set with the transaction <code>id</code>.</p>
 
 <pre><code>
-  var txid = "unique_transaction_identifier";
   // start the transaction
-  <mark>client.begin</mark>(txid);
+  var tx = <mark>client.begin</mark>();
   // send the message in a transaction
-  client.send("/queue/test", <mark>{transaction: txid}</mark>, "message in a transaction");
+  client.send("/queue/test", <mark>{transaction: tx.id}</mark>, "message in a transaction");
   // commit the transaction to effectively send the message
-  <mark>client.commit</mark>(txid);
+  <mark>tx.commit</mark>();
 </code></pre>
 
 <div class=advice>
@@ -460,10 +463,10 @@ This method expects an object that conforms to the WebSocket definition.
   <pre style="clear:both"><code>
   var txid = "unique_transaction_identifier";
   // start the transaction
-  <mark>client.begin</mark>(txid);
+  var tx = <mark>client.begin</mark>();
   // oops! send the message outside the transaction
   client.send("/queue/test", <mark>{}</mark>, "I thought I was in a transaction!");
-  <mark>client.abort</mark>(txid); // Too late! the message has been sent
+  <mark>tx.abort</mark>(); // Too late! the message has been sent
   </code></pre>
 </div>
 
@@ -480,6 +483,8 @@ This method expects an object that conforms to the WebSocket definition.
     $("#debug").append(str + "\n");
   };
 </code></pre>
+
+<p>By default, the debug messages are logged in the browser window's console.
 
 </section>
 

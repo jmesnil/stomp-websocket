@@ -324,7 +324,8 @@ class Client
     @_transmit "SUBSCRIBE", headers
     client = this
     return {
-      id: headers.id,
+      id: headers.id
+
       unsubscribe: ->
         client.unsubscribe headers.id
     }
@@ -347,15 +348,31 @@ class Client
 
   # [BEGIN Frame](http://stomp.github.com/stomp-specification-1.1.html#BEGIN)
   #
-  # * `transaction` is MANDATORY.
+  # If no transaction ID is passed, one will be created automatically
   begin: (transaction) ->
+    txid = transaction || "tx-" + @counter++
     @_transmit "BEGIN", {
-      transaction: transaction
+      transaction: txid
+    }
+    client = this
+    return {
+      id: txid
+      commit: ->
+        client.commit txid
+      abort: ->
+        client.abort txid
     }
   
   # [COMMIT Frame](http://stomp.github.com/stomp-specification-1.1.html#COMMIT)
   #
   # * `transaction` is MANDATORY.
+  #
+  # It is preferable to commit a transaction by calling `commit()` directly on
+  # the object returned by `client.begin()`:
+  #
+  #     var tx = client.begin(txid);
+  #     ...
+  #     tx.commit();
   commit: (transaction) ->
     @_transmit "COMMIT", {
       transaction: transaction
@@ -364,6 +381,13 @@ class Client
   # [ABORT Frame](http://stomp.github.com/stomp-specification-1.1.html#ABORT)
   #
   # * `transaction` is MANDATORY.
+  #
+  # It is preferable to abort a transaction by calling `abort()` directly on
+  # the object returned by `client.begin()`:
+  #
+  #     var tx = client.begin(txid);
+  #     ...
+  #     tx.abort();
   abort: (transaction) ->
     @_transmit "ABORT", {
       transaction: transaction

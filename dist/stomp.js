@@ -369,9 +369,21 @@
     };
 
     Client.prototype.begin = function(transaction) {
-      return this._transmit("BEGIN", {
-        transaction: transaction
+      var client, txid;
+      txid = transaction || "tx-" + this.counter++;
+      this._transmit("BEGIN", {
+        transaction: txid
       });
+      client = this;
+      return {
+        id: txid,
+        commit: function() {
+          return client.commit(txid);
+        },
+        abort: function() {
+          return client.abort(txid);
+        }
+      };
     };
 
     Client.prototype.commit = function(transaction) {
