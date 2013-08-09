@@ -320,14 +320,14 @@ This method expects an object that conforms to the WebSocket definition.
 <pre><code>
   id = <mark>client.subscribe</mark>("/queue/test", callback);
 </code></pre>
-<p>The <code>subscribe()</code> methods returns an id that correspond to the client subscription. You can use this
-  subscription ID later on to unsubscribe the client from this destination.</p>
+<p>The <code>subscribe()</code> methods returns a JavaScript obect with 1 attribute, <code>id</code>, that correspond to the client subscription ID
+  and one method <code>unsubscribe()</code> that can be used later on to unsubscribe the client from this destination.</p>
 
 <p>By default, the library will generate an unique ID if there is none provided in the headers. To use your own ID, pass it using the <code>headers</code> argument:
 
 <pre><code>
   var mysubid = '...';
-  client.subscribe(destination, callback, <mark>{ id: mysubid }</mark>);
+  var subscription = client.subscribe(destination, callback, <mark>{ id: mysubid }</mark>);
 </code></pre>
 
 
@@ -366,23 +366,21 @@ This method expects an object that conforms to the WebSocket definition.
   onmessage = function(message) {
     // called every time the client receives a message
   }
-  client.subscribe("queue/test", <mark>onmessage</mark>);
-  client.subscribe("queue/another", <mark>onmessage</mark>);
+  var sub1 = client.subscribe("queue/test", <mark>onmessage</mark>);
+  var sub2 = client.subscribe("queue/another", <mark>onmessage</mark>);
   </code></pre>
 </div>
 
-<p>To stop receiving messages, the client can use its <code>unsubscribe()</code> method.
-  The method takes a <code>id</code> argument corresponding to the subscription ID to unsubscribe from.</p>
+<p>To stop receiving messages, the client can use the <code>unsubscribe()</code> method on the object returned by the <code>subscribe()</code>
+  method.</p>
 
 <pre><code>
-  id = client.subscribe(...);
+  var subscription = client.subscribe(...);
   
   ...
   
-  <mark>client.unsubscribe</mark>(id);
+  <mark>subscription.unsubscribe</mark>();
 </code></pre>
-
-<p> The method also takes an optional <code>headers</code> argument if the client needs to pass additional headers.</p>
 
 <h3 id=json>JSON support</h3>
 
@@ -410,7 +408,7 @@ This method expects an object that conforms to the WebSocket definition.
   acknowledge the message.</p>
 
 <pre><code>
-  var subid = client.subscribe("/queue/test",
+  var subscription = client.subscribe("/queue/test",
     function(message) {
       // do something with the message
       ...

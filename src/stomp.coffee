@@ -250,14 +250,14 @@ class Client
             subscription = frame.headers.subscription
             onreceive = @subscriptions[subscription] or @onreceive
             if onreceive
-              that = this
+              client = this
               messageID = frame.headers["message-id"]
               # add `ack()` and `nack()` methods directly to the returned frame
               # so that a simple call to `message.ack()` can acknowledge the message.
               frame.ack = (headers = {}) =>
-                that.ack messageID , subscription, headers
+                client .ack messageID , subscription, headers
               frame.nack = (headers = {}) =>
-                that.nack messageID, subscription, headers
+                client .nack messageID, subscription, headers
               onreceive frame
             else
               @debug? "Unhandled received MESSAGE: #{frame}"
@@ -322,11 +322,23 @@ class Client
     headers.destination = destination
     @subscriptions[headers.id] = callback
     @_transmit "SUBSCRIBE", headers
-    return headers.id
+    client = this
+    return {
+      id: headers.id,
+      unsubscribe: ->
+        client.unsubscribe headers.id
+    }
 
   # [UNSUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#UNSUBSCRIBE)
   #
   # * `id` is MANDATORY.
+  #
+  # It is preferable to unsubscribe from a subscription by calling
+  # `unsubscribe()` directly on the object returned by `client.subscribe()`:
+  #
+  #     var subscription = client.subscribe(destination, onmessage);
+  #     ...
+  #     subscription.unsubscribe();
   unsubscribe: (id) ->
     delete @subscriptions[id]
     @_transmit "UNSUBSCRIBE", {
@@ -361,7 +373,7 @@ class Client
   #
   # * `messageID` & `subscription` are MANDATORY.
   #
-  # It is also possible to acknowledge a message by calling `ack()` directly
+  # It is preferable to acknowledge a message by calling `ack()` directly
   # on the message handled by a subscription callback:
   #
   #     client.subscribe(destination,
@@ -381,7 +393,7 @@ class Client
   #
   # * `messageID` & `subscription` are MANDATORY.
   #
-  # It is also possible to nack a message by calling `nack()` directly on the
+  # It is preferable to nack a message by calling `nack()` directly on the
   # message handled by a subscription callback:
   #
   #     client.subscribe(destination,
