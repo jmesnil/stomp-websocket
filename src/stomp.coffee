@@ -43,7 +43,7 @@ class Frame
     return lines.join(Byte.LF)
 
   # Unmarshall a single STOMP frame from a `data` string
-  @_unmarshallSingle: (data) ->
+  unmarshallSingle= (data) ->
     # search for 2 consecutives LF byte to split the command
     # and headers from the body
     divider = data.search(///#{Byte.LF}#{Byte.LF}///)
@@ -84,7 +84,7 @@ class Frame
     # Ugly list comprehension to split and unmarshall *multiple STOMP frames*
     # contained in a *single WebSocket frame*.
     # The data are splitted when a NULL byte (follwode by zero or many LF bytes) is found
-    return (Frame._unmarshallSingle(data) for data in datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
+    return (unmarshallSingle(data) for data in datas.split(///#{Byte.NULL}#{Byte.LF}*///) when data?.length > 0)
 
   # Marshall a Stomp frame
   @marshall: (command, headers, body) ->

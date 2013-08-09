@@ -18,6 +18,8 @@
   };
 
   Frame = (function() {
+    var unmarshallSingle;
+
     function Frame(command, headers, body) {
       this.command = command;
       this.headers = headers != null ? headers : {};
@@ -40,7 +42,7 @@
       return lines.join(Byte.LF);
     };
 
-    Frame._unmarshallSingle = function(data) {
+    unmarshallSingle = function(data) {
       var body, chr, command, divider, headerLines, headers, i, idx, len, line, start, trim, _i, _j, _len, _ref, _ref1;
       divider = data.search(RegExp("" + Byte.LF + Byte.LF));
       headerLines = data.substring(0, divider).split(Byte.LF);
@@ -82,7 +84,7 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           data = _ref[_i];
           if ((data != null ? data.length : void 0) > 0) {
-            _results.push(Frame._unmarshallSingle(data));
+            _results.push(unmarshallSingle(data));
           }
         }
         return _results;
