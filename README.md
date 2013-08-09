@@ -3,7 +3,7 @@
 The library file is located in `dist/stomp.js` (a minified version is available in `dist/stomp.min.js`).
 It does not require any dependency (except WebSocket support from the browser or an alternative to WebSocket!)
 
-Online [documentation][doc] describes the library API.
+Online [documentation][doc] describes the library API (including the [annotated source code][annotated])
 
 ## Development Requirements
 
@@ -46,3 +46,4 @@ to send and receive STOMP messages from a server directly in the Web Browser or 
  * [Jeff Lindsay](http://github.com/progrium)
 
 [doc]: http://jmesnil.net/stomp-websocket/doc/
+[annotated]: http://jmesnil.net/stomp-websocket/doc/stomp.html
