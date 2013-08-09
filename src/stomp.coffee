@@ -247,8 +247,17 @@ class Client
             # This is useful for subscriptions that are automatically created
             # on the browser side (e.g. [RabbitMQ's temporary
             # queues](http://www.rabbitmq.com/stomp.html)).
-            onreceive = @subscriptions[frame.headers.subscription] or @onreceive
+            subscription = frame.headers.subscription
+            onreceive = @subscriptions[subscription] or @onreceive
             if onreceive
+              that = this
+              messageID = frame.headers["message-id"]
+              # add `ack()` and `nack()` methods directly to the returned frame
+              # so that a simple call to `message.ack()` can acknowledge the message.
+              frame.ack = (headers = {}) =>
+                that.ack messageID , subscription, headers
+              frame.nack = (headers = {}) =>
+                that.nack messageID, subscription, headers
               onreceive frame
             else
               @debug? "Unhandled received MESSAGE: #{frame}"
@@ -351,6 +360,18 @@ class Client
   # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
   #
   # * `messageID` & `subscription` are MANDATORY.
+  #
+  # It is also possible to acknowledge a message by calling `ack()` directly
+  # on the message handled by a subscription callback:
+  #
+  #     client.subscribe(destination,
+  #       function(message) {
+  #         // process the message
+  #         // acknowledge it
+  #         message.ack();
+  #       },
+  #       {'ack': 'client'}
+  #     );
   ack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription
@@ -359,6 +380,18 @@ class Client
   # [NACK Frame](http://stomp.github.com/stomp-specification-1.1.html#NACK)
   #
   # * `messageID` & `subscription` are MANDATORY.
+  #
+  # It is also possible to nack a message by calling `nack()` directly on the
+  # message handled by a subscription callback:
+  #
+  #     client.subscribe(destination,
+  #       function(message) {
+  #         // process the message
+  #         // an error occurs, nack it
+  #         message.nack();
+  #       },
+  #       {'ack': 'client'}
+  #     );
   nack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription

@@ -405,27 +405,29 @@ This method expects an object that conforms to the WebSocket definition.
 <p>By default, STOMP messages will be automatically acknowledged by the server before the message
   is delivered to the client.</p>
 <p>The client can chose instead to handle message <a href=http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE_ack_Header>acknowledgement</a> by subscribing to a destination and
-  specify a <code>ack</code> header set to <code>'client'</code> or <code>client-individual</code>.</p>
-<p>In that case, the client must use the <code>ack()</code> method to inform the server that it has
-  acknowledge the message. The methods takes a mandatory <code>message_id</code> corresponding to the message
-  to acknowledge and a <code>subscription</code> that received the message.</p>
+  specify a <code>ack</code> header set to <code>client</code> or <code>client-individual</code>.</p>
+<p>In that case, the client must use the <code>message.ack()</code> method to inform the server that it has
+  acknowledge the message.</p>
 
 <pre><code>
-  var subid = client.subscribe("/queue/test", <mark>{ack: 'client'}</mark>, function(message) {
-    // do something with the message
-    ...
-    // and acknowledge it
-    var message_id = message.headers['message-id']
-    <mark>client.ack</mark>(message_id, subid);
-  });
+  var subid = client.subscribe("/queue/test",
+    function(message) {
+      // do something with the message
+      ...
+      // and acknowledge it
+      <mark>message.ack()</mark>;
+    },
+    <mark>{ack: 'client'}</mark>
+  );
 </code></pre>
 
-<p>The <code>ack()</code> method accepts a 3<sup>rd</sup> argument for additional headers to pass to the acknowledgement. For example:
+<p>The <code>ack()</code> method accepts a <code>headers</code> argument for additional headers to acknowledge the message. For example, it is possible
+  to acknowledge a message as part of a transaction and ask for a receipt when the <code>ACK</code> STOMP frame has effectively be processed by the broker:
 
 <pre><code>
   var txid = '...';
   client.begin(txid);
-  client.ack(message_id, subid, <mark>{ transaction: txid, receipt: 'my-receipt' }</mark>);
+  message.ack(<mark>{ transaction: txid, receipt: 'my-receipt' }</mark>);
   client.commit(txid);
 </code></pre>
 

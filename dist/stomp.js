@@ -223,7 +223,7 @@
         this.debug("Opening Web Socket...");
       }
       this.ws.onmessage = function(evt) {
-        var arr, c, data, frame, onreceive, _i, _len, _ref, _results;
+        var arr, c, data, frame, messageID, onreceive, subscription, that, _i, _len, _ref, _results;
         data = typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer ? (arr = new Uint8Array(evt.data), typeof _this.debug === "function" ? _this.debug("--- got data length: " + arr.length) : void 0, ((function() {
           var _i, _len, _results;
           _results = [];
@@ -257,8 +257,23 @@
               _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
               break;
             case "MESSAGE":
-              onreceive = _this.subscriptions[frame.headers.subscription] || _this.onreceive;
+              subscription = frame.headers.subscription;
+              onreceive = _this.subscriptions[subscription] || _this.onreceive;
               if (onreceive) {
+                that = _this;
+                messageID = frame.headers["message-id"];
+                frame.ack = function(headers) {
+                  if (headers == null) {
+                    headers = {};
+                  }
+                  return that.ack(messageID, subscription, headers);
+                };
+                frame.nack = function(headers) {
+                  if (headers == null) {
+                    headers = {};
+                  }
+                  return that.nack(messageID, subscription, headers);
+                };
                 _results.push(onreceive(frame));
               } else {
                 _results.push(typeof _this.debug === "function" ? _this.debug("Unhandled received MESSAGE: " + frame) : void 0);
