@@ -137,7 +137,7 @@ class Client
     Date.now || new Date().valueOf
 
   # Base method to transmit any stomp frame
-  _transmit: (command, headers, body) ->
+  transmit= (command, headers, body) ->
     out = Frame.marshall(command, headers, body)
     @debug? ">>> " + out
     # if necessary, split the *STOMP* frame to send it on many smaller
@@ -151,7 +151,7 @@ class Client
         return @ws.send(out)
 
   # Heart-beat negotiation
-  _setupHeartbeat: (headers) ->
+  setupHeartbeat= (headers) ->
     return unless headers.version in [Stomp.VERSIONS.V1_1, Stomp.VERSIONS.V1_2]
 
     # heart-beat header received from the server looks like:
@@ -236,7 +236,7 @@ class Client
           when "CONNECTED"
             @debug? "connected to server #{frame.headers.server}"
             @connected = true
-            @_setupHeartbeat(frame.headers)
+            setupHeartbeat.call this, frame.headers
             @connectCallback? frame
           # [MESSAGE Frame](http://stomp.github.com/stomp-specification-1.1.html#MESSAGE)
           when "MESSAGE"
@@ -272,27 +272,27 @@ class Client
     @ws.onclose   = =>
       msg = "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
-      @_cleanUp()
+      cleanUp.call this
       errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       headers["accept-version"] = Stomp.VERSIONS.supportedVersions()
       headers["heart-beat"] = [@heartbeat.outgoing, @heartbeat.incoming].join(',')
-      @_transmit "CONNECT", headers
+      transmit.call this, "CONNECT", headers
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
   disconnect: (disconnectCallback) ->
-    @_transmit "DISCONNECT"
+    transmit.call this, "DISCONNECT"
     # Discard the onclose callback to avoid calling the errorCallback when
     # the client is properly disconnected.
     @ws.onclose = null
     @ws.close()
-    @_cleanUp()
+    cleanUp.call this
     disconnectCallback?()
 
   # Clean up client resources when it is disconnected or the server did not
   # send heart beats in a timely fashion
-  _cleanUp: () ->
+  cleanUp= () ->
     @connected = false
     window?.clearInterval(@pinger) if @pinger
     window?.clearInterval(@ponger) if @ponger
@@ -302,7 +302,7 @@ class Client
   # * `destination` is MANDATORY.
   send: (destination, headers={}, body='') ->
     headers.destination = destination
-    @_transmit "SEND", headers, body
+    transmit.call this, "SEND", headers, body
 
   # [SUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#SUBSCRIBE)
   subscribe: (destination, callback, headers={}) ->
@@ -312,7 +312,7 @@ class Client
       headers.id = "sub-" + @counter++
     headers.destination = destination
     @subscriptions[headers.id] = callback
-    @_transmit "SUBSCRIBE", headers
+    transmit.call this, "SUBSCRIBE", headers
     return headers.id
 
   # [UNSUBSCRIBE Frame](http://stomp.github.com/stomp-specification-1.1.html#UNSUBSCRIBE)
@@ -320,7 +320,7 @@ class Client
   # * `id` is MANDATORY.
   unsubscribe: (id) ->
     delete @subscriptions[id]
-    @_transmit "UNSUBSCRIBE", {
+    transmit.call this, "UNSUBSCRIBE", {
       id: id
     }
 
@@ -328,7 +328,7 @@ class Client
   #
   # * `transaction` is MANDATORY.
   begin: (transaction) ->
-    @_transmit "BEGIN", {
+    transmit.call this, "BEGIN", {
       transaction: transaction
     }
   
@@ -336,7 +336,7 @@ class Client
   #
   # * `transaction` is MANDATORY.
   commit: (transaction) ->
-    @_transmit "COMMIT", {
+    transmit.call this, "COMMIT", {
       transaction: transaction
     }
   
@@ -344,7 +344,7 @@ class Client
   #
   # * `transaction` is MANDATORY.
   abort: (transaction) ->
-    @_transmit "ABORT", {
+    transmit.call this, "ABORT", {
       transaction: transaction
     }
   
@@ -354,7 +354,7 @@ class Client
   ack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription
-    @_transmit "ACK", headers
+    transmit.call this, "ACK", headers
 
   # [NACK Frame](http://stomp.github.com/stomp-specification-1.1.html#NACK)
   #
@@ -362,7 +362,7 @@ class Client
   nack: (messageID, subscription, headers = {}) ->
     headers["message-id"] = messageID
     headers.subscription = subscription
-    @_transmit "NACK", headers
+    transmit.call this, "NACK", headers
 
 # ##The `Stomp` Object
 Stomp =

@@ -102,7 +102,7 @@
   })();
 
   Client = (function() {
-    var now;
+    var cleanUp, now, setupHeartbeat, transmit;
 
     function Client(ws) {
       this.ws = ws;
@@ -126,7 +126,7 @@
       return Date.now || new Date().valueOf;
     };
 
-    Client.prototype._transmit = function(command, headers, body) {
+    transmit = function(command, headers, body) {
       var out;
       out = Frame.marshall(command, headers, body);
       if (typeof this.debug === "function") {
@@ -145,7 +145,7 @@
       }
     };
 
-    Client.prototype._setupHeartbeat = function(headers) {
+    setupHeartbeat = function(headers) {
       var serverIncoming, serverOutgoing, ttl, v, _ref, _ref1,
         _this = this;
       if ((_ref = headers.version) !== Stomp.VERSIONS.V1_1 && _ref !== Stomp.VERSIONS.V1_2) {
@@ -253,7 +253,7 @@
                 _this.debug("connected to server " + frame.headers.server);
               }
               _this.connected = true;
-              _this._setupHeartbeat(frame.headers);
+              setupHeartbeat.call(_this, frame.headers);
               _results.push(typeof _this.connectCallback === "function" ? _this.connectCallback(frame) : void 0);
               break;
             case "MESSAGE":
@@ -282,7 +282,7 @@
         if (typeof _this.debug === "function") {
           _this.debug(msg);
         }
-        _this._cleanUp();
+        cleanUp.call(_this);
         return typeof errorCallback === "function" ? errorCallback(msg) : void 0;
       };
       return this.ws.onopen = function() {
@@ -291,19 +291,19 @@
         }
         headers["accept-version"] = Stomp.VERSIONS.supportedVersions();
         headers["heart-beat"] = [_this.heartbeat.outgoing, _this.heartbeat.incoming].join(',');
-        return _this._transmit("CONNECT", headers);
+        return transmit.call(_this, "CONNECT", headers);
       };
     };
 
     Client.prototype.disconnect = function(disconnectCallback) {
-      this._transmit("DISCONNECT");
+      transmit.call(this, "DISCONNECT");
       this.ws.onclose = null;
       this.ws.close();
-      this._cleanUp();
+      cleanUp.call(this);
       return typeof disconnectCallback === "function" ? disconnectCallback() : void 0;
     };
 
-    Client.prototype._cleanUp = function() {
+    cleanUp = function() {
       this.connected = false;
       if (this.pinger) {
         if (typeof window !== "undefined" && window !== null) {
@@ -323,7 +323,7 @@
         body = '';
       }
       headers.destination = destination;
-      return this._transmit("SEND", headers, body);
+      return transmit.call(this, "SEND", headers, body);
     };
 
     Client.prototype.subscribe = function(destination, callback, headers) {
@@ -335,31 +335,31 @@
       }
       headers.destination = destination;
       this.subscriptions[headers.id] = callback;
-      this._transmit("SUBSCRIBE", headers);
+      transmit.call(this, "SUBSCRIBE", headers);
       return headers.id;
     };
 
     Client.prototype.unsubscribe = function(id) {
       delete this.subscriptions[id];
-      return this._transmit("UNSUBSCRIBE", {
+      return transmit.call(this, "UNSUBSCRIBE", {
         id: id
       });
     };
 
     Client.prototype.begin = function(transaction) {
-      return this._transmit("BEGIN", {
+      return transmit.call(this, "BEGIN", {
         transaction: transaction
       });
     };
 
     Client.prototype.commit = function(transaction) {
-      return this._transmit("COMMIT", {
+      return transmit.call(this, "COMMIT", {
         transaction: transaction
       });
     };
 
     Client.prototype.abort = function(transaction) {
-      return this._transmit("ABORT", {
+      return transmit.call(this, "ABORT", {
         transaction: transaction
       });
     };
@@ -370,7 +370,7 @@
       }
       headers["message-id"] = messageID;
       headers.subscription = subscription;
-      return this._transmit("ACK", headers);
+      return transmit.call(this, "ACK", headers);
     };
 
     Client.prototype.nack = function(messageID, subscription, headers) {
@@ -379,7 +379,7 @@
       }
       headers["message-id"] = messageID;
       headers.subscription = subscription;
-      return this._transmit("NACK", headers);
+      return transmit.call(this, "NACK", headers);
     };
 
     return Client;
