@@ -23,12 +23,12 @@ describe "Stomp", ->
   
   it "lets you subscribe to a destination", ->
     client = Stomp.client("ws://mocked/stomp/server")
-    id = null
+    subscription = null
     client.connect("guest", "guest", ->
-      id = client.subscribe("/queue/test")
+      subscription = client.subscribe("/queue/test")
     )
-    waitsFor -> id
-    runs -> expect(Object.keys(client.ws.subscriptions)).toContain(id)
+    waitsFor -> subscription
+    runs -> expect(Object.keys(client.ws.subscriptions)).toContain(subscription.id)
   
   it "lets you publish a message to a destination", ->
     client = Stomp.client("ws://mocked/stomp/server")
@@ -43,44 +43,35 @@ describe "Stomp", ->
   it "lets you unsubscribe from a destination", ->
     client = Stomp.client("ws://mocked/stomp/server")
     unsubscribed = false
-    id = null
+    subscription = null
     client.connect("guest", "guest", ->
-      id = client.subscribe("/queue/test")
-      client.unsubscribe(id)
+      subscription = client.subscribe("/queue/test")
+      subscription.unsubscribe()
       unsubscribed = true
     )
     waitsFor -> unsubscribed
-    runs -> expect(Object.keys(client.ws.subscriptions)).not.toContain(id)
+    runs -> expect(Object.keys(client.ws.subscriptions)).not.toContain(subscription.id)
     
   it "lets you receive messages only while subscribed", ->
     client = Stomp.client("ws://mocked/stomp/server")
-    id = null
+    subscription = null
     messages = []
     client.connect("guest", "guest", ->
-      id = client.subscribe("/queue/test", (msg) ->
+      subscription = client.subscribe("/queue/test", (msg) ->
         messages.push(msg)
       )
     )
-    waitsFor -> id
+    waitsFor -> subscription
     runs ->
-      client.ws.test_send(id, Math.random())
-      client.ws.test_send(id, Math.random())
+      client.ws.test_send(subscription.id, Math.random())
+      client.ws.test_send(subscription.id, Math.random())
       expect(messages.length).toEqual(2)
-      client.unsubscribe(id)
+      subscription.unsubscribe()
       try
         client.ws.test_send(id, Math.random()) 
       catch err
         null
       expect(messages.length).toEqual(2)
-  
-  it "lets you ack messages received from subscriptions set up for acking", ->
-    # id = client.subscribe(
-    #   "/queue/test"
-    #   (message) ->
-    #     message_id = message.headers['message-id']
-    #     client.ack(message_id)
-    #   {ack: 'client'}
-    # )
   
   it "lets you send messages in a transaction", ->
     client = Stomp.client("ws://mocked/stomp/server")

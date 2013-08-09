@@ -223,7 +223,7 @@
         this.debug("Opening Web Socket...");
       }
       this.ws.onmessage = function(evt) {
-        var arr, c, data, frame, messageID, onreceive, subscription, that, _i, _len, _ref, _results;
+        var arr, c, client, data, frame, messageID, onreceive, subscription, _i, _len, _ref, _results;
         data = typeof ArrayBuffer !== 'undefined' && evt.data instanceof ArrayBuffer ? (arr = new Uint8Array(evt.data), typeof _this.debug === "function" ? _this.debug("--- got data length: " + arr.length) : void 0, ((function() {
           var _i, _len, _results;
           _results = [];
@@ -260,19 +260,19 @@
               subscription = frame.headers.subscription;
               onreceive = _this.subscriptions[subscription] || _this.onreceive;
               if (onreceive) {
-                that = _this;
+                client = _this;
                 messageID = frame.headers["message-id"];
                 frame.ack = function(headers) {
                   if (headers == null) {
                     headers = {};
                   }
-                  return that.ack(messageID, subscription, headers);
+                  return client.ack(messageID, subscription, headers);
                 };
                 frame.nack = function(headers) {
                   if (headers == null) {
                     headers = {};
                   }
-                  return that.nack(messageID, subscription, headers);
+                  return client.nack(messageID, subscription, headers);
                 };
                 _results.push(onreceive(frame));
               } else {
@@ -342,6 +342,7 @@
     };
 
     Client.prototype.subscribe = function(destination, callback, headers) {
+      var client;
       if (headers == null) {
         headers = {};
       }
@@ -351,7 +352,13 @@
       headers.destination = destination;
       this.subscriptions[headers.id] = callback;
       this._transmit("SUBSCRIBE", headers);
-      return headers.id;
+      client = this;
+      return {
+        id: headers.id,
+        unsubscribe: function() {
+          return client.unsubscribe(headers.id);
+        }
+      };
     };
 
     Client.prototype.unsubscribe = function(id) {

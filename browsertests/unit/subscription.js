@@ -28,20 +28,21 @@ test("Should receive messages sent to destination after subscribing", 1, functio
 
 test("Should no longer receive messages after unsubscribing to destination", 1, function() {
   var msg1 = 'Calling all cars!',
-      subId = null;
+      subscription1 = null,
+      subscription2 = null;
 
   client.connect(TEST.login, TEST.password, function() {
-    subId = client.subscribe(TEST.destination, function(frame) {
+    subscription1 = client.subscribe(TEST.destination, function(frame) {
       start();
       ok(false, 'Should not have received message!');
     });
 
-    client.subscribe(TEST.destination, function(frame) {
+    subscription2 = client.subscribe(TEST.destination, function(frame) {
       start();
       equals(frame.body, msg1);
     });
 
-    client.unsubscribe(subId);
+    subscription1.unsubscribe();
     client.send(TEST.destination, {}, msg1);
   });
 
