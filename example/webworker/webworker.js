@@ -12,13 +12,13 @@ onmessage = function (event) {
   var client = Stomp.client(url);
   
   // connect to the server
-  var subID = client.connect(login, passcode, function(frame) {
+  client.connect(login, passcode, function(frame) {
     // upon connection, subscribe to the destination
-    client.subscribe(destination, function(message) {
+    var sub = client.subscribe(destination, function(message) {
       // when a message is received, post it to the current WebWorker
       postMessage("WebWorker: " + message.body);
       //... unsubscribe from the destination
-      client.unsubscribe(subID);
+      sub.unsubscribe();
       //... and disconnect from the server
       client.disconnect();
     });
