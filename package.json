@@ -1,7 +1,7 @@
 {
   "name": "stomp-websocket",
   "preferGlobal": "true",
-  "version": "2.1.0",
+  "version": "2.1.0-next",
   "author": "Jeff Mesnil <jmesnil@gmail.com",
   "description": "STOMP over Web Sockets",
   "scripts": {
