@@ -318,7 +318,7 @@ This method expects an object that conforms to the WebSocket definition.
   and an <em>optional</em> argument <code>headers</code>, a JavaScript object for additional headers.
 
 <pre><code>
-  id = <mark>client.subscribe</mark>("/queue/test", callback);
+  var subscription = <mark>client.subscribe</mark>("/queue/test", callback);
 </code></pre>
 <p>The <code>subscribe()</code> methods returns a JavaScript obect with 1 attribute, <code>id</code>, that correspond to the client subscription ID
   and one method <code>unsubscribe()</code> that can be used later on to unsubscribe the client from this destination.</p>
