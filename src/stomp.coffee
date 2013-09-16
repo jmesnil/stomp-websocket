@@ -193,7 +193,7 @@ class Client
       when 4
         [headers.login, headers.passcode, connectCallback, errorCallback] = args
       else
-        [headers.login, headers.passcode, connectCallback, errorCallback, headers.vhost] = args
+        [headers.login, headers.passcode, connectCallback, errorCallback, headers.host] = args
 
     [headers, connectCallback, errorCallback]
 
@@ -205,10 +205,10 @@ class Client
   # * `connect(headers, connectCallback, errorCallback)`
   # * `connect(login, passcode, connectCallback)`
   # * `connect(login, passcode, connectCallback, errorCallback)`
-  # * `connect(login, passcode, connectCallback, errorCallback, vhost)`
+  # * `connect(login, passcode, connectCallback, errorCallback, host)`
   #
   # The errorCallback is optional and the 2 first forms allow to pass other
-  # headers in addition to `client`, `passcode` and `vhost`.
+  # headers in addition to `client`, `passcode` and `host`.
   connect: (args...) ->
     out = @_parseConnect(args...)
     [headers, @connectCallback, errorCallback] = out

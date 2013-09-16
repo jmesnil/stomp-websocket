@@ -47,13 +47,13 @@
     checkArgs(
       client._parseConnect("jmesnil", "wombats", myConnectCallback, myErrorCallback, "myvhost"),
       
-      {login: 'jmesnil', passcode: 'wombats', vhost: 'myvhost'},
+      {login: 'jmesnil', passcode: 'wombats', host: 'myvhost'},
       myConnectCallback,
       myErrorCallback);
   });
 
   test("connect(headers, connectCallback)", function() {
-    var headers = {login: 'jmesnil', passcode: 'wombats', vhost: 'myvhost'};
+    var headers = {login: 'jmesnil', passcode: 'wombats', host: 'myvhost'};
 
     checkArgs(
       client._parseConnect(headers, myConnectCallback),
@@ -64,7 +64,7 @@
   });
 
   test("connect(headers, connectCallback, errorCallback)", function() {
-    var headers = {login: 'jmesnil', passcode: 'wombats', vhost: 'myvhost'};
+    var headers = {login: 'jmesnil', passcode: 'wombats', host: 'myvhost'};
 
     checkArgs(
       client._parseConnect(headers, myConnectCallback, myErrorCallback),

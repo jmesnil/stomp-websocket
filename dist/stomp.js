@@ -208,7 +208,7 @@
           headers.login = args[0], headers.passcode = args[1], connectCallback = args[2], errorCallback = args[3];
           break;
         default:
-          headers.login = args[0], headers.passcode = args[1], connectCallback = args[2], errorCallback = args[3], headers.vhost = args[4];
+          headers.login = args[0], headers.passcode = args[1], connectCallback = args[2], errorCallback = args[3], headers.host = args[4];
       }
       return [headers, connectCallback, errorCallback];
     };
