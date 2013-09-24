@@ -1,5 +1,6 @@
 WebSocketMock = require('./websocket.mock.js').WebSocketMock
-Stomp = require('../stomp.js').Stomp
+Stomp = require('../../lib/stomp.js').Stomp
+
 console = require 'console'
 
 class StompServerMock extends WebSocketMock

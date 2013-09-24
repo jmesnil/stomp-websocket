@@ -1,5 +1,7 @@
-Stomp = require('../stomp.js').Stomp
+Stomp = require('../../lib/stomp.js').Stomp
 StompServerMock = require('./server.mock.js').StompServerMock
+
+Stomp.WebSocketClass = StompServerMock
 
 describe "Stomp", ->
   it "lets you connect to a server with a websocket and get a callback", ->

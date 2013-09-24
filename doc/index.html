@@ -138,9 +138,9 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
   
 <h2 id=download>Download stomp.js JavaScript file</h2>
 
-<p>You can download <a href="https://raw.github.com/jmesnil/stomp-websocket/master/dist/stomp.js">stomp.js</a> to use it in your Web applications</p>
+<p>You can download <a href="https://raw.github.com/jmesnil/stomp-websocket/master/lib/stomp.js">stomp.js</a> to use it in your Web applications</p>
 
-<p>A <a href="https://raw.github.com/jmesnil/stomp-websocket/master/dist/stomp.min.js">minified version</a> is also provided to be used in production.
+<p>A <a href="https://raw.github.com/jmesnil/stomp-websocket/master/lib/stomp.min.js">minified version</a> is also provided to be used in production.
 
 <p>This JavaScript file is generated from <a href=http://jashkenas.github.com/coffee-script/>CoffeeScript</a> files. See the <a href=#contribute>Contribute</a> section to download the source code or browse the <a href="stomp.html">annotated source code</a>.
 
@@ -165,6 +165,8 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 
 <h3 id=client>Create a STOMP client</h3>
 
+<h4 id=clientws>In a Web browser with regular Web Socket</h4>
+
 <p>STOMP JavaScript clients will communicate to a STOMP server using a <code>ws://</code> URL.</p>
 <p>To create a STOMP client JavaScript object, you need to call <code>Stomp.client(url)</code>
   with the URL corresponding to the server's WebSocket endpoint:
@@ -176,7 +178,7 @@ It accepts <em>WebSocket connections</em> from the URL <code>ws://localhost:6161
 
 <p>The <code>Stomp.client(url, protocols)</code> can also be used to override the default subprotocols provided by the library: <code>['v10.stomp', 'v11.stomp]'</code> (for STOMP 1.0 &amp; 1.1 specifications). This second argument can either be a single string or an array of strings to specify multiple subprotocols.
 
-<h3 id=alternative>Create a STOMP client with a WebSocket</h3>
+<h4 id=alternative>In the Web browser with a custom WebSocket</h3>
 
 <p>Web browsers supports different versions of the WebSocket protocol. Some older browsers does not provide the WebSocket JavaScript or expose it under another name. By default, <code>stomp.js</code> will use the Web browser native <code>WebSocket</code> class to create the WebSocket.
 <p>However it is possible to use other type of WebSockets by using the <code>Stomp.over(ws)</code> method.
@@ -193,10 +195,38 @@ This method expects an object that conforms to the WebSocket definition.
     [...]
   &lt;/script>
 </code></pre>
-</strike>
 
 <p>Use <code>Stomp.client(url)</code> to use regular WebSockets or use <code>Stomp.over(ws)</code> if you required another type of WebSocket.
 <p>Apart from this initialization, the STOMP API remains the same in both cases.
+
+<h4 id=nodejs>In a node.js application</h3>
+
+<p>The library can also be used in <a href="http://nodejs.org">node.js</a> application by using the 
+  <a href="https://npmjs.org/package/stompjs">stompjs npm package</a>.
+
+<pre>
+  <samp>$ </samp><kbd>npm install <mark>stompjs</mark></kbd>
+</pre>
+  
+<p>In the node.js app, require the module with:
+
+<pre><code>
+  var <mark>Stomp</mark> = require(<mark>'stompjs'</mark>);
+</code></pre>
+  
+<p>To connect to a STOMP broker over a <em>TCP socket</em>, use the <code>Stomp.overTCP(host, port)</code> method:
+
+<pre><code>
+  var client = Stomp.<mark>overTCP</mark>('localhost', 61613);
+</code></pre>
+
+<p>To connect to a STOMP broker over a <em>Web Socket</em>, use instead the <code>Stomp.overWS(url)</code> method:
+
+<pre><code>
+  var client = Stomp.<mark>overWS</mark>('ws://localhost:61614/stomp');
+</code></pre>
+
+<p>Apart from this initialization, the STOMP API remains the same whether it is running in a Web browser or in node.js application.
 
 <h3 id=connection>Connection to the server</h3>
 

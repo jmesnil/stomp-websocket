@@ -38,12 +38,12 @@ task 'build', 'Build source and tests', ->
 
 task 'build:src', 'Build the src files into lib', ->
   util.log "Compiling src..."
-  exec binDir + "coffee -o dist/ -c src/", (err, stdout, stderr) -> 
+  exec binDir + "coffee -o lib/ -c src/", (err, stdout, stderr) -> 
     handleError(err) if err
 
 task 'build:min', 'Build the minified files into lib', ->
   util.log "Minify src..."
-  exec binDir + "uglifyjs -m --comments all -o dist/stomp.min.js dist/stomp.js", (err, stdout, stderr) ->
+  exec binDir + "uglifyjs -m --comments all -o lib/stomp.min.js lib/stomp.js", (err, stdout, stderr) ->
     handleError(err) if err
 
 task 'build:doc', 'Build docco documentation', ->

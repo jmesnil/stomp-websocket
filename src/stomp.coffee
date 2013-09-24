@@ -485,7 +485,6 @@ if window?
 # or as module (for tests only)
 else if exports?
   exports.Stomp = Stomp
-  Stomp.WebSocketClass = require('./test/server.mock.js').StompServerMock
 # or in the current object (e.g. a WebWorker)
 else
   self.Stomp = Stomp
