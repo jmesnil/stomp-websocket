@@ -1,8 +1,7 @@
 var Stomp = require('./stomp-node');
 Stomp.debug = console.log;
 
-var ws = Stomp.wrap(61613, 'localhost');
-var client = Stomp.over(ws);
+var client = Stomp.client('localhost', 61613);
 // heart-beating is not working yet
 client.heartbeat.outgoing = 0;
 client.heartbeat.incoming = 0;
