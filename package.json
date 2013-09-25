@@ -1,8 +1,8 @@
 {
   "name": "stompjs",
-  "version": "2.1.0-next",
+  "version": "2.2.0",
   "author": "Jeff Mesnil <jmesnil@gmail.com>",
-  "description": "STOMP for JavaScript",
+  "description": "STOMP for JavaScript apps (Web browser & node.js)",
   "scripts": {
     "build": "cake build",
     "test": "coffeelint -f coffeelint.json -r src && cake test"
