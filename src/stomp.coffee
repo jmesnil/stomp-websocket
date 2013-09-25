@@ -433,11 +433,6 @@ class Client
 
 # ##The `Stomp` Object
 Stomp =
-
-  # Version of the JavaScript library. This can be used to check what has
-  # changed in the release notes
-  libVersion: "2.0.0-next"
-
   VERSIONS:
     V1_0: '1.0'
     V1_1: '1.1'
