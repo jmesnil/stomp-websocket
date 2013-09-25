@@ -162,6 +162,8 @@ class Client
     unless @heartbeat.outgoing == 0 or serverIncoming == 0
       ttl = Math.max(@heartbeat.outgoing, serverIncoming)
       @debug? "send PING every #{ttl}ms"
+      # The `Stomp.setInterval` is a wrapper to handle regular callback
+      # that depends on the runtime environment (Web browser or node.js app)
       @pinger = Stomp.setInterval ttl, =>
         @ws.send Byte.LF
         @debug? ">>> PING"
@@ -474,6 +476,7 @@ Stomp =
 
 # export in the Web Browser
 if window?
+  # in the Web browser, rely on `window.setInterval` to handle heart-beats
   Stomp.setInterval= (interval, f) ->
     window.setInterval f, interval
   Stomp.clearInterval= (id) ->
