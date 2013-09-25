@@ -33,7 +33,7 @@
     "messaging",
     "queue"
   ],
-  "license": "APL v2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/jmesnil/stomp-websocket/issues"
   }
