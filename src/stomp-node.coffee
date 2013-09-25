@@ -1,6 +1,6 @@
 # * Copyright (C) 2013 [Jeff Mesnil](http://jmesnil.net/)
 #
-# The library can be used in node.js app to connect to STOMP brokers over TCP 
+# The library can be used in node.js app to connect to STOMP brokers over TCP
 # or Web sockets.
 
 ###
@@ -12,17 +12,17 @@
 Stomp = require('./stomp')
 net   = require('net')
 
-# in node.js apps, `setInterval` and `clearInterval` methods used to handle 
+# in node.js apps, `setInterval` and `clearInterval` methods used to handle
 # hear-beats are implemented using node.js Timers
 Stomp.Stomp.setInterval = (interval, f) ->
-    setInterval f, interval
+  setInterval f, interval
 Stomp.Stomp.clearInterval = (id) ->
-    clearInterval id
+  clearInterval id
 
-# wrap a TCP socket (provided by node.js's net module) in a "Web Socket"-like 
+# wrap a TCP socket (provided by node.js's net module) in a "Web Socket"-like
 # object
-wrapTCP= (port, host) ->
-  
+wrapTCP = (port, host) ->
+
   # the raw TCP socket
   socket = null
 
@@ -44,10 +44,10 @@ wrapTCP= (port, host) ->
 
   return ws
 
-# wrap a Web Socket connection (provided by the websocket npm module) in a "Web 
+# wrap a Web Socket connection (provided by the websocket npm module) in a "Web
 # Socket"-like object
-wrapWS= (url) ->
-  
+wrapWS = (url) ->
+
   WebSocketClient = require('websocket').client
 
   # the underlying connection that will be wrapped
@@ -59,7 +59,7 @@ wrapWS= (url) ->
     send: (d) -> connection.sendUTF(d)
     close: ->connection.close()
   }
-  
+
   socket = new WebSocketClient()
   socket.on 'connect', (conn) ->
     connection = conn
