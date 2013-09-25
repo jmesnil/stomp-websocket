@@ -1,6 +1,11 @@
 Stomp = require('./stomp')
 net   = require('net')
 
+Stomp.Stomp.setInterval = (interval, f) ->
+    setInterval f, interval
+Stomp.Stomp.clearInterval = (id) ->
+    clearInterval id
+
 wrapTCP= (port, host) ->
   socket = null
 

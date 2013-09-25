@@ -131,11 +131,11 @@ class Client
   #     };
   debug: (message) ->
     window?.console?.log message
-    
+      
   # Utility method to get the current timestamp (Date.now is not defined in IE8)
   now= ->
     Date.now || new Date().valueOf
-
+  
   # Base method to transmit any stomp frame
   _transmit: (command, headers, body) ->
     out = Frame.marshall(command, headers, body)
@@ -162,21 +162,19 @@ class Client
     unless @heartbeat.outgoing == 0 or serverIncoming == 0
       ttl = Math.max(@heartbeat.outgoing, serverIncoming)
       @debug? "send PING every #{ttl}ms"
-      @pinger = window?.setInterval(=>
+      @pinger = Stomp.setInterval ttl, =>
         @ws.send Byte.LF
         @debug? ">>> PING"
-      , ttl)
 
     unless @heartbeat.incoming == 0 or serverOutgoing == 0
       ttl = Math.max(@heartbeat.incoming, serverOutgoing)
       @debug? "check PONG every #{ttl}ms"
-      @ponger = window?.setInterval(=>
+      @ponger = Stomp.setInterval ttl, =>
         delta = now() - @serverActivity
         # We wait twice the TTL to be flexible on window's setInterval calls
         if delta > ttl * 2
           @debug? "did not receive server activity for the last #{delta}ms"
           @ws.close()
-      , ttl)
 
   # parse the arguments number and type to find the headers, connectCallback and
   # (eventually undefined) errorCallback
@@ -303,8 +301,8 @@ class Client
   # send heart beats in a timely fashion
   _cleanUp: () ->
     @connected = false
-    window?.clearInterval(@pinger) if @pinger
-    window?.clearInterval(@ponger) if @ponger
+    Stomp.clearInterval @pinger if @pinger
+    Stomp.clearInterval @ponger if @ponger
 
   # [SEND Frame](http://stomp.github.com/stomp-specification-1.1.html#SEND)
   #
@@ -481,6 +479,10 @@ Stomp =
 
 # export in the Web Browser
 if window?
+  Stomp.setInterval= (interval, f) ->
+    window.setInterval f, interval
+  Stomp.clearInterval= (id) ->
+    window.clearInterval id
   window.Stomp = Stomp
 # or as module (for tests only)
 else if exports?
