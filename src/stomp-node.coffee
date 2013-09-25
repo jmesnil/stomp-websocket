@@ -16,10 +16,10 @@ wrapTCP= (port, host) ->
   socket.on 'data', (data) ->
     event = {
       'data': data.toString()
-    };
+    }
     ws.onmessage(event)
 
-  return ws;
+  return ws
 
 wrapWS= (url) ->
   WebSocketClient = require('websocket').client
