@@ -490,5 +490,5 @@ else
   self.Stomp = Stomp
   Stomp.setInterval = (interval, f) =>
     self.setInterval f, interval
-  Stomp.clearInterval = (interval, f) =>
-    self.clearInterval f, interval
+  Stomp.clearInterval = (id) =>
+    self.clearInterval id
