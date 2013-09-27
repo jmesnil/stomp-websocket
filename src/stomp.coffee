@@ -488,3 +488,7 @@ else if exports?
 # or in the current object (e.g. a WebWorker)
 else
   self.Stomp = Stomp
+  Stomp.setInterval = (interval, f) =>
+    self.setInterval f, interval
+  Stomp.clearInterval = (interval, f) =>
+    self.clearInterval f, interval
