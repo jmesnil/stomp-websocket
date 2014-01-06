@@ -47,3 +47,12 @@ test("only the 1st value of repeated headers is used", function() {
 
   equals(Stomp.Frame.unmarshall(msg)[0].headers['foo'], 'World');
 });
+
+test("Content length of UTF-8 strings", function() {
+  equals(0,  Stomp.Frame.sizeOfUTF8());
+  equals(0,  Stomp.Frame.sizeOfUTF8(""));
+  equals(1,  Stomp.Frame.sizeOfUTF8("a"));
+  equals(2,  Stomp.Frame.sizeOfUTF8("ф"));
+  equals(3,  Stomp.Frame.sizeOfUTF8("№"));
+  equals(15, Stomp.Frame.sizeOfUTF8("1 a ф № @ ®"));
+});

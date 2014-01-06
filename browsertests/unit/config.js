@@ -4,7 +4,7 @@ $(document).ready(function(){
     destination : "/topic/chat.general",
     login : "admin",
     password : "password",
-    url : "ws://localhost:61623",
+    url : "ws://localhost:61614",
     badUrl: "ws://localhost:61625",
     timeout: 2000,
     debug : function(str) {

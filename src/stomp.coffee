@@ -38,9 +38,17 @@ class Frame
     lines = [@command]
     for own name, value of @headers
       lines.push("#{name}:#{value}")
-    lines.push("content-length:#{('' + @body).length}") if @body
+    lines.push("content-length:#{Frame.sizeOfUTF8(@body)}") if @body
     lines.push(Byte.LF + @body)
     return lines.join(Byte.LF)
+
+  # Compute the size of a UTF-8 string by counting its number of bytes
+  # (and not the number of characters composing the string)
+  @sizeOfUTF8: (s)->
+    if s
+      encodeURI(s).split(/%..|./).length - 1
+    else
+      0
 
   # Unmarshall a single STOMP frame from a `data` string
   unmarshallSingle= (data) ->
