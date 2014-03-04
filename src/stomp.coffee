@@ -142,7 +142,7 @@ class Client
       
   # Utility method to get the current timestamp (Date.now is not defined in IE8)
   now= ->
-    Date.now || new Date().valueOf
+    if Date.now then Date.now() else new Date().valueOf
   
   # Base method to transmit any stomp frame
   _transmit: (command, headers, body) ->
