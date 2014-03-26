@@ -298,8 +298,8 @@ class Client
       @_transmit "CONNECT", headers
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
-  disconnect: (disconnectCallback) ->
-    @_transmit "DISCONNECT"
+  disconnect: (disconnectCallback, headers={}) ->
+    @_transmit "DISCONNECT", headers
     # Discard the onclose callback to avoid calling the errorCallback when
     # the client is properly disconnected.
     @ws.onclose = null
