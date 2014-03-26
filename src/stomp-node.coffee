@@ -65,7 +65,7 @@ wrapWS = (url) ->
     connection = conn
     ws.onopen()
     connection.on 'error', (error) -> ws.onclose?(error)
-    connection.on 'close', -> ws.onclose?(error)
+    connection.on 'close', -> ws.onclose?()
     connection.on 'message', (message) ->
       if message.type == 'utf8'
         event = {
