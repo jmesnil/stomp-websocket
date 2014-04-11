@@ -259,13 +259,13 @@ class Client
             onreceive = @subscriptions[subscription] or @onreceive
             if onreceive
               client = this
-              messageID = frame.headers["message-id"]
+              ackID= frame.headers["ack"]
               # add `ack()` and `nack()` methods directly to the returned frame
               # so that a simple call to `message.ack()` can acknowledge the message.
               frame.ack = (headers = {}) =>
-                client .ack messageID , subscription, headers
+                client .ack ackID , headers, frame.headers
               frame.nack = (headers = {}) =>
-                client .nack messageID, subscription, headers
+                client .nack ackID, headers, frame.headers
               onreceive frame
             else
               @debug? "Unhandled received MESSAGE: #{frame}"
@@ -401,9 +401,9 @@ class Client
       transaction: transaction
     }
   
-  # [ACK Frame](http://stomp.github.com/stomp-specification-1.1.html#ACK)
+  # [ACK Frame](http://stomp.github.com/stomp-specification-1.2.html#ACK)
   #
-  # * `messageID` & `subscription` are MANDATORY.
+  # * `ackID` is MANDATORY.
   #
   # It is preferable to acknowledge a message by calling `ack()` directly
   # on the message handled by a subscription callback:
@@ -416,14 +416,18 @@ class Client
   #       },
   #       {'ack': 'client'}
   #     );
-  ack: (messageID, subscription, headers = {}) ->
-    headers["message-id"] = messageID
-    headers.subscription = subscription
+  ack: (ackID, headers = {}, messageHeaders= {}) ->
+    # ackID is undefined for STOMP 1.1
+    headers["id"] = ackID if ackID
+    # to be compatible with STOMP 1.1, add the message's `message-id`
+    # and `subscription` headers if present
+    headers["message-id"] = messageHeaders["message-id"] if messageHeaders["message-id"]
+    headers["subscription"] = messageHeaders["subscription"] if messageHeaders["subscription"]
     @_transmit "ACK", headers
 
-  # [NACK Frame](http://stomp.github.com/stomp-specification-1.1.html#NACK)
+  # [NACK Frame](http://stomp.github.com/stomp-specification-1.2.html#NACK)
   #
-  # * `messageID` & `subscription` are MANDATORY.
+  # * `ackID` is MANDATORY.
   #
   # It is preferable to nack a message by calling `nack()` directly on the
   # message handled by a subscription callback:
@@ -436,9 +440,13 @@ class Client
   #       },
   #       {'ack': 'client'}
   #     );
-  nack: (messageID, subscription, headers = {}) ->
-    headers["message-id"] = messageID
-    headers.subscription = subscription
+  nack: (ackID, headers = {}, messageHeaders= {}) ->
+    # ackID is undefined for STOMP 1.1
+    headers["id"] = ackID if ackID
+    # to be compatible with STOMP 1.1, add the message's `message-id`
+    # and `subscription` headers if present
+    headers["message-id"] = messageHeaders["message-id"] if messageHeaders["message-id"]
+    headers["subscription"] = messageHeaders["subscription"] if messageHeaders["subscription"]
     @_transmit "NACK", headers
 
 # ##The `Stomp` Object
@@ -450,7 +458,7 @@ Stomp =
 
     # Versions of STOMP specifications supported
     supportedVersions: ->
-      '1.1,1.0'
+      '1.2,1.1,1.0'
 
   # This method creates a WebSocket client that is connected to
   # the STOMP server located at the url.
