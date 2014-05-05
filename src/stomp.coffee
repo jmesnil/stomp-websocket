@@ -36,9 +36,13 @@ class Frame
   # suitable to be sent to the server
   toString: ->
     lines = [@command]
+    if @headers["content-length"] == false
+      skipContentLength = true
+      delete @headers["content-length"]
     for own name, value of @headers
       lines.push("#{name}:#{value}")
-    lines.push("content-length:#{Frame.sizeOfUTF8(@body)}") if @body
+    if @body && skipContentLength == false
+      lines.push("content-length:#{Frame.sizeOfUTF8(@body)}")
     lines.push(Byte.LF + @body)
     return lines.join(Byte.LF)
 

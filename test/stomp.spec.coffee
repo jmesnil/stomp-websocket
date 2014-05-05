@@ -40,7 +40,19 @@ describe "Stomp", ->
       client.send("/queue/test", {}, message)
     )
     waitsFor -> message
-    runs -> expect(client.ws.messages).toContain(message)
+    runs -> expect(client.ws.messages.pop().toString()).toContain(message)
+
+  
+  it "lets you publish a message without content-length header to a destination", ->
+    client = Stomp.client("ws://mocked/stomp/server")
+    message = null
+    client.connect("guest", "guest", ->
+      message = "Hello world!"
+      client.send("/queue/test", {"content-length": false}, message)
+    )
+    waitsFor -> message
+    runs -> expect(client.ws.messages.pop().toString()).not.toContain("content-length")
+  
   
   it "lets you unsubscribe from a destination", ->
     client = Stomp.client("ws://mocked/stomp/server")

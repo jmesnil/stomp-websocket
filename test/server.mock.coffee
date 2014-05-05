@@ -67,7 +67,7 @@ class StompServerMock extends WebSocketMock
     if frame.headers.transaction
       @transactions[frame.headers.transaction].push(frame)
     else
-      @messages.push(frame.body)
+      @messages.push(frame)
 
   stomp_handle_subscribe: (frame) ->
     sub_id = frame.headers.id or Math.random()
