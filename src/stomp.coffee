@@ -50,7 +50,7 @@ class Frame
   # (and not the number of characters composing the string)
   @sizeOfUTF8: (s)->
     if s
-      encodeURI(s).split(/%..|./).length - 1
+      encodeURI(s).match(/%..|./g).length
     else
       0
 
