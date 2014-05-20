@@ -10,6 +10,11 @@ test("marshall a SEND frame", function() {
   equals(out, "SEND\ndestination:/queue/test\ncontent-length:13\n\nhello, world!\0");
 });
 
+test("marshall a SEND frame without content-length", function() {
+  var out = Stomp.Frame.marshall("SEND", {destination: '/queue/test', 'content-length': false}, "hello, world!");
+  equals(out, "SEND\ndestination:/queue/test\n\nhello, world!\0");
+});
+
 test("unmarshall a CONNECTED frame", function() {
   var data = "CONNECTED\nsession-id: 1234\n\n\0";
   var frame = Stomp.Frame.unmarshall(data)[0];
