@@ -486,6 +486,10 @@ Stomp =
 
 # # `Stomp` object exportation
 
+# export as CommonJS module
+if exports?
+  exports.Stomp = Stomp
+
 # export in the Web Browser
 if window?
   # in the Web browser, rely on `window.setInterval` to handle heart-beats
@@ -494,9 +498,6 @@ if window?
   Stomp.clearInterval= (id) ->
     window.clearInterval id
   window.Stomp = Stomp
-# or as module (for tests only)
-else if exports?
-  exports.Stomp = Stomp
 # or in the current object (e.g. a WebWorker)
-else
+else if !exports
   self.Stomp = Stomp
