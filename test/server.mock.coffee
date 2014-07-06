@@ -7,7 +7,7 @@ class StompServerMock extends WebSocketMock
   # WebSocketMock handlers
   
   handle_send: (msg) =>
-    @stomp_dispatch(Stomp.Frame.unmarshall(msg)[0])
+    @stomp_dispatch(Stomp.Frame.unmarshall(msg).frames[0])
   
   handle_close: =>
     @_shutdown()
