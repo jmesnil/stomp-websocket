@@ -314,23 +314,25 @@ class Client
             errorCallback?(frame)
           else
             @debug? "Unhandled frame: #{frame}"
-    @ws.onclose   = =>
-      msg = "Whoops! Lost connection to #{@ws.url}"
+    @ws.onclose = (event) =>
+      msg = if event.reason then event.reason else "Whoops! Lost connection to #{@ws.url}"
       @debug?(msg)
       @_cleanUp()
-      errorCallback?(msg)
+      unless event.wasClean
+        errorCallback?(msg)
     @ws.onopen    = =>
       @debug?('Web Socket Opened...')
       headers["accept-version"] = Stomp.VERSIONS.supportedVersions()
       headers["heart-beat"] = [@heartbeat.outgoing, @heartbeat.incoming].join(',')
       @_transmit "CONNECT", headers
+    if errorCallback
+      @ws.onerror = (event) =>
+        errorCallback(event)
 
   # [DISCONNECT Frame](http://stomp.github.com/stomp-specification-1.1.html#DISCONNECT)
   disconnect: (disconnectCallback, headers={}) ->
     @_transmit "DISCONNECT", headers
     # Discard the onclose callback to avoid calling the errorCallback when
-    # the client is properly disconnected.
-    @ws.onclose = null
     @ws.close()
     @_cleanUp()
     disconnectCallback?()

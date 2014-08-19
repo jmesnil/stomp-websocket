@@ -34,8 +34,8 @@ wrapTCP = (port, host) ->
   }
 
   socket = net.connect port, host, (e) -> ws.onopen()
-  socket.on 'error', (e) -> ws.onclose?(e)
-  socket.on 'close', (e) -> ws.onclose?(e)
+  socket.on 'error', (e) -> ws.onerror?(e)
+  socket.on 'close', (e) -> ws.onclose?({wasClean: !e})
   socket.on 'data', (data) ->
     event = {
       'data': data.toString()
@@ -64,8 +64,8 @@ wrapWS = (url) ->
   socket.on 'connect', (conn) ->
     connection = conn
     ws.onopen()
-    connection.on 'error', (error) -> ws.onclose?(error)
-    connection.on 'close', -> ws.onclose?()
+    connection.on 'error', (error) -> ws.onerror?(error)
+    connection.on 'close', (event) -> ws.onclose?(event)
     connection.on 'message', (message) ->
       if message.type == 'utf8'
         event = {
