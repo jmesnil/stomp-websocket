@@ -2,6 +2,12 @@
 
 This library provides a STOMP client for Web browser (using Web Sockets) or node.js applications (either using raw TCP sockets or Web Sockets).
 
+# Project Status
+
+__This project is _no longer maintained_ ([some context about this decision](http://jmesnil.net/weblog/2015/09/04/stepping-out-from-personal-open-source-projects/)).__
+
+__If you encounter bugs with it or need enhancements, you can fork it and modify it as the project is under the Apache License 2.0.__
+
 ## Web Browser support
 
 The library file is located in `lib/stomp.js` (a minified version is available in `lib/stomp.min.js`).
